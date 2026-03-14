@@ -15,7 +15,8 @@ UCI PhD dissertation in LaTeX using the `ucithesis` document class.
 
 ```
 main.tex                  root document
-preliminaries.tex         title, abstract, CV, committee — fill in all TODOs
+preliminaries.tex         title, abstract, committee metadata
+vita.tex                  curriculum vitae (included via \input{vita} in main.tex)
 thesis-style.sty          custom macros; add all personal commands here
 thesis.bib                BibTeX bibliography database
 Makefile                  build system

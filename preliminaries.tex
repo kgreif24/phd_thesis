@@ -1,4 +1,4 @@
-\thesistitle{Title of the Thesis}
+\thesistitle{A High and Variable Dimensional Measurement of the $Z$+jets Differential Cross Section with the ATLAS Experiment and Aritifical Intelligence}
 
 %"Dissertation" for PhD, "Thesis" for master's
 \documenttitle{Dissertation}
@@ -7,21 +7,21 @@
 
 % Use the wording given in the official list of degrees awarded by UCI:
 % http://www.rgs.uci.edu/grad/academic/degrees_offered.htm
-\degreefield{Computer Science}
+\degreefield{Physics and Astronomy}
 
 % Your name as it appears on official UCI records.
-\authorname{Your name}
+\authorname{Kevin Greif}
 
 % Use the full name of each committee member and full title 
 % (e.g. Professor/Associate Professor).
-\committeechair{Professor A}
+\committeechair{Daniel Whiteson}
 \othercommitteemembers
 {
-  Assistant Professor B\\
-  Associate Professor C
+  Andrew Lankford \\
+  Jonathan Feng
 }
 
-\degreeyear{2012}
+\degreeyear{2026}
 
 \copyrightdeclaration
 {
@@ -44,7 +44,7 @@
 {
   (Optional dedication page)
   
-  To ...
+  To Dario Amodei mostly I guess?
 }
 
 \acknowledgments
@@ -63,87 +63,14 @@
 }
 
 
-% Some custom commands for your list of publications and software.
-\newcommand{\mypubentry}[3]{
-  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}p{4.5in}r}
-    \textbf{#1} & \textbf{#2} \\ 
-    \multicolumn{2}{@{\extracolsep{\fill}}p{.95\textwidth}}{#3}\vspace{6pt} \\
-  \end{tabular*}
-}
-\newcommand{\mysoftentry}[3]{
-  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
-    \textbf{#1} & \url{#2} \\
-    \multicolumn{2}{@{\extracolsep{\fill}}p{.95\textwidth}}
-    {\emph{#3}}\vspace{-6pt} \\
-  \end{tabular*}
-}
-
-% Include, at minimum, a listing of your degrees and educational
-% achievements with dates and the school where the degrees were
-% earned. This should include the degree currently being
-% attained. Other than that it's mostly up to you what to include here
-% and how to format it, below is just an example.
-%
-% CV is required for PhD theses, but not Master's
-% comment out to exclude
-\curriculumvitae
-{
-
-\textbf{EDUCATION}
-  
-  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
-    \textbf{Doctor of Philosophy in Computer Science} & \textbf{2012} \\
-    \vspace{6pt}
-    University name & \emph{City, State} \\
-    \textbf{Bachelor of Science in Computational Sciences} & \textbf{2007} \\
-    \vspace{6pt}
-    Another university name & \emph{City, State} \\
-  \end{tabular*}
-
-\vspace{12pt}
-\textbf{RESEARCH EXPERIENCE}
-
-  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
-    \textbf{Graduate Research Assistant} & \textbf{2007--2012} \\
-    \vspace{6pt}
-    University of California, Irvine & \emph{Irvine, California} \\
-  \end{tabular*}
-
-\vspace{12pt}
-\textbf{TEACHING EXPERIENCE}
-
-  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
-    \textbf{Teaching Assistant} & \textbf{2009--2010} \\
-    \vspace{6pt}
-    University name & \emph{City, State} \\
-  \end{tabular*}
-
-\pagebreak
-
-\textbf{REFEREED JOURNAL PUBLICATIONS}
-
-  \mypubentry{Ground-breaking article}{2012}{Journal name}
-
-\vspace{12pt}
-\textbf{REFEREED CONFERENCE PUBLICATIONS}
-
-  \mypubentry{Awesome paper}{Jun 2011}{Conference name}
-  \mypubentry{Another awesome paper}{Aug 2012}{Conference name}
-
-\vspace{12pt}
-\textbf{SOFTWARE}
-
-  \mysoftentry{Magical tool}{http://your.url.here/}
-  {C++ algorithm that solves TSP in polynomial time.}
-
-}
+% Curriculum vitae is in vita.tex, which is \input into main.tex.
 
 % The abstract was previously limited to a maximum of 350 words, 
 % but the UCI manual at https://etd.lib.uci.edu/electronic/td2e#2.2.1.
 % currently does not indicate that there is any word limit for the abstract
 \thesisabstract
 {
-  The abstract of your contribution goes here.
+  Proton-proton collisions at the Large Hadron Collider (LHC) offer the opportunity to observe the interactions of fundamental particles at very high energy scales. The high collision rate and large number of final state particles produced per collision imply that the datasets produced by detectors such as the ATLAS experiment are large and highly dimensional. The complexity of these datasets calls for the use of novel data analysis techniques which can exploit all of the available information to illuminate known interactions and search for new ones. This thesis presents applications of artifical intelligence (AI) techniques to improve the physics results of the ATLAS experiment. It centers on a full phase measurement of the Z+jets production cross section at the LHC, where the cross section is measured differential in the kinematics of every final state charged particle through the use of an AI based unfolding algorithm. This is the first such measurement performed at the LHC, which provides a complete experimental characterisation of the Z+jets production process and a proof-of-principle for the further pursuit of such measurements on a host of LHC processes.
 }
 
 

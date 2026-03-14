@@ -1,0 +1,195 @@
+% ============================================================
+% vita.tex -- Curriculum Vitae for the UCI thesis
+%
+% The \curriculumvitae{} macro (defined in ucithesis.cls) stores
+% its argument and renders it on the VITA preliminary page.
+% This file is \input into main.tex before \begin{document}.
+%
+% UCI requirement: include at minimum education (with dates and
+% institutions) plus the degree currently being attained.
+% ============================================================
+
+% ----------------------------------------------------------
+% Helper commands used only in the vita
+% ----------------------------------------------------------
+
+% \vitaentry{Title}{Date(s)}{Description}
+% Produces a two-column entry: bold title flush-left, bold date flush-right,
+% followed by an italic description.
+\newcommand{\vitaentry}[3]{%
+  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
+    \textbf{#1} & \textbf{#2}
+  \end{tabular*}\\[-0.3em]
+  \textit{#3}\vspace{0.8em}
+}
+
+% \pubentry{Authors}{Title}{Venue}{Year}
+% Single numbered publication entry.
+\newcommand{\pubentry}[4]{\item #1. ``#2''. #3, #4.}
+
+% ----------------------------------------------------------
+% Vita content
+% ----------------------------------------------------------
+
+\curriculumvitae{
+
+% --- Education ---
+\textbf{EDUCATION}
+\vspace{0.5em}
+
+\vitaentry{Doctor of Philosophy in Physics and Astronomy}{2026}%
+  {University of California, Irvine \hfill Irvine, California \\
+   Advisor: Daniel Whiteson}
+
+\vitaentry{Bachelor of Science, Magna Cum Laude}{2020}%
+  {University of Notre Dame \hfill Notre Dame, Indiana \\
+   Majors: Physics and Program of Liberal Studies}
+
+\vspace{0.5em}
+
+% --- Research Experience ---
+\textbf{RESEARCH EXPERIENCE}
+\vspace{0.5em}
+
+\vitaentry{Foundation models for particle physics}{Ongoing}%
+  {Researched the application of pre-trained foundation models in particle physics. Compared their performance to equivariant neural networks, and investigated the proper composition of pre-training data to optimize scaling laws.}
+
+\vitaentry{Artificial Intelligence based unfolding}{Ongoing}%
+  {Developed novel unfolding methods based on generative models
+   and contributed to community comparison studies. Studied the use of
+   unbinned, highly differential cross section measurements for parameter
+   estimation. Deployed Artificial Intelligence based unfolding to perform a
+   hyper-differential cross section measurement of $Z$+jets production
+   with the ATLAS detector.}
+
+\vitaentry{Constituent based top tagging}{2022--2024}%
+  {Benchmarked several constituent top-tagging algorithms on realistic detector
+   simulation. Assessed systematic uncertainties in tagger performance.
+   Prepared research-grade open data records for use by the broader particle
+   physics community.}
+
+\vitaentry{Calibration of the ATLAS New Small Wheel}{2022--2023}%
+  {Calibrated the peak detector output (PDO) readout used in the ATLAS New Small
+   Wheel muon detector. Participated in detector operations during Run 3.}
+
+\vitaentry{Physics inspired neural networks}{2018--2020}%
+  {Deployed a physically motivated neural network architecture on a
+   classification problem in particle physics.}
+
+\vitaentry{CMS track trigger development}{2017--2019}%
+  {Improved the efficiency of cuts on track candidates in the CMS experiment's
+   track trigger algorithm.}
+
+\vspace{0.5em}
+
+% --- Publications ---
+\textbf{SELECTED PUBLICATIONS}
+\vspace{0.5em}
+
+{\small Only includes papers in which I made a significant contribution,
+in reverse chronological order.}
+\vspace{0.3em}
+
+\begin{enumerate}
+  \pubentry{V.~Breso-Pla et al.}%
+    {Explicit or Implicit? Encoding Physics at the Precision Frontier}%
+    {\textit{Preprint:} arXiv:2603.08802}{2026}
+  \pubentry{A.~Petitjean et al.}%
+    {Generative unfolding of jets and their substructure}%
+    {\textit{Preprint:} arXiv:2510.19906}{2025}
+  \pubentry{A.~Shmakov et al.}%
+    {Full event particle-level unfolding with variable-length latent variational diffusion}%
+    {\textit{SciPost Phys.}~18(4):117}{2025}
+  \pubentry{N.~Huetsch et al.}%
+    {The landscape of unfolding with machine learning}%
+    {\textit{SciPost Phys.}~18(2):070}{2025}
+  \pubentry{ATLAS Collaboration}%
+    {Accuracy versus precision in boosted top tagging with the ATLAS detector}%
+    {\textit{JINST}~19(08):P08018}{2024}
+  \pubentry{A.~Shmakov et al.}%
+    {End-to-end latent variational diffusion models for inverse problems in high energy physics}%
+    {\textit{NeurIPS Proceedings}}{2023}
+  \pubentry{K.~Greif and K.~Lannon}%
+    {Physics Inspired Deep Neural Networks for Top Quark Reconstruction}%
+    {\textit{EPJ Web Conf.}~245:6029}{2020}
+\end{enumerate}
+
+\vspace{0.5em}
+
+% --- Presentations ---
+\textbf{PRESENTATIONS}
+\vspace{0.5em}
+
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{2.2cm}p{0.78\textwidth}}
+  \textbf{Jul.\ 2025} & ``Forward folding versus unfolding in the age of ML'', \textit{ML4Jets 2025} \\[0.4em]
+  \textbf{Nov.\ 2024} & ``Full Event Particle-Level Unfolding with Variable Length Variational Latent Diffusion'', \textit{ML4Jets 2024} \\[0.4em]
+  \textbf{Nov.\ 2023} & ``Systematic Effects in Jet Tagging Performance for the ATLAS Detector'', \textit{ML4Jets 2023} \\[0.4em]
+  \textbf{Nov.\ 2023} & ``End-to-End Latent Variational Diffusion Models for Unfolding LHC Events'', \textit{ML4Jets 2023} \\[0.4em]
+  \textbf{Nov.\ 2022} & ``Constituent-Based Top-Quark Tagging with the ATLAS Detector'', \textit{ML4Jets 2022} \\[0.4em]
+  \textbf{Nov.\ 2019} & ``Physics Inspired Deep Neural Networks for Top Quark Reconstruction'', \textit{CHEP 2019} \\[0.4em]
+\end{tabular*}
+
+\vspace{0.5em}
+
+% --- Appointments & Memberships ---
+\textbf{APPOINTMENTS AND MEMBERSHIPS}
+\vspace{0.5em}
+
+\vitaentry{ATLAS Early Career Scientist Board}{2024--Present}%
+  {Advocate for the interests of early career scientists within the ATLAS
+   collaboration. Organize educational and career development events.}
+
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
+  \textbf{Phi Beta Kappa Society}  & \textbf{2020--Present} \\
+  \textbf{Sigma Pi Sigma Society}  & \textbf{2020--Present} \\
+\end{tabular*}
+
+\vspace{0.5em}
+
+% --- Awards ---
+\textbf{AWARDS}
+\vspace{0.5em}
+
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{0.55\textwidth}r}
+  \textbf{Outstanding Physics Major}  & \textbf{2020} \\
+  \multicolumn{2}{p{0.95\textwidth}}{\textit{Physics Department, University of Notre Dame}} \\[0.4em]
+  \textbf{Paul Chagnon Award in Physics}  & \textbf{2020} \\
+  \multicolumn{2}{p{0.95\textwidth}}{\textit{Physics Department, University of Notre Dame --- recognizing service to the department and fellow students}} \\[0.4em]
+  \textbf{Edward J.\ Cronin Award}  & \textbf{2020} \\
+  \multicolumn{2}{p{0.95\textwidth}}{\textit{Program of Liberal Studies, University of Notre Dame --- awarded for the finest piece of written work submitted in an academic year}} \\[0.4em]
+  \textbf{Hichwa Fellowship}  & \textbf{2019} \\
+  \multicolumn{2}{p{0.95\textwidth}}{\textit{Physics Department, University of Notre Dame}} \\
+\end{tabular*}
+
+\vspace{0.5em}
+
+% --- Teaching ---
+\textbf{TEACHING EXPERIENCE}
+\vspace{0.5em}
+
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
+  \textbf{Teaching Assistant, University of California, Irvine} & \textbf{2020--2021} \\
+\end{tabular*}
+
+\begin{itemize}
+  \item Physics 3A (Mechanics), Fall 2021
+  \item Physics 3LB (Electricity and Magnetism Lab), Spring 2021
+  \item Physics 7LC (Mechanics Lab), Winter 2021
+  \item Physics 2 (Mathematical Methods in Physics), Fall 2020
+  \item Computational Methods in Physics, Spring 2020
+\end{itemize}
+
+\vspace{0.5em}
+
+% --- Outreach ---
+\textbf{OUTREACH}
+\vspace{0.5em}
+
+\vitaentry{ATLAS Virtual Visit Tour Guide}{2022--2025}%
+  {Remote visits to the ATLAS experiment for students from around the world.}
+
+\vitaentry{UCI Physics and Astronomy Blog}{2020--2022}%
+  {Published accessible descriptions of new research from the UCI physics
+   department.}
+
+} % end \curriculumvitae
