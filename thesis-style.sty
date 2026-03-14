@@ -1,0 +1,80 @@
+% ============================================================
+% thesis-style.sty -- Custom commands for the PhD dissertation
+% ============================================================
+% This file is the right place for:
+%   - Field-specific math macros and notation shortcuts
+%   - Custom figure/table environments
+%   - Any other personal LaTeX conveniences
+%
+% NOTE: cleveref is loaded here because it MUST be the very
+%       last package loaded. Do not \usepackage{cleveref} in
+%       main.tex or any chapter file.
+% ============================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis-style}[2026/03/14 PhD thesis custom commands]
+
+% ----------------------------------------------------------
+% cleveref -- smart cross-references
+% Always use \cref{} / \Cref{} instead of bare \ref{}.
+% capitalize: "Figure" not "figure" at start of sentence -> \Cref
+% ----------------------------------------------------------
+\usepackage[capitalize, noabbrev]{cleveref}
+
+% ----------------------------------------------------------
+% Accessibility: figures
+%
+% UCI requires accessible PDFs. Every \includegraphics MUST
+% have an `alt` key with a descriptive text alternative.
+% The tagpdf package enables this key.
+%
+% Usage:
+%   \begin{figure}
+%     \centering
+%     \includegraphics[width=\linewidth, alt={Description of figure}]{figures/ch1/myplot}
+%     \caption{Caption text.}
+%     \label{fig:myplot}
+%   \end{figure}
+%
+% If you forget the alt= key, you will get a tagpdf warning.
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Accessibility: tables
+%
+% UCI manual §2.9.1: table numbers and titles go ABOVE each table.
+% Always use:
+%   \begin{table}
+%     \caption{Title above.}   <-- caption BEFORE tabular
+%     \label{tab:foo}
+%     \begin{tabular}{...}
+%       \toprule
+%       ...
+%       \bottomrule
+%     \end{tabular}
+%   \end{table}
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Math notation -- add your field-specific macros below
+% ----------------------------------------------------------
+
+% Example shortcuts (delete and replace with your own):
+\newcommand{\R}{\mathbb{R}}          % real numbers
+\newcommand{\N}{\mathbb{N}}          % natural numbers
+\newcommand{\Z}{\mathbb{Z}}          % integers
+\newcommand{\E}{\mathbb{E}}          % expectation
+\newcommand{\Prob}{\mathbb{P}}       % probability
+\newcommand{\norm}[1]{\left\|#1\right\|}          % norm
+\newcommand{\abs}[1]{\left|#1\right|}             % absolute value
+\newcommand{\inner}[2]{\langle #1,\, #2 \rangle}  % inner product
+
+% Operators
+\DeclareMathOperator{\argmin}{arg\,min}
+\DeclareMathOperator{\argmax}{arg\,max}
+\DeclareMathOperator{\tr}{tr}        % trace
+\DeclareMathOperator{\rank}{rank}
+
+% ----------------------------------------------------------
+% Add your own macros below this line
+% ----------------------------------------------------------
