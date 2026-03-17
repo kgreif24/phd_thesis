@@ -1,4 +1,3 @@
-
 \chapter{Introduction}
 \label{ch:intro}
 
@@ -78,7 +77,71 @@ The most important observations are:
         \textbf{Neutrino oscillations}: Neutrinos are massless under the Standard Model. However many iterations of neutrino experiments have verified that these particles ``oscillate'' between the three neutrino flavors as they propagate through space. This phenomenon is easily explained if the neutrinos carry a mass that is small enough to remain currently undetected by experiments, but the mechanism that produces this mass is unknown. This fascinating topic is not covered at all in this thesis, but current and next generation neutrino experiments are making active use of deep learning.
     }
     \item{
-        \textbf{Dark matter}: 
+        \textbf{Dark matter}: A wide range of astrophysical and cosmological observations---galaxy rotation curves~\cite{Rubin:1970zza}, gravitational lensing, and the large-scale structure of the cosmic microwave background---indicate that roughly 27\% of the energy budget of the universe is composed of a non-luminous, non-baryonic form of matter.
+        The Standard Model contains no candidate particle that could account for this ``dark matter''.
+        Weakly Interacting Massive Particles (WIMPs) remain the most theoretically motivated candidate, but decades of direct detection experiments have returned null results, strongly constraining the simplest models.
+        The LHC continues to search for dark matter production in missing-transverse-energy signatures, and deep learning has become an essential tool for both model-specific searches and model-agnostic anomaly detection approaches.
+    }
+    \item{
+        \textbf{Matter--antimatter asymmetry}: The Standard Model predicts that the Big Bang should have produced equal amounts of matter and antimatter, yet the observable universe is composed overwhelmingly of matter.
+        The known sources of CP violation in the Standard Model---the complex phase in the CKM quark mixing matrix and, to a lesser extent, the strong CP phase discussed below---are far too small to account for the observed asymmetry by many orders of magnitude~\cite{Sakharov:1967dj}.
+        A new source of CP violation beyond the Standard Model is therefore required, and identifying it is one of the central motivations for precision flavor physics experiments such as LHCb and Belle~II.
+    }
+    \item{
+        \textbf{Gravity}: General relativity provides an extraordinarily accurate classical description of gravity, yet all attempts to construct a consistent quantum field theory of gravity have so far failed.
+        At the energy scales probed by the LHC ($\mathcal{O}$(TeV)) gravitational effects are negligible, so this is not a direct experimental puzzle for collider physics, but it represents the deepest incompleteness of our theoretical framework.
+        Any truly unified description of nature must reconcile quantum mechanics and general relativity.
+    }
+    \item{
+        \textbf{Hubble tension}: Two independent classes of measurement---the cosmic microwave background~\cite{Planck:2018vyg} and local distance-ladder observations~\cite{Riess:2021jrx}---yield values of the Hubble constant $H_0$ that disagree at the 4--5$\sigma$ level.
+        Whether this tension reflects unaccounted systematic uncertainties or genuinely new physics beyond $\Lambda$CDM remains unresolved.
+        If it is the latter, it would represent one of the clearest signals of beyond-Standard-Model physics in the cosmological sector.
+    }
+    \item{
+        \textbf{Origin of the BAO scale}: Baryon Acoustic Oscillations (BAO)---the preferred clustering scale of galaxies imprinted by sound waves in the early universe---provide a powerful cosmological standard ruler.
+        While the BAO scale is well measured and its physics within $\Lambda$CDM is well understood, tensions are beginning to emerge in BAO measurements from next-generation surveys such as DESI~\cite{DESI:2024mwx}.
+        Understanding whether these tensions point to new physics in dark energy or the early universe is an active area of investigation.
+    }
+\end{enumerate}
+
+The theoretical open problems are in some sense more troubling, because they are not observations that contradict the Standard Model but rather deep aesthetic and structural puzzles that suggest the theory is incomplete in ways that experiments have not yet confirmed.
+
+\begin{enumerate}
+    \item{
+        \textbf{The hierarchy problem}: The Higgs boson mass receives quantum corrections from every particle it couples to.
+        In the absence of fine-tuning or a symmetry protecting the Higgs mass, these corrections naturally drive the Higgs mass to the Planck scale ($\sim 10^{18}$~GeV), roughly 16 orders of magnitude above the observed value of 125~GeV.
+        Supersymmetry, compositeness, and extra dimensions are the most studied solutions, but none has been confirmed experimentally.
+        The absence of any BSM signal at the LHC has sharpened this ``naturalness'' tension considerably.
+    }
+    \item{
+        \textbf{The strong CP problem}: Quantum chromodynamics (QCD) admits a CP-violating term in the Lagrangian parameterized by $\bar{\theta}$.
+        Measurements of the neutron electric dipole moment constrain $|\bar{\theta}| \lesssim 10^{-10}$, yet there is no symmetry in the Standard Model that forces this parameter to be small.
+        The most elegant proposed solution---the Peccei--Quinn mechanism, which predicts a new pseudo-Goldstone boson called the axion~\cite{Peccei:1977hh,Weinberg:1977ma}---also happens to be a compelling dark matter candidate, and axion searches are a very active experimental program.
+    }
+    \item{
+        \textbf{The cosmological constant problem}: The observed energy density of the vacuum (dark energy) is roughly $10^{-47}$~GeV$^4$, yet naive estimates from quantum field theory predict a value $\sim 10^{120}$ times larger.
+        This is arguably the worst fine-tuning problem in all of physics, and no compelling dynamical mechanism has been found to explain the observed small but non-zero value of the cosmological constant.
+    }
+    \item{
+        \textbf{Accidental symmetries}: Several conservation laws of the Standard Model---baryon number $B$, and the individual lepton numbers $L_e$, $L_\mu$, $L_\tau$---are not imposed by the gauge structure of the theory but instead arise as ``accidental'' consequences of the field content and renormalizability.
+        There is no deep theoretical reason these symmetries must be exact, and many well-motivated BSM theories predict their violation at some level.
+        The experimental search for baryon-number violation (proton decay) and charged lepton flavor violation are active programs that would be unambiguous signs of new physics.
+    }
+    \item{
+        \textbf{Scale of Yukawa couplings and the PMNS matrix}: The fermion masses in the Standard Model span nearly 12 orders of magnitude---from the electron at 0.511~MeV to the top quark at 173~GeV---yet the Higgs mechanism provides no explanation for this hierarchy of Yukawa couplings.
+        Similarly, the neutrino mixing angles encoded in the PMNS matrix are large and apparently anarchic, in sharp contrast to the small mixing angles of the quark sector described by the CKM matrix.
+        Why these parameters take the values they do, and whether there is an underlying flavor symmetry that explains them, remains unknown.
+    }
+    \item{
+        \textbf{V-A structure of the weak interaction}: The weak interaction couples exclusively to left-handed fermions, a structure encoded in the $V-A$ (vector minus axial-vector) form of the weak current.
+        While this is experimentally well established, there is no deep theoretical explanation within the Standard Model for why the weak force singles out left-handedness.
+        Left-right symmetric extensions of the Standard Model restore parity at high energies, predicting new heavy gauge bosons, but none have been observed.
+    }
+    \item{
+        \textbf{Calculability of QCD}: Quantum chromodynamics is in principle a complete theory of the strong force, but asymptotic freedom means it is only perturbatively tractable at high energies.
+        At low energies---the regime of hadron masses, the proton structure, and non-perturbative QCD dynamics---the coupling becomes large and perturbation theory breaks down entirely.
+        Lattice QCD provides a systematic non-perturbative approach but is computationally expensive and limited in scope.
+        This difficulty is not merely academic: the ability to perform precise QCD calculations is a central bottleneck for extracting new physics signals from LHC data, and it is one of the most important problems that machine learning methods for unfolding and fast simulation aim to address.
     }
 \end{enumerate}
 
