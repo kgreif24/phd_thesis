@@ -37,9 +37,8 @@ Concurrently, most other sub-fields of physics have taken interest in applying d
 Cosmology, astrophysics, gravitational wave science, condensed matter physics, plasma physics, fluid dynamics, quantum information, and optical physics have all seen fruitful applications.
 There are few areas of active physics research that have not been effected by the AlexNet moment in some sense.
 While these applications have yet to produce a landmark discovery or new capability like the AlphaFold protein structure prediction model that was awarded the Nobel prize in chemisty in 2024, the breadth of these applications is a testatment to the power of deep learning for physics research.
-% \footnote{Despite this active interest deep learning has yet to produce significant breakthroughs in other sub-fields of physics as well as particle physics. In contrast, deep learning tools have already produced a Nobel Prize in chemistry, for the AlphaFold protein structure prediction model in 2024.}.
 
-In the remainder of the Introduction, I will outline the open problems in particle physics, and very briefly summarize the last 14 years of progress in machine learning and artificial intelligence.
+In the remainder of the Introduction, I will outline the open problems in fundamental physics\footnote{I generally refer to the fields of particle physics and cosmology as ``fundamental physics'', given open questions do not necessarily sort neatly into the two sub-fields.}, and very briefly summarize the last 14 years of progress in machine learning and artificial intelligence.
 This review serves two purposes.
 The first is to give context to the very specific research detailed in this thesis.
 The second is to reflect on the fact that all open problems in particle physics are long-standing, and that the list is essentially unchanged since the 2012 discovery of the Higgs.
@@ -64,86 +63,138 @@ The hope of this thesis, is that some of this dizzying progress can finally brea
 % and growing, but extracting its full physics potential requires
 % tools far beyond cut-based analyses.  This is where AI enters.
 
-\section{Open problems in particle physics}
+\section{Open Problems in Fundamental Physics}
 \label{sec:open_problems}
 
-The most pressing open problems in particle physics can be understood as the need for a better understanding of Beyond the Standard Model (BSM) physics.
+The most pressing open problems in fundamental physics can be understood as either the need for a better understanding of Beyond the Standard Model (BSM) physics, or evidence of Beyond $\Lambda$CDM cosmology.
 BSM physics is known to exist through multiple experimental observations that can not be explained by the particle content and forces contained in the Standard Model.
 However the correct quantum field theory (or other type of theory consistent with the existing Standard Model) that explains these observations is unknown.
-The most important observations are:
+$\Lambda$CDM cosmology accounts for all cosmological observations very well, with the exception of some significant tensions, namely the Hubble tension.
+My list of the open problems is as follows:
 
 \begin{enumerate}
     \item{
         \textbf{Neutrino oscillations}: Neutrinos are massless under the Standard Model. However many iterations of neutrino experiments have verified that these particles ``oscillate'' between the three neutrino flavors as they propagate through space. This phenomenon is easily explained if the neutrinos carry a mass that is small enough to remain currently undetected by experiments, but the mechanism that produces this mass is unknown. This fascinating topic is not covered at all in this thesis, but current and next generation neutrino experiments are making active use of deep learning.
     }
     \item{
-        \textbf{Dark matter}: A wide range of astrophysical and cosmological observations---galaxy rotation curves~\cite{Rubin:1970zza}, gravitational lensing, and the large-scale structure of the cosmic microwave background---indicate that roughly 27\% of the energy budget of the universe is composed of a non-luminous, non-baryonic form of matter.
+        \textbf{Dark matter}: A wide range of astrophysical and cosmological observations, including galaxy rotation curves~\cite{Rubin:1970zza}, gravitational lensing, and the large-scale structure of the cosmic microwave background, indicate that roughly 27\% of the energy budget of the universe is composed of a non-luminous, non-baryonic form of matter.
         The Standard Model contains no candidate particle that could account for this ``dark matter''.
-        Weakly Interacting Massive Particles (WIMPs) remain the most theoretically motivated candidate, but decades of direct detection experiments have returned null results, strongly constraining the simplest models.
-        The LHC continues to search for dark matter production in missing-transverse-energy signatures, and deep learning has become an essential tool for both model-specific searches and model-agnostic anomaly detection approaches.
+        Many BSM dark matter candidate particles have been proposed, but none has ever been observed in a particle physics experiment.
+        To the best of our knowledge, dark matter only interacts with the particles of the Standard Model through gravity.
     }
     \item{
         \textbf{Matter--antimatter asymmetry}: The Standard Model predicts that the Big Bang should have produced equal amounts of matter and antimatter, yet the observable universe is composed overwhelmingly of matter.
+        Introduction of this asymmetry requires breaking of the CP discrete symmetry.
         The known sources of CP violation in the Standard Model---the complex phase in the CKM quark mixing matrix and, to a lesser extent, the strong CP phase discussed below---are far too small to account for the observed asymmetry by many orders of magnitude~\cite{Sakharov:1967dj}.
-        A new source of CP violation beyond the Standard Model is therefore required, and identifying it is one of the central motivations for precision flavor physics experiments such as LHCb and Belle~II.
+        A new source of CP violation beyond the Standard Model is therefore required, but remains unknown.
     }
     \item{
-        \textbf{Gravity}: General relativity provides an extraordinarily accurate classical description of gravity, yet all attempts to construct a consistent quantum field theory of gravity have so far failed.
-        At the energy scales probed by the LHC ($\mathcal{O}$(TeV)) gravitational effects are negligible, so this is not a direct experimental puzzle for collider physics, but it represents the deepest incompleteness of our theoretical framework.
-        Any truly unified description of nature must reconcile quantum mechanics and general relativity.
+        \textbf{Gravity}: The gravitational interactions are not present within the Standard Model.
+        The general theory of relativity provides an extraodinarily accurate classical theory of gravity, but none of the attempts to quantize gravity and incoporate it with the other known forces has received experimental verification.
+        At the energy scales probed by the LHC ($\mathcal{O}$(TeV)) gravitational effects are negligible, so this is not a direct experimental puzzle for collider physics, but our everyday experience of the gravitational force is evidence of BSM physics.
     }
     \item{
-        \textbf{Hubble tension}: Two independent classes of measurement---the cosmic microwave background~\cite{Planck:2018vyg} and local distance-ladder observations~\cite{Riess:2021jrx}---yield values of the Hubble constant $H_0$ that disagree at the 4--5$\sigma$ level.
-        Whether this tension reflects unaccounted systematic uncertainties or genuinely new physics beyond $\Lambda$CDM remains unresolved.
-        If it is the latter, it would represent one of the clearest signals of beyond-Standard-Model physics in the cosmological sector.
+        \textbf{Origin of primordial density fluctuations}: The presence of the Baryon Acoustic Oscillation (BAO) peak in the CMB power spectrum is precisely predicted by $\Lambda$CDM cosmology, but requires the presence of primordial density perturbations to seed the oscillations.
+        The mechanism that formed these perturbations in the early universe is not known, though inflation provides a compelling framework which requires the presence of a BSM field.
+        Given there are competeing models and experimental evidence is scarce, this is less of a clean example of BSM physics than those listed above, but it is worth mentioning.
     }
     \item{
-        \textbf{Origin of the BAO scale}: Baryon Acoustic Oscillations (BAO)---the preferred clustering scale of galaxies imprinted by sound waves in the early universe---provide a powerful cosmological standard ruler.
-        While the BAO scale is well measured and its physics within $\Lambda$CDM is well understood, tensions are beginning to emerge in BAO measurements from next-generation surveys such as DESI~\cite{DESI:2024mwx}.
-        Understanding whether these tensions point to new physics in dark energy or the early universe is an active area of investigation.
+        \textbf{Hubble tension}: The Hubble constant is a parameter of the $\Lambda$CDM model of cosmology that determines the expansion rate of the universe.
+        This constant can be measured through two probes: the cosmic microwave background~\cite{Planck:2018vyg} and local distance-ladder observations~\cite{Riess:2021jrx}.
+        However these two approaches yield values of the Hubble constant $H_0$ that disagree at the 4--5$\sigma$ level.
+        This tension could only be caused by an unaccounted for systematic effect and is under very active research.
+        However if confirmed this would be a clear sign of beyond $\Lambda$CDM cosmology.
     }
 \end{enumerate}
 
-The theoretical open problems are in some sense more troubling, because they are not observations that contradict the Standard Model but rather deep aesthetic and structural puzzles that suggest the theory is incomplete in ways that experiments have not yet confirmed.
+In addition to open problems related to experimental observations, there are many more open problems related to the theory of the Standard Model and its possible extensions.
+To make them more tractable I would group them into three categories.
+The first, and arguably the most salient at this moment in particle physics, are related to ``fine-tunings'' of the free parameters of the Standard Model and $\Lambda$CDM.
+Whether these fine-tunings are true problems or only an issue of philosophical priors is often debated, but I find them troubling enough to deserve mention here.
 
 \begin{enumerate}
     \item{
         \textbf{The hierarchy problem}: The Higgs boson mass receives quantum corrections from every particle it couples to.
-        In the absence of fine-tuning or a symmetry protecting the Higgs mass, these corrections naturally drive the Higgs mass to the Planck scale ($\sim 10^{18}$~GeV), roughly 16 orders of magnitude above the observed value of 125~GeV.
-        Supersymmetry, compositeness, and extra dimensions are the most studied solutions, but none has been confirmed experimentally.
+        Given its difficult to imagine a quantum theory of gravity or generally any BSM model that doesn't couple to the Higgs directly or through loops, these quantum corrections should pull the Higgs mass up to the scale of the UV cutoff of the Standard Model.
+        Instead the Higgs has a mass of 125~GeV.
+        This requires either that the quantum corrections are cancelled by some new BSM physics near the electroweak scale, or that the scale of the corrections and the ``bare mass'' of the Higgs cancel nearly exactly despite their large size.
+        This is the canonical example of a fine-tuning.
+        Supersymmetry, compositeness, and extra dimensions are the most studied solutions to this problem, but none have been confirmed experimentally.
         The absence of any BSM signal at the LHC has sharpened this ``naturalness'' tension considerably.
     }
     \item{
-        \textbf{The strong CP problem}: Quantum chromodynamics (QCD) admits a CP-violating term in the Lagrangian parameterized by $\bar{\theta}$.
+        \textbf{The strong CP problem}: Quantum chromodynamics (QCD) admits a CP-violating term in the Standard Model Lagrangian parameterized by $\bar{\theta}$.
         Measurements of the neutron electric dipole moment constrain $|\bar{\theta}| \lesssim 10^{-10}$, yet there is no symmetry in the Standard Model that forces this parameter to be small.
-        The most elegant proposed solution---the Peccei--Quinn mechanism, which predicts a new pseudo-Goldstone boson called the axion~\cite{Peccei:1977hh,Weinberg:1977ma}---also happens to be a compelling dark matter candidate, and axion searches are a very active experimental program.
+        This is another fine-tuning problem, though less relevant to LHC physics.
     }
     \item{
         \textbf{The cosmological constant problem}: The observed energy density of the vacuum (dark energy) is roughly $10^{-47}$~GeV$^4$, yet naive estimates from quantum field theory predict a value $\sim 10^{120}$ times larger.
         This is arguably the worst fine-tuning problem in all of physics, and no compelling dynamical mechanism has been found to explain the observed small but non-zero value of the cosmological constant.
     }
+\end{enumerate}
+
+The second category consists of problems that are not fine-tunings, at least to the degree of the problems above, but are features of the Standard Model that in some sense ``feel odd''.
+Perosonally I don't discount such feelings as irrelevant as they have produced discoveries in the past\footnote{Dirac's prediction of the positron through aesthetic considerations about negative solutions to the Dirac equation is perhaps the most relevant one. The GIM mechanism is a particle physics example of how taking a fine-tuning seriously led to new discoveries (the charm quark).}.
+
+\begin{enumerate}
     \item{
-        \textbf{Accidental symmetries}: Several conservation laws of the Standard Model---baryon number $B$, and the individual lepton numbers $L_e$, $L_\mu$, $L_\tau$---are not imposed by the gauge structure of the theory but instead arise as ``accidental'' consequences of the field content and renormalizability.
-        There is no deep theoretical reason these symmetries must be exact, and many well-motivated BSM theories predict their violation at some level.
-        The experimental search for baryon-number violation (proton decay) and charged lepton flavor violation are active programs that would be unambiguous signs of new physics.
+        \textbf{The flavor puzzle}: The Standard Model contains three generations of quarks and leptons that share identical gauge quantum numbers but differ enormously in mass, with Yukawa couplings spanning nearly five orders of magnitude from the electron to the top quark.
+        No symmetry principle explains why there are exactly three generations, nor why the quark mixing angles (CKM matrix) are small while two of the neutrino mixing angles (PMNS matrix) are large.
+        These hierarchies and mixing patterns are encoded in 13 of the 19 free parameters of the Standard Model with no motivation for their values.
+        This is less of a fine-tuning and more of a structure that ``feels odd''.
+        Personally I don't discount such feelings as irrelevant
+        They have produced discoveries in the past.
     }
     \item{
-        \textbf{Scale of Yukawa couplings and the PMNS matrix}: The fermion masses in the Standard Model span nearly 12 orders of magnitude---from the electron at 0.511~MeV to the top quark at 173~GeV---yet the Higgs mechanism provides no explanation for this hierarchy of Yukawa couplings.
-        Similarly, the neutrino mixing angles encoded in the PMNS matrix are large and apparently anarchic, in sharp contrast to the small mixing angles of the quark sector described by the CKM matrix.
-        Why these parameters take the values they do, and whether there is an underlying flavor symmetry that explains them, remains unknown.
+        \textbf{Accidental symmetries}: Several conservation laws of the Standard Model, baryon number $B$, and the individual lepton numbers $L_e$, $L_\mu$, $L_\tau$, are not imposed by the symmetries of the theory.
+        Instead, they are accidents of the Standard Model gauge group, particle content, and renormalizability constraints.
+        The fact that they are present and seem to hold experimentally is another of the ``feels odd'' problems.
     }
     \item{
         \textbf{V-A structure of the weak interaction}: The weak interaction couples exclusively to left-handed fermions, a structure encoded in the $V-A$ (vector minus axial-vector) form of the weak current.
-        While this is experimentally well established, there is no deep theoretical explanation within the Standard Model for why the weak force singles out left-handedness.
-        Left-right symmetric extensions of the Standard Model restore parity at high energies, predicting new heavy gauge bosons, but none have been observed.
-    }
-    \item{
-        \textbf{Calculability of QCD}: Quantum chromodynamics is in principle a complete theory of the strong force, but asymptotic freedom means it is only perturbatively tractable at high energies.
-        At low energies---the regime of hadron masses, the proton structure, and non-perturbative QCD dynamics---the coupling becomes large and perturbation theory breaks down entirely.
-        Lattice QCD provides a systematic non-perturbative approach but is computationally expensive and limited in scope.
-        This difficulty is not merely academic: the ability to perform precise QCD calculations is a central bottleneck for extracting new physics signals from LHC data, and it is one of the most important problems that machine learning methods for unfolding and fast simulation aim to address.
+        Another way of stating this is that the weak interactions are maximally parity violating: the weak force would effect the dynamics of some particles but be completely turned off for their mirror image.
+        While this is experimentally well established, there is no theoretical explanation within the Standard Model for why the weak force singles out left-handedness.
     }
 \end{enumerate}
+
+The final category is in my opinion the most important one.
+This is because it is indisputably experimentally and theoretically tracatable at this exact moment in particle physics, and has direct implications for how data from particle physics experiments are processed to hopefully make progress on the many problems quoted above.
+Furthermore it is the only set of open questions that is directly relevant to the research presented in this thesis.
+It is problems relating to our ability to \textit{calculate} within the Standard Model.
+
+\begin{enumerate}
+    \item{
+        \textbf{Calculation of scattering amplitudes}: The Standard Model is predictive because it can be used to calculate scattering amplitudes that are tested every day in particle physics experiments.
+        These amplitudes are almost always calculated at a fixed order in some perturbative expansion, and pushing known amplitudes to ever higher orders is an important open question in particle physics.
+        In particular, improved modeling of Standard Model processes, whether as signal in measurements or background in searches, depends on making progress in this direction.
+    }
+    \item{
+        \textbf{Calculatibility of non-perturbative QCD}: Quantum chromodynamics is in principle a complete theory of the strong force, but the comparatively large value of the strong coupling constant $\alpha_s$ means perturbative expansions are only valid at high energies.
+        At low energies, lattice QCD provides a systematic non-perturbative approach but is computationally expensive and limited in scope.
+        This leaves us with few tools for modeling QCD dynamics at or below the QCD confinement scale of $\Lambda_{QCD} \sim 200$~MeV.
+        This difficulty is one of the central bottlenecks in the interpretation of data from the LHC.
+    }
+\end{enumerate}
+
+Experimental evidence is needed to guide theoretical progress on both of these problems.
+It is exactly that evidence that the research in this thesis provides at a uniquely large and flexible scale.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/ch1/particle_discoveries.pdf}
+    \caption{A timeline of the theortical prediction or explanation (green) and experimental discovery (red) of all Standard Model particles. \textbf{TODO: cite as fair use}}
+    \label{fig:particle_discoveries}
+\end{figure}
+
+Finally, I will note that the best way to make progress on the many of these problems is unambiguously to find a new particle (necessarily one not in the Standard Model).
+Some historical data is relevant here.
+Figure~\ref{fig:particle_discoveries} shows a timeline of the theoretical prediction or explanation (green) and experimental discovery (red) of all Standard Model particles.
+The rate of discoveries between 1965 and 1985, the ``golden era'' of particle physics, is clearly unique, as is the muon's experimental discovery before it was conceived of theoretically.
+However, it is also interesting to examine past droughts.
+Given the gap between the discovery of the electron and the photon can hardly be considered a time of drought for fundamental physics, the 20 year gap between the discovery of the muon in 1936 and the discovery of the electron neutrino in 1956 strikes me as the longest on record, and will remain so even if the next particle after the Higgs is not discovered for another couple years.
+Whatever geopolitical forces may have been at play in that time, particle physics research is clearly not always smooth sailing.
+However the next particle is soon to be overdue, and in my opinion prospects for finding it in the next few years are not fantastic.
+With that sobering fact, I'll contrast a field in which extraordinary progress has happened in the comparative blink of an eye.
 
 
 % ---------------------------------------------------------------
@@ -167,7 +218,7 @@ The theoretical open problems are in some sense more troubling, because they are
 % simulation, enabling powerful supervised and semi-supervised
 % approaches.
 
-\section{The deep learning revolution and artificial intelligence}
+\section{The Deep Learning Revolution}
 \label{sec:ml_intro}
 
 % ---------------------------------------------------------------
