@@ -1,0 +1,154 @@
+
+\chapter{Unfolding}
+\label{ch:unfolding}
+
+% ---------------------------------------------------------------
+% WRITING NOTES:
+%   Target: ~12–15 pages (Week 6: Apr 20–26)
+%   Structure: classical unfolding (IBU) → AI unfolding motivation
+%              → VLD (your pheno work) → Omnifold (what you use
+%              for the measurement in Ch.6)
+%   Goal: the reader should understand WHY each method is an
+%         improvement over the previous, not just WHAT it does.
+% ---------------------------------------------------------------
+
+\section{Unfolding as an Inverse Problem}
+\label{sec:unfolding-intro}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. The measurement problem
+%    - We measure detector-level (reco) quantities; we want
+%      particle-level (truth) distributions.
+%    - The detector smears, distorts, and has finite acceptance:
+%        x_reco = R(x_truth) + noise
+%    - Unfolding inverts this: infer p(x_truth) from observed
+%      p(x_reco).  This is an ill-posed inverse problem.
+%
+% 2. Binned unfolding and the response matrix
+%    - Discretize x_truth and x_reco into bins.
+%    - Response matrix R_{ij} = P(reco in bin i | truth in bin j).
+%    - Estimated from simulation; direct matrix inversion is
+%      numerically unstable (amplifies statistical fluctuations).
+%    - Regularization is required.
+%
+% 3. Iterative Bayesian Unfolding (IBU / D'Agostini)
+%    - Apply Bayes' theorem iteratively:
+%        P(truth_j | reco_i) updated each iteration.
+%    - Stopping criterion = regularization (early stopping).
+%    - Widely used in HEP (RooUnfold); well understood.
+%    - Limitations:
+%        a) Binned → loses information, requires choice of binning.
+%        b) Curse of dimensionality: multi-D unfolding is very costly.
+%        c) Observable-by-observable: must redo for each quantity.
+%    - These limitations motivate the AI-based approaches below.
+
+\section{AI-Based Unfolding: Unbinned and High-Dimensional}
+\label{sec:ai-unfolding-motivation}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. The two key advantages
+%    a) Unbinned: operate on individual events, not histograms.
+%       → No binning bias; full statistical power preserved.
+%       → Can histogram in any observable post-unfolding.
+%    b) High-dimensional: unfold the full phase space jointly.
+%       → Correlations between observables are correctly handled.
+%       → One network, many downstream observables.
+%
+% 2. Analytic bottlenecks in LHC analyses that this alleviates
+%    - Choosing optimal binning is non-trivial and analysis-specific.
+%    - Multi-dimensional binned unfolding has combinatorial bin scaling.
+%    - Detector correction factors (unfolding weights) that are
+%      per-event rather than per-bin enable more flexible analyses.
+%
+% 3. Overview of the AI unfolding landscape
+%    - OmniFold (Andreassen et al. 2019): density ratio iteration.
+%    - INN-based methods (Bellagente et al.): normalizing flows.
+%    - Generative unfolding: train a generative model p(truth|reco).
+%      Examples: cINN, diffusion-based (VLD — this section).
+%    - Bayesian deep learning approaches.
+
+\section{Variational Latent Diffusion Unfolding}
+\label{sec:vld}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Motivation for a diffusion-based approach
+%    - Generative unfolding: directly model p(truth | reco).
+%    - Diffusion models are state-of-the-art generative models;
+%      outperform flows and GANs on sample quality.
+%    - Latent diffusion: compress jet/event representation first,
+%      then diffuse in latent space → computationally tractable.
+%
+% 2. VLD architecture
+%    - [FILL IN: detailed description of the VLD network.
+%      Include: VAE encoder/decoder, latent space dimension,
+%      diffusion backbone (UNet? Transformer?), conditioning
+%      mechanism for detector-level inputs.]
+%    - Two stages:
+%        Stage 1: Train VAE on particle-level events.
+%                 Encoder: x_truth → z ∈ R^d
+%                 Decoder: z → x_truth
+%        Stage 2: Train conditional diffusion in latent space:
+%                 p(z | x_reco) via score network s_\theta(z_t, x_reco, t)
+%    - At inference: sample z ~ p(z | x_reco), decode to get x_truth.
+%
+% 3. Training procedure and datasets
+%    - [FILL IN: MC samples used, training hyperparameters,
+%      loss functions, evaluation metrics.]
+%
+% 4. Results
+%    - [FILL IN: main results from the VLD pheno paper(s).
+%      Include: closure tests, comparison to IBU, performance
+%      on multi-dimensional distributions, robustness to
+%      systematic variations.]
+%    - Figures: include representative unfolded distributions,
+%      coverage plots, comparison to ground truth.
+%
+% 5. Limitations and future work
+%    - Generalization: does it work on real data (not just MC)?
+%    - Sensitivity to systematic uncertainties in the response model.
+%    - Scalability to full event unfolding (not just jets).
+
+\section{Omnifold}
+\label{sec:omnifold}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Core idea: iterative reweighting
+%    - OmniFold (Andreassen et al., Phys.Rev.Lett. 124 (2020) 182001).
+%    - Two-step iterative procedure:
+%        Step 1 (detector level): train classifier f_1 to distinguish
+%               data from MC reco.  Weights w_1(x_reco) = f_1/(1-f_1).
+%        Step 2 (particle level): train classifier f_2 to distinguish
+%               MC truth (reweighted by w_1) from MC truth (unweighted).
+%               Weights w_2(x_truth) = f_2/(1-f_2).
+%    - Iterate until convergence.  The final per-event weights
+%      w(x_truth) encode the unfolded distribution.
+%
+% 2. Why OmniFold works: statistical foundations
+%    - Each step is a density ratio estimation (connection to Ch.3 Sec.5).
+%    - The iteration converges to the true particle-level weights.
+%    - Proof sketch: connect to moment-matching / IPM minimization.
+%    - Unbinned by construction; high-dimensional because classifiers
+%      operate on full feature vectors.
+%
+% 3. Implementation choices relevant to the Z+jets measurement
+%    - Network architecture for Steps 1 and 2 (MLP? GNN?).
+%    - Feature sets: which reco and truth observables are used.
+%    - Number of iterations (typically 3–5 suffice).
+%    - Uncertainty estimation: bootstrap resampling of the data;
+%      generator variations for systematic uncertainties.
+%    - Pre-training strategy: [FILL IN — relevant to Ch.6 discussion
+%      of the pre-training + network methodology used in Z+jets].
+%
+% 4. Validation
+%    - Closure test: unfold MC reco against same MC truth.
+%    - Stress test: unfold against a different generator
+%      (e.g., Pythia → Herwig).
+%    - Coverage: verify uncertainty bands have correct coverage.

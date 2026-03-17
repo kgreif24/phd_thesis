@@ -13,7 +13,7 @@ all: $(PDF)
 
 $(PDF): $(SRC) $(DEP)
 	$(CMDLATEX) $(SRC)
-	-bibtex $(PROJ)
+	-biber $(PROJ)
 	$(CMDLATEX) $(SRC)
 	$(CMDLATEX) $(SRC)
 
@@ -29,6 +29,7 @@ clean:
 	rm -rf $(OUT)/*.lot
 	rm -rf $(OUT)/*.out
 	rm -rf $(OUT)/*.toc
+	rm -rf $(OUT)/*.bcf
 	rm -rf $(OUT)/*.run.xml
 	rm -rf $(OUT)/*.synctex.gz
 	rm -rf chapters/*.aux

@@ -1,4 +1,122 @@
 
 \chapter{Introduction}
+\label{ch:intro}
 
-This is a test of the system.
+% ---------------------------------------------------------------
+% WRITING NOTES:
+%   Target: ~4–6 pages (Week 1: Mar 16–22)
+%   Arc: open with the two "moments" of 2012, zoom out to the
+%        state of HEP open problems, then pivot to ML revolution.
+%        End with a roadmap of the thesis.
+% ---------------------------------------------------------------
+
+% ---------------------------------------------------------------
+% Opening: The two defining moments of 2012
+% ---------------------------------------------------------------
+%
+
+The discovery of the Higgs Boson, announced on July 4th, 2012~\cite{ATLAS:2012yve,CMS:2012qbp}, is widely regarded as the most important discovery in particle physics in the 21st century.
+With that discovery the electroweak symmetry breaking mechanism~\cite{PhysRevLett.13.321, PhysRevLett.13.508, PhysRevLett.13.585} received experimental confirmation and the Standard Model of particle physics~\cite{PhysRevLett.19.1264, THOOFT1972189} was complete.
+This triumph of modern science was rightly front-page news, and is still well known in the popular imagination.
+A less well known, though equally important, advancement was announced 87 days later on September 30th, 2012 when the results of the ``ImageNet Large Scale Visual Recognition Challenge'' were released.
+This was a challenge within the computer vision research community to develop a machine learning model that could sort images into 1000 classes.
+The training set for this challenge consisted of 1.2 million painstakingly hand-labeled images, which was unprecedented scale for labeled datasets at the time.
+This scale and the recent release of Nvidia's CUDA toolkit, which allowed for optimized matrix operations on GPU hardware, allowed for a team of researchers from the University of Toronto to train a deep convolutional neural network named AlexNet that outperformed its closest competitor by 10\% in top-5 error rate\footnote{The top-5 error rate is the percentage of images that were not correctly classified into the top 5 most likely classes.}~\cite{krizhevsky2012imagenet}.
+Before this moment state-of-the-art computer vision models relied on hand-engineered features programmed by human experts, but AlexNet learned all features used to classify the images directly from the data, requiring the humans who programmed it to know essentially nothing about the images themselves.
+This breakthrough became known as the ``AlexNet moment'' and marked the beginning of the modern era of machine learning.
+
+This thesis is an attempt to understand the impact of the AlexNet moment on particle physics research in the post-Higgs era.
+It's worth dwelling very briefly on the fact that both discoveries lead to a Nobel prize in physics, the Higgs for Peter Higgs and François Englert in 2013 and AlexNet for Geoffrey Hinton in 2024.
+The nobel prize for Higgs and Englert was, by my count, the 12th Nobel prize awarded for the development of the Standard Model\footnote{Notable exlusions from this count are the Nobel prizes of Feynman, Schwinger, and Tomonaga for the QED theory which is a precursor of the Standard Model, and the Nobel prizes of Kajita and McDonald for the discovery of neutrino oscillations, which is notably not a part of the Standard Model.}.
+It was the capstone of a very fruitful and now very mature research program.
+By contrast the Nobel for AlexNet was at least in-part an ``instrumentation'' award\footnote{An excellent parallel to AlexNet is Charles Wilson's development of the cloud chamber, which was a tool developed by a meteorologist that became very useful for fundamental physics research and was awarded the Nobel a decade after it was developed.}, significant for the other discoveries it enables.
+Particle physics was one of the first scientific disciplines to make use of deep learning.
+The first papers demonstrating the use of deep learning for event selection~\cite{Baldi:2014kfa} and jet tagging~\cite{Cogan:2014oua} were written in 2014, only two years after AlexNet.
+Since then there has been a remarkable growth in the number of papers applying deep learning to particle physics~\cite{hepmllivingreview}.
+This thesis will provide a tour of some of these applications.
+Concurrently, most other sub-fields of physics have taken interest in applying deep learning tools.
+Cosmology, astrophysics, gravitational wave science, condensed matter physics, plasma physics, fluid dynamics, quantum information, and optical physics have all seen fruitful applications.
+There are few areas of active physics research that have not been effected by the AlexNet moment in some sense.
+While these applications have yet to produce a landmark discovery or new capability like the AlphaFold protein structure prediction model that was awarded the Nobel prize in chemisty in 2024, the breadth of these applications is a testatment to the power of deep learning for physics research.
+% \footnote{Despite this active interest deep learning has yet to produce significant breakthroughs in other sub-fields of physics as well as particle physics. In contrast, deep learning tools have already produced a Nobel Prize in chemistry, for the AlphaFold protein structure prediction model in 2024.}.
+
+In the remainder of the Introduction, I will outline the open problems in particle physics, and very briefly summarize the last 14 years of progress in machine learning and artificial intelligence.
+This review serves two purposes.
+The first is to give context to the very specific research detailed in this thesis.
+The second is to reflect on the fact that all open problems in particle physics are long-standing, and that the list is essentially unchanged since the 2012 discovery of the Higgs.
+These problems are extremely subtle and difficult, and many years of effort by very resourceful and intelligent scientists has so far proven insufficient to solve them.
+By contrast, the field of machine learning and artificial intelligence is completely unrecognizable to itself in 2012.
+The hope of this thesis, is that some of this dizzying progress can finally break the current impasse facing particle physics.
+
+% ---------------------------------------------------------------
+% Section: Open Problems in Particle Physics
+% ---------------------------------------------------------------
+%
+% After completing the Standard Model with the Higgs, the field
+% faces several deep, stubborn puzzles:
+%   - Hierarchy / naturalness problem
+%   - Dark matter (direct detection null results)
+%   - Matter–antimatter asymmetry
+%   - Neutrino masses and mixing
+%   - Strong CP problem
+%
+% Key point: these problems have proved resistant to decades of
+% targeted searches.  The LHC run-2 dataset is enormous (~140/fb)
+% and growing, but extracting its full physics potential requires
+% tools far beyond cut-based analyses.  This is where AI enters.
+
+\section{Open problems in particle physics}
+\label{sec:open_problems}
+
+The most pressing open problems in particle physics can be understood as the need for a better understanding of Beyond the Standard Model (BSM) physics.
+BSM physics is known to exist through multiple experimental observations that can not be explained by the particle content and forces contained in the Standard Model.
+However the correct quantum field theory (or other type of theory consistent with the existing Standard Model) that explains these observations is unknown.
+The most important observations are:
+
+\begin{enumerate}
+    \item{
+        \textbf{Neutrino oscillations}: Neutrinos are massless under the Standard Model. However many iterations of neutrino experiments have verified that these particles ``oscillate'' between the three neutrino flavors as they propagate through space. This phenomenon is easily explained if the neutrinos carry a mass that is small enough to remain currently undetected by experiments, but the mechanism that produces this mass is unknown. This fascinating topic is not covered at all in this thesis, but current and next generation neutrino experiments are making active use of deep learning.
+    }
+    \item{
+        \textbf{Dark matter}: 
+    }
+\end{enumerate}
+
+
+% ---------------------------------------------------------------
+% Section: The Machine Learning Revolution
+% ---------------------------------------------------------------
+%
+% Contrast the state of ML in 2012 (AlexNet, ~60M parameters,
+% trained on two GPUs) with today (LLMs at 10^{11} parameters,
+% diffusion models generating photorealistic images).  The field
+% is unrecognizable in 16 years.
+%
+% How this maps to HEP:
+%   - Jet tagging: from cut-based to BDT to deep sets / GNN
+%   - Anomaly detection: model-agnostic searches
+%   - Fast simulation: GANs → flows → diffusion
+%   - Unfolding: binned → machine-learned density ratios
+%
+% Key claim: the LHC is nearly an ideal laboratory for ML methods
+% because (a) the data are high-dimensional and highly structured,
+% and (b) we have extremely accurate synthetic data from MC
+% simulation, enabling powerful supervised and semi-supervised
+% approaches.
+
+\section{The deep learning revolution and artificial intelligence}
+\label{sec:ml_intro}
+
+% ---------------------------------------------------------------
+% Section: Thesis Roadmap
+% ---------------------------------------------------------------
+%
+% Brief paragraph-per-chapter overview:
+%   Ch.2 — QCD & jet substructure background
+%   Ch.3 — ML methods (architectures through diffusion + density ratio)
+%   Ch.4 — Jet tagging: ATLAS top-tagger paper + future outlook
+%   Ch.5 — Unfolding: IBU → VLD → Omnifold
+%   Ch.6 — Z+jets measurement with Omnifold
+%   Ch.7 — Conclusion: ML as the future of collider physics
+
+\section*{} % placeholder — remove once prose is written

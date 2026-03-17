@@ -1,0 +1,120 @@
+
+\chapter{Jet Classification at the LHC}
+\label{ch:tagging}
+
+% ---------------------------------------------------------------
+% WRITING NOTES:
+%   Target: ~12–15 pages (Week 5: Apr 13–19)
+%   Structure: motivation → ATLAS top-tagger paper → future
+%   Key paper: ATLAS top-tagger training + UQ paper (your paper)
+%   End with a forward-looking argument connecting foundation
+%   models → diHiggs sensitivity at the HL-LHC.
+% ---------------------------------------------------------------
+
+\section{Boosted Jet Tagging: Motivation and Landscape}
+\label{sec:tagging-intro}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Why boosted object tagging matters
+%    - At the HL-LHC (sqrt(s)=14 TeV, 3000/fb), heavy SM particles
+%      (top quarks, W/Z/H bosons) are frequently produced with
+%      pT >> m, so decay products merge into a single large-R jet.
+%    - Tagging these jets is essential for:
+%        a) measuring SM processes (ttbar, diboson)
+%        b) BSM searches (stop, KK-gluon, etc.)
+%        c) diHiggs searches (H->bb + H->WW/tau tau)
+%
+% 2. Brief history of jet tagging methods
+%    - Cut-based: simple cuts on mass + N-subjettiness ratios.
+%    - BDT: multivariate, but hand-engineered features.
+%    - Deep learning: end-to-end, learns features from
+%      raw constituents.  Cite Cogan et al. (2015), de Oliveira
+%      et al. (2016) for jet images; deep sets, ParticleNet, ParT.
+%
+% 3. The top quark as a benchmark
+%    - Three-pronged decay (t->Wbqqb) gives distinctive substructure.
+%    - Top tagging is the canonical multi-prong benchmark.
+%    - ATLAS uses a DNN top tagger in many analyses.
+
+\section{ATLAS Top Tagger: Training and Uncertainty Quantification}
+\label{sec:atlas-toptagger}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Dataset and simulation
+%    - MC samples: ttbar signal, QCD dijets background.
+%    - Generator: Pythia 8 / Herwig 7 for systematic variations.
+%    - Detector simulation: FullSim (Geant4) vs. AFII (fast sim).
+%    - Large-R jet inputs: constituent four-momenta (point cloud),
+%      track parameters, calorimeter cell energies.
+%
+% 2. Network architecture
+%    - Describe the specific architecture used in the paper.
+%    - [FILL IN: e.g., ParticleNet / GNN / transformer-based?]
+%    - Input features, preprocessing (pT-sorting, normalization).
+%    - Loss: binary cross-entropy; training procedure.
+%
+% 3. Working point definition and efficiency
+%    - Fixed signal efficiency WP (e.g., 80% WP).
+%    - Background rejection as the key figure of merit.
+%    - ROC curves; compare to baseline cut-based tagger.
+%
+% 4. Uncertainty quantification methodology
+%    - Systematic uncertainties considered:
+%        a) MC generator choice (Pythia vs. Herwig)
+%        b) Parton shower / hadronization model
+%        c) Underlying event tune
+%        d) Detector simulation (FullSim vs. AFII)
+%        e) Pile-up modeling
+%    - Ensemble approach: N networks trained with different seeds.
+%    - How uncertainties are propagated to the final WP efficiency.
+%    - Key result: [FILL IN — quote main numbers from the paper]
+%
+% 5. Main results and conclusions
+%    - Improvement over baseline tagger.
+%    - Rigorous UQ framework: first ATLAS paper to do X? [FILL IN]
+%    - Impact on downstream physics analyses that use the tagger.
+
+\section{The Future of Jet Classification}
+\label{sec:tagging-future}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Latest ATLAS + CMS flavor tagging models
+%    - b-tagging: GN2 (ATLAS), DeepJet (CMS) — transformer-based,
+%      use track + secondary vertex information.
+%    - Performance: light-jet rejection factors of O(1000) at 70% b-eff.
+%    - Multiclass: simultaneous b/c/light/tau tagging.
+%    - Cite recent ATLAS and CMS performance notes.
+%    - [FILL IN: specific numbers from the latest GN2/DeepJet papers]
+%
+% 2. Large pre-trained foundation models
+%    - Analogy to NLP: pre-train on massive unlabeled corpus,
+%      fine-tune on small labeled dataset.
+%    - Jet foundation models: OmniJet-\alpha, OMNIJET, JetCLR,
+%      PELICAN pretrained variants.
+%    - Self-supervised objectives: masked jet modeling,
+%      contrastive learning, next-constituent prediction.
+%    - Key advantage: the vast unlabeled LHC dataset (O(10^9) jets)
+%      can be used for pre-training; labeled (simulated) data
+%      for fine-tuning specific tasks.
+%    - [FILL IN: cite specific foundation model papers and results]
+%
+% 3. diHiggs at the HL-LHC: the case for jet tagging
+%    - HH production is the key measurement to probe the Higgs
+%      self-coupling lambda.  Current limits are O(5-10x SM).
+%    - The dominant decay channel for sensitivity is HH -> bbbb
+%      and HH -> bbtautau.  Both require excellent b-tagging.
+%    - The argument: improved b-taggers (from foundation models)
+%      directly translate to improved diHiggs sensitivity because:
+%        a) Higher b-eff at fixed mistagging rate → more signal events.
+%        b) Better c-jet rejection → cleaner control regions.
+%        c) Better light-jet rejection → reduced QCD multijet background.
+%    - Quantify: [FILL IN — e.g., going from 70% to 77% b-eff
+%      corresponds to ~X% improvement in HH significance per analysis].
+%    - This is arguably the most important single ML contribution
+%      the collaboration can make to the HL-LHC physics program.
