@@ -254,4 +254,31 @@ The task is now to use those tools to achieve concrete physics goals.
 %   Ch.6 — Z+jets measurement with Omnifold
 %   Ch.7 — Conclusion: ML as the future of collider physics
 
-\section*{} % placeholder — remove once prose is written
+\section{Thesis Roadmap}
+\label{sec:roadmap}
+
+The remainder of this thesis is organized as follows.
+
+Chapter~\ref{ch:qcd} provides the theoretical background in quantum chromodynamics necessary to understand the physics measurement at the heart of this thesis.
+The treatment is selective by design: rather than surveying the Standard Model broadly, it focuses on the aspects of QCD that are directly relevant to jet physics and jet substructure at the LHC.
+This includes the physics of jet formation and clustering, the energy correlation observables used to characterize jet substructure, and the concept of intrinsic dimensionality as applied to collider data.
+
+Chapter~\ref{ch:ml} introduces the machine learning methods that underpin the research chapters that follow.
+The goal of this chapter is to bring the reader to a working understanding of the latent diffusion models used in the unfolding work of Chapter~\ref{ch:unfolding}.
+The chapter is organized as a progression through the key ideas: from the fundamentals of deep learning and the neural network architectures most relevant to HEP, through normalizing flows and generative modeling, to score-based diffusion models and their latent variants.
+Along the way, it covers the density ratio estimation techniques that are central to Omnifold and several other methods discussed in this thesis, and closes with a discussion of uncertainty quantification, connecting directly to the top tagger work of Chapter~\ref{ch:tagging}.
+
+Chapter~\ref{ch:tagging} turns to the first of the three research thrusts: jet classification at the LHC.
+After introducing the problem of boosted jet tagging and its importance for new physics searches, it presents the results of an ATLAS study on the training and calibration of top quark taggers with rigorous uncertainty quantification.
+The chapter closes with a forward-looking discussion of where jet classification is heading: large-scale pre-trained foundation models for jet physics, and the argument that advances in tagging will be among the most decisive factors in the sensitivity of diHiggs searches at the High-Luminosity LHC.
+
+Chapter~\ref{ch:unfolding} provides the methodological foundation for the cross-section measurement of Chapter~\ref{ch:zjets}.
+It begins with a review of classical unfolding methods, using Iterative Bayesian Unfolding (IBU) as the canonical example, before motivating the move to machine-learned, unbinned, high-dimensional unfolding.
+Two AI-based methods are then described in detail: the Variational Latent Diffusion (VLD) model, developed in part by this author, and Omnifold~\cite{Andreassen:2019cjw}, the method used to perform the cross-section measurement.
+The key conceptual advance shared by both methods---the ability to unfold simultaneously in many dimensions without binning---is emphasized throughout, as it directly addresses the calculability bottlenecks described in Section~\ref{sec:open_problems}.
+
+Chapter~\ref{ch:zjets} presents the culmination of the thesis: a highly differential measurement of $Z$+jets production at the LHC using the Omnifold technique.
+After describing the event selection, simulation samples, and Omnifold implementation (including the pre-training and network methodology), the chapter presents results across four physics use cases that illustrate the unique power of unbinned, high-dimensional unfolding for extracting physics from LHC data.
+
+Chapter~\ref{ch:conclusion} closes the thesis by stepping back to assess the broader trajectory.
+It revisits the argument for machine learning as an indispensable tool for collider physics, reflects on what the next decade of HL-LHC running may look like, and considers the role that agentic AI systems may play in accelerating---or perhaps transforming---the practice of fundamental physics research.
