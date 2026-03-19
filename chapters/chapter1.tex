@@ -207,6 +207,51 @@ With that sobering fact, I'll contrast a field in which extraordinary progress h
 \section{The Deep Learning Revolution}
 \label{sec:ml_intro}
 
+Since the AlexNet moment in 2012, the field of machine learning---now more commonly called artificial intelligence---has undergone progress that is without precedent in the history of technology.
+The story is one in which one supposedly impossible task after another falls in the space of a few years, and it is worth tracing that arc in some detail before turning to the specific research in this thesis.
+
+The years immediately following AlexNet saw rapid architectural innovation.
+Deeper networks with hundreds of layers achieved steadily better performance on image recognition benchmarks~\cite{Simonyan:2014vgg,He:2015resnet}, an early precursor of the scaling laws that would later come to dominate the field.
+The particle physics community moved quickly: the first deep learning jet taggers appeared in 2014~\cite{Cogan:2014oua,Baldi:2014kfa}, only two years after AlexNet.
+This period also saw the introduction of generative neural networks.
+Generative Adversarial Networks (GANs)~\cite{Goodfellow:2014gan} and Variational Autoencoders (VAEs)~\cite{Kingma:2013vae} demonstrated that neural networks could not only classify data but synthesize it, opening an entirely new set of applications.
+The reinforcement learning (RL) sub-field also announced itself dramatically in this period: in 2016, AlphaGo~\cite{Silver:2016alphago} defeated Lee Sedol, the world champion Go player, a feat that had been considered decades away.
+Notably, RL has yet to find widespread application in high-energy physics, but its broader trajectory is relevant to the discussion of agentic AI in the conclusion.
+
+The single most consequential development of the decade was the introduction of the \textit{attention mechanism} and the Transformer architecture in 2017~\cite{Vaswani:2017attention}.
+Transformers replaced recurrent networks (LSTMs) as the dominant sequence-processing architecture, achieving state-of-the-art performance on machine translation and, crucially, scaling gracefully with both data and compute in a way that recurrent networks could not.
+Their ability to parallelize computation on GPU hardware meant that the primary bottleneck shifted from architecture to scale.
+This moment is also, I will admit, personally significant: it was my growing curiosity about Transformers during my undergraduate years that deepened my interest in the intersection of machine learning and physics, and was a factor in my decision to pursue a PhD at a laboratory where that intersection was already being actively explored.
+
+The scaling era that followed, roughly 2018--2022, produced a cascade of breakthroughs.
+Large language models trained on internet-scale text began to exhibit \textit{emergent} capabilities---abilities not present at smaller scales that appeared abruptly as model size and training compute increased~\cite{Wei:2022emergent}.
+The CLIP model~\cite{Radford:2021clip} demonstrated powerful multi-modal representations learned from image--text pairs, enabling zero-shot image classification.
+In parallel, the AI + HEP community focused on generative modeling for simulation: auto-regressive models and rational-quadratic spline normalizing flows~\cite{Durkan:2019nsf} were applied to jet generation~\cite{Butter:2019cae}, calorimeter simulation~\cite{Paganini:2017hrr}, and anomaly detection.
+Then, between 2021 and 2022, diffusion models~\cite{Ho:2020ddpm,Song:2021score} transformed both fields simultaneously.
+In the AI community, diffusion-based image generators---DALL-E~2, Stable Diffusion, Midjourney---made photorealistic image synthesis accessible to the general public for the first time.
+In HEP, latent diffusion models were applied to the problem of unfolding, the core methodological contribution of this thesis, as described in Chapter~\ref{ch:unfolding}.
+It is worth pausing to appreciate the distance traveled: from classifying handwritten digits to generating photorealistic images of arbitrary subjects, in ten years.
+
+The year 2023 marked a qualitative shift in public awareness of AI.
+Reinforcement Learning from Human Feedback (RLHF)~\cite{Ouyang:2022instructgpt} was applied to large language models, transforming them from autocomplete engines into conversational assistants capable of writing code, reasoning through multi-step problems, and passing professional licensing examinations such as the bar exam.
+ChatGPT reached 100 million users in two months, faster than any consumer product in history, and the term ``artificial intelligence'' entered everyday vocabulary in a way it never had before.
+
+The period from 2024 to the present has seen model scale reach the trillions of parameters, and advanced RL pipelines teach language models to use external tools---web search, code execution, and APIs---enabling autonomous, multi-step task completion.
+A small but growing number of physics papers have been produced substantially through the use of AI systems.
+Whether or not this represents the future of scientific research, it is a remarkable development, and one that bears directly on the conclusion of this thesis.
+
+It is worth closing this survey with two caveats.
+First, although the progress described above is genuine and remarkable, it has not been evenly distributed across all of machine learning.
+There is still no firm theoretical understanding of why stochastic gradient descent generalizes as well as it does, and out-of-distribution generalization remains a challenge even on relatively simple tasks.
+This pattern is not entirely unfamiliar to a physicist: fundamental questions about the foundations of quantum mechanics were largely set aside by the physics community because simply taking the formalism and running with it produced much faster and more practical progress.
+Fields often grow by exploiting, rather than explaining, their most powerful tools.
+Second, the year 2022 appears in retrospect to be something of an inflection point for the AI + HEP research program.
+Before that point, the main research directions of the broader AI community---better architectures, better generative models---produced general-purpose tools that the HEP community could adapt relatively directly.
+Benchmarks in AI + HEP were rewritten nearly every year.
+Since then, the dominant direction of frontier AI research has shifted toward scaling, tool use, and the pursuit of general-purpose intelligence, a direction that does not map as cleanly onto the specific needs of collider physics.
+The community has largely settled on Transformers and diffusion models as the core architectural toolkit, and the task now is to use those tools---with whatever LLM assistance is available---to achieve concrete physics goals.
+That is precisely the program this thesis attempts to advance.
+
 % ---------------------------------------------------------------
 % Section: Thesis Roadmap
 % ---------------------------------------------------------------
