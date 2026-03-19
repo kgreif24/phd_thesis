@@ -75,6 +75,18 @@ My list of the open problems is as follows:
         A new source of CP violation beyond the Standard Model is therefore required, but remains unknown.
     }
     \item{
+        \textbf{Dark energy and the hubble tension}: Cosmological observations indicate that the universe is expanding, and that the expansion is speeding up over time.
+        If the universe was composed of only the baryonic matter of the Standard Model and dark matter, this expansion would not be occuring.
+        Therefore there must be an additional type of energy density, termed ``dark energy'', that is driving this expansion.
+        A good explanation for this dark energy is a non-zero cosmological constant $\Lambda$, however this model has significant theoretical issues as discussed below.
+        Additionally measurements of the expansion rate of the universe have turned up inconsistencies.
+        There $\Lambda$CDM model of cosmology parametrizes the expansion of the universe through the Hubble constant.
+        This constant can be measured through two probes: the cosmic microwave background~\cite{Planck:2018vyg} and local distance-ladder observations~\cite{Riess:2021jrx}.
+        However these two approaches yield values of the Hubble constant $H_0$ that disagree at the 4--5$\sigma$ level.
+        This tension could be caused by an unaccounted for systematic effect and is under very active research.
+        However if confirmed this would be a clear sign of beyond $\Lambda$CDM cosmology.
+    }
+    \item{
         \textbf{Gravity}: The gravitational interactions are not present within the Standard Model.
         The general theory of relativity provides an extraodinarily accurate classical theory of gravity, but none of the attempts to quantize gravity and incoporate it with the other known forces has received experimental verification.
         At the energy scales probed by the LHC ($\mathcal{O}$(TeV)) gravitational effects are negligible, so this is not a direct experimental puzzle for collider physics, but our everyday experience of the gravitational force is evidence of BSM physics.
@@ -83,13 +95,6 @@ My list of the open problems is as follows:
         \textbf{Origin of primordial density fluctuations}: The presence of the Baryon Acoustic Oscillation (BAO) peak in the CMB power spectrum is precisely predicted by $\Lambda$CDM cosmology, but requires the presence of primordial density perturbations to seed the oscillations.
         The mechanism that formed these perturbations in the early universe is not known, though inflation provides a compelling framework which requires the presence of a BSM field.
         Given there are competeing models and experimental evidence is scarce, this is less of a clean example of BSM physics than those listed above, but it is worth mentioning.
-    }
-    \item{
-        \textbf{Hubble tension}: The Hubble constant is a parameter of the $\Lambda$CDM model of cosmology that determines the expansion rate of the universe.
-        This constant can be measured through two probes: the cosmic microwave background~\cite{Planck:2018vyg} and local distance-ladder observations~\cite{Riess:2021jrx}.
-        However these two approaches yield values of the Hubble constant $H_0$ that disagree at the 4--5$\sigma$ level.
-        This tension could only be caused by an unaccounted for systematic effect and is under very active research.
-        However if confirmed this would be a clear sign of beyond $\Lambda$CDM cosmology.
     }
 \end{enumerate}
 
@@ -260,25 +265,23 @@ The task is now to use those tools to achieve concrete physics goals.
 The remainder of this thesis is organized as follows.
 
 Chapter~\ref{ch:qcd} provides the theoretical background in quantum chromodynamics necessary to understand the physics measurement at the heart of this thesis.
-The treatment is selective by design: rather than surveying the Standard Model broadly, it focuses on the aspects of QCD that are directly relevant to jet physics and jet substructure at the LHC.
-This includes the physics of jet formation and clustering, the energy correlation observables used to characterize jet substructure, and the concept of intrinsic dimensionality as applied to collider data.
+The treatment is selective.
+Rather than surveying the Standard Model broadly, it focuses on the aspects of QCD that are directly relevant to jet physics and jet substructure at the LHC.
+This section will also introduce some of the exotic jet substructure observables measured in Chapter~\ref{sec:zjets}.
 
 Chapter~\ref{ch:ml} introduces the machine learning methods that underpin the research chapters that follow.
-The goal of this chapter is to bring the reader to a working understanding of the latent diffusion models used in the unfolding work of Chapter~\ref{ch:unfolding}.
-The chapter is organized as a progression through the key ideas: from the fundamentals of deep learning and the neural network architectures most relevant to HEP, through normalizing flows and generative modeling, to score-based diffusion models and their latent variants.
-Along the way, it covers the density ratio estimation techniques that are central to Omnifold and several other methods discussed in this thesis, and closes with a discussion of uncertainty quantification, connecting directly to the top tagger work of Chapter~\ref{ch:tagging}.
+The goal of this chapter is to bring the reader to a working understanding of the variational latent diffusion models used in the unfolding work of Chapter~\ref{ch:unfolding}.
+The chapter is organized as something a progression through the deep learning methods that have been applied within HEP.
 
-Chapter~\ref{ch:tagging} turns to the first of the three research thrusts: jet classification at the LHC.
-After introducing the problem of boosted jet tagging and its importance for new physics searches, it presents the results of an ATLAS study on the training and calibration of top quark taggers with rigorous uncertainty quantification.
-The chapter closes with a forward-looking discussion of where jet classification is heading: large-scale pre-trained foundation models for jet physics, and the argument that advances in tagging will be among the most decisive factors in the sensitivity of diHiggs searches at the High-Luminosity LHC.
+Chapter~\ref{ch:tagging} turns to the first of the three original research contributions on top-quark tagging using deep learning methods.
+It presents the results of an ATLAS study on the training and calibration of top quark taggers with rigorous uncertainty quantification.
+Given this study was published some time ago the chapter concludes with a summary of recent progress and future directions in jet tagging at the LHC.
 
 Chapter~\ref{ch:unfolding} provides the methodological foundation for the cross-section measurement of Chapter~\ref{ch:zjets}.
-It begins with a review of classical unfolding methods, using Iterative Bayesian Unfolding (IBU) as the canonical example, before motivating the move to machine-learned, unbinned, high-dimensional unfolding.
-Two AI-based methods are then described in detail: the Variational Latent Diffusion (VLD) model, developed in part by this author, and Omnifold~\cite{Andreassen:2019cjw}, the method used to perform the cross-section measurement.
-The key conceptual advance shared by both methods---the ability to unfold simultaneously in many dimensions without binning---is emphasized throughout, as it directly addresses the calculability bottlenecks described in Section~\ref{sec:open_problems}.
+It begins with a review of classical unfolding methods, using Iterative Bayesian Unfolding (IBU) as the canonical example.
+Two AI-based methods are then described in detail: the Variational Latent Diffusion (VLD) model which I developed with collaborators, and Omnifold~\cite{Andreassen:2019cjw}, the method used to perform the cross-section measurement.
 
-Chapter~\ref{ch:zjets} presents the culmination of the thesis: a highly differential measurement of $Z$+jets production at the LHC using the Omnifold technique.
-After describing the event selection, simulation samples, and Omnifold implementation (including the pre-training and network methodology), the chapter presents results across four physics use cases that illustrate the unique power of unbinned, high-dimensional unfolding for extracting physics from LHC data.
+Chapter~\ref{ch:zjets} presents the culmination of the thesis: a high and variable dimensional cross section measurement of $Z$+jets production at the LHC using the Omnifold technique.
+After describing the methodology, the chapter presents results across four physics use cases that illustrate the unique power of unbinned, high-dimensional unfolding for extracting physics from LHC data.
 
-Chapter~\ref{ch:conclusion} closes the thesis by stepping back to assess the broader trajectory.
-It revisits the argument for machine learning as an indispensable tool for collider physics, reflects on what the next decade of HL-LHC running may look like, and considers the role that agentic AI systems may play in accelerating---or perhaps transforming---the practice of fundamental physics research.
+Chapter~\ref{ch:conclusion} concludes the thesis by drawing on overall themes and discussing future roles of machine learning and artificial intelligence in particle physics research.
