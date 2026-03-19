@@ -5,9 +5,11 @@
 UCI PhD dissertation in LaTeX using the `ucithesis` document class.
 
 - **Compiler:** `lualatex` (TeX Live 2023)
-- **Bibliography:** `natbib` + `bibtex` backend
+- **Bibliography:** `biblatex` + `biber` backend (note: `main.tex` uses `biblatex`; the original `natbib`/`bibtex` description below is outdated)
 - **Build system:** `make` (full build) / `make quick` (single pass)
 - **Root file:** `main.tex`
+
+> **⚠️ Agent note:** The Cowork sandbox does **not** have `biblatex` or `biber` installed, so `make` / `make quick` will fail inside the sandbox. Do **not** attempt to run builds here. All LaTeX compilation must be done on the user's local machine.
 
 ---
 
