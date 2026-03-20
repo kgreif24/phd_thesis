@@ -1,0 +1,166 @@
+
+\chapter{Z+Jets Cross Section Measurement}
+\label{ch:zjets}
+
+% ---------------------------------------------------------------
+% WRITING NOTES:
+%   Target: ~15–20 pages (Week 7: Apr 27 – May 3)
+%   This is the culmination of the thesis.  Structure mirrors
+%   the Z+jets paper; the four physics use cases are the headline
+%   result.
+%   FLAG: this chapter depends on the Z+jets paper results being
+%   finalized.  Coordinate with collaborators on timeline.
+% ---------------------------------------------------------------
+
+\section{Measurement Overview}
+\label{sec:zjets-overview}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Physics motivation
+%    - Z+jets production is one of the most precisely calculable
+%      processes in QCD (high-order calculations available).
+%    - The associated jets carry rich substructure information
+%      about QCD radiation patterns, hadronization, UE.
+%    - An unbinned, high-dimensional measurement with OmniFold
+%      can go far beyond traditional binned cross sections:
+%      it produces per-event particle-level weights that can
+%      be projected onto any observable post-unfolding.
+%    - Highlight novelty: first (or among first) fully
+%      differential unbinned unfolding measurement with this
+%      technique on ATLAS data.
+%
+% 2. Process: pp → Z(→ ll) + jets at sqrt(s) = 13 TeV
+%    - Z boson reconstructed from lepton pair (e+e- or mu+mu-).
+%    - Leading large-R jet selected; substructure observables computed.
+%    - Dataset: [FILL IN — Run 2 luminosity, year(s)].
+
+\section{Event Selection and Simulation Samples}
+\label{sec:zjets-eventsel}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Data sample
+%    - ATLAS Run 2 dataset: [FILL IN — luminosity, triggers].
+%    - Lepton triggers: single-lepton and dilepton triggers.
+%    - Quality requirements: good runs list (GRL).
+%
+% 2. Object selection
+%    - Electrons: [FILL IN — pT, eta, ID WP, isolation].
+%    - Muons: [FILL IN — pT, eta, ID WP, isolation].
+%    - Z boson: dilepton mass window [FILL IN] GeV.
+%    - Large-R jets: anti-kT R=1.0, trimmed; pT > [FILL IN] GeV,
+%      |eta| < [FILL IN].
+%
+% 3. Simulation samples
+%    - Signal MC: Sherpa 2.2.x Z+jets (matrix element + parton shower).
+%    - Alternative generators: MadGraph+Pythia8, Herwig 7.
+%      Used for generator systematic uncertainties.
+%    - Detector simulation: ATLAS FullSim (Geant4) for nominal;
+%      AFII for large samples.
+%
+% 4. Observables
+%    - Particle-level: jet constituents from truth record.
+%    - Detector-level: calorimeter + track inputs to jet algorithm.
+%    - [FILL IN: list the specific substructure observables
+%      that are included in the OmniFold feature vector.]
+
+\section{OmniFold Implementation}
+\label{sec:zjets-omnifold}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Pre-training strategy
+%    - [FILL IN: describe the pre-training + network methodology
+%      used in the Z+jets measurement.  This is a key novel
+%      aspect of the analysis.]
+%    - Motivation: pre-training on large MC sample stabilizes
+%      classifier training before fine-tuning on data vs. MC.
+%    - Architecture: [FILL IN — MLP? transformer over constituents?]
+%
+% 2. Step 1: detector-level reweighting
+%    - Feature vector at detector level: [FILL IN — list observables].
+%    - Training: data vs. nominal MC reco.
+%    - Weight clipping / regularization applied: [FILL IN].
+%
+% 3. Step 2: particle-level reweighting
+%    - Feature vector at particle level: [FILL IN].
+%    - Reweight MC truth to match Step 1 corrected distribution.
+%
+% 4. Convergence and validation
+%    - Number of OmniFold iterations: [FILL IN].
+%    - Closure test: [FILL IN results].
+%    - Stress tests with alternative generators.
+%
+% 5. Uncertainty treatment
+%    - Statistical: bootstrap resampling of data events.
+%    - Systematic: generator variations (Sherpa vs. MadGraph vs. Herwig),
+%      detector systematics propagated through the reweighting.
+%    - [FILL IN: describe how systs are evaluated — eigenvector
+%      method? direct variation?]
+
+\section{Results: Four Physics Use Cases}
+\label{sec:zjets-results}
+
+% ---------------------------------------------------------------
+% WRITING NOTES:
+%   These are the four physics use cases developed for the Z+jets
+%   paper.  Fill in each one with the specific observable,
+%   theoretical prediction, and key finding.
+%   [FILL IN: all four use cases from the paper — include figures]
+% ---------------------------------------------------------------
+
+\subsection{Use Case 1: [FILL IN Title]}
+\label{sec:zjets-uc1}
+
+% ---------------------------------------------------------------
+% [FILL IN: description of the first physics use case.
+%  Suggested structure:
+%    - Observable(s) being measured.
+%    - Theoretical predictions compared to: NLL/NNLL resummation?
+%      fixed-order? MC generators?
+%    - Key plot: unfolded data vs. theory.
+%    - Main physics conclusion / takeaway.]
+
+\subsection{Use Case 2: [FILL IN Title]}
+\label{sec:zjets-uc2}
+
+% [FILL IN]
+
+\subsection{Use Case 3: [FILL IN Title]}
+\label{sec:zjets-uc3}
+
+% [FILL IN]
+
+\subsection{Use Case 4: [FILL IN Title]}
+\label{sec:zjets-uc4}
+
+% [FILL IN]
+
+\section{Discussion}
+\label{sec:zjets-discussion}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Summary of results
+%    - What did we learn about QCD/jet substructure from this
+%      measurement?  Are the generators well-calibrated?
+%    - Are the theory predictions consistent with data?
+%
+% 2. Advantages of the OmniFold approach demonstrated here
+%    - The per-event weights allow all four use cases to be
+%      extracted from a single unfolding — contrast with
+%      IBU which would require four separate unfoldings.
+%    - High-dimensional unfolding captured correlations that
+%      1D unfolding would miss.
+%
+% 3. Limitations and future improvements
+%    - Sensitivity to the choice of training features.
+%    - The generator uncertainty: if both MC generators are
+%      wrong, OmniFold cannot fix that.
+%    - Future: extend to higher pT, more observables,
+%      or full event unfolding.

@@ -1,0 +1,214 @@
+
+\chapter{Machine Learning and Artificial Intelligence}
+\label{ch:ml}
+
+% ---------------------------------------------------------------
+% WRITING NOTES:
+%   Target: ~15–20 pages (Weeks 3–4: Mar 30 – Apr 12)
+%   Goal: give the reader the ML toolkit needed to understand
+%         the VLD unfolding architecture (Ch.5) and Omnifold.
+%         This is the part of the thesis you most want to
+%         remember from your PhD — make it count.
+%   Tone: conceptual first, mathematical as needed; always
+%         connect back to the HEP application.
+% ---------------------------------------------------------------
+
+\section{Overview: ML as a Paradigm Shift}
+\label{sec:ml-overview}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Framing
+%    - Classical programming: explicit rules → output.
+%    - ML paradigm: data + optimization → learned rules.
+%    - This shift is especially powerful when the rules are
+%      too complex to write by hand (e.g., "what does a
+%      boosted top jet look like?").
+%
+% 2. Taxonomy: supervised / unsupervised / generative / RL
+%    - Supervised: labeled training data; loss = task loss.
+%    - Unsupervised: learning structure without labels.
+%    - Generative: model p(x); sample new data.
+%    - Reinforcement: agent + reward signal (less relevant here
+%      but mention in the context of agentic AI in Ch.7).
+%
+% 3. Why HEP is a natural fit
+%    - Enormous labeled datasets from simulation (MC generators
+%      like Pythia, Herwig, Sherpa) — no labeling cost.
+%    - High-dimensional, structured data (jets as point clouds
+%      or images; events as graphs).
+%    - Physical symmetries (Lorentz invariance, permutation
+%      invariance of jet constituents) can be built into the
+%      architecture → inductive bias.
+%    - Fast, accurate simulation enables supervised learning
+%      in a way that most other fields cannot match.
+
+\section{Neural Networks and Deep Learning}
+\label{sec:dl}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Multi-layer perceptrons (MLPs)
+%    - Composition of affine + nonlinear layers.
+%    - Universal approximation theorem (intuition only).
+%    - Activation functions: ReLU, GELU.
+%
+% 2. Training basics
+%    - Loss function; stochastic gradient descent; backprop.
+%    - Regularization: dropout, weight decay, batch norm.
+%    - Practical tips: learning rate scheduling, early stopping.
+%
+% 3. Convolutional Neural Networks (CNNs)
+%    - Translational equivariance; weight sharing.
+%    - Early HEP use: jet images (Cogan et al., de Oliveira et al.)
+%
+% 4. Graph Neural Networks (GNNs)
+%    - Jets as point clouds / graphs; node + edge features.
+%    - Message passing; DeepSets as a special case (sum aggregation).
+%    - ParticleNet (DGCNN-based), PELICAN as examples.
+%
+% 5. Transformers
+%    - Self-attention: queries, keys, values.
+%    - Permutation invariance for free — natural for jet constituents.
+%    - Particle Transformer (ParT) — state-of-the-art jet tagger.
+%    - Connection to large pre-trained models (forward pointer to Ch.4).
+
+\section{Normalizing Flows and Generative Models}
+\label{sec:flows}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Variational Autoencoders (VAEs)
+%    - Encoder q_\phi(z|x), decoder p_\theta(x|z).
+%    - ELBO objective; reparameterization trick.
+%    - Limitation: blurry samples due to pixel-wise MSE.
+%    - HEP use: fast calorimeter simulation (e.g., CaloVAE).
+%
+% 2. Generative Adversarial Networks (GANs)
+%    - Generator vs. discriminator; minimax game.
+%    - Training instability; mode collapse.
+%    - HEP use: CaloGAN, jet generation.
+%
+% 3. Normalizing flows
+%    - Bijective f: x <-> z with tractable Jacobian.
+%    - Change of variables formula: log p(x) = log p(z) + log|det J|.
+%    - Coupling layers (RealNVP, Glow); autoregressive flows (MAF).
+%    - HEP use: fast simulation (SurVAE, NF-based shower generators),
+%      inference (nflows for posterior estimation).
+%    - Key property: exact density evaluation — useful for reweighting.
+%
+% 4. Motivation for moving to diffusion
+%    - Flows require bijective transformations → architectural
+%      constraints.  GANs are unstable.  VAEs are blurry.
+%    - Diffusion models sidestep these issues at the cost of
+%      sequential sampling.  Forward pointer to Section \ref{sec:diffusion}.
+
+\section{Diffusion Models}
+\label{sec:diffusion}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Score-based / SMLD models
+%    - Noise perturbation at multiple scales; score matching.
+%    - Song \& Ermon (2019): Generative Modeling by Estimating
+%      Gradients of the Data Distribution.
+%    - Score function s_\theta(x) ≈ \nabla_x \log p(x).
+%
+% 2. Denoising Diffusion Probabilistic Models (DDPMs)
+%    - Forward process: q(x_t | x_{t-1}) = N(x_t; sqrt(1-beta)x_{t-1}, beta I).
+%    - Reverse process: p_\theta(x_{t-1} | x_t) learned by a UNet.
+%    - Ho et al. (2020) — key equations; ELBO derivation (high level).
+%    - Connection to score matching via x_0-prediction vs. eps-prediction.
+%
+% 3. Latent Diffusion Models (LDMs)
+%    - Two-stage: (a) train a VAE to compress x -> z;
+%                 (b) train a diffusion model in latent space z.
+%    - Rombach et al. (2022) — Stable Diffusion; key architectural
+%      choices: cross-attention for conditioning.
+%    - Why latent space? Much lower dimensionality → faster training
+%      and sampling; also aligns with the low ID of jet data (Ch.2).
+%
+% 4. The VLD architecture for unfolding
+%    - Forward pointer to Ch.5 where VLD is described in full.
+%    - Mention here: VLD = Variational Latent Diffusion, designed
+%      specifically for particle physics unfolding.  It conditions
+%      the diffusion model on detector-level observables and generates
+%      samples from the inferred particle-level distribution.
+%    - Highlight what makes VLD novel: unbinned, high-dimensional,
+%      generative output that can be histogrammed in any observable.
+
+\section{Density Ratio Estimation and Reweighting}
+\label{sec:dre}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. The core statistical trick
+%    - Given two distributions p(x) and q(x), we often want
+%      the ratio r(x) = p(x)/q(x) without knowing either
+%      density explicitly.
+%    - Key insight: a binary classifier trained to distinguish
+%      samples from p vs. q learns r(x) implicitly, because
+%      the optimal classifier output is r(x)/(1 + r(x)).
+%
+% 2. Classifier-based density ratio estimation
+%    - Train f_\theta(x) -> [0,1] with BCE loss.
+%    - Recover r(x) = f(x)/(1 - f(x)).
+%    - Works in high dimensions where direct density estimation fails.
+%
+% 3. Applications in HEP
+%    - Monte Carlo reweighting: correct simulation to data.
+%    - Importance sampling: reweight one generator to another.
+%    - Omnifold (Ch.5): iterative density ratio estimation for
+%      unbinned unfolding — this is the key application.
+%    - CARL (Cranmer et al.) as a foundational reference.
+%
+% 4. Practical considerations
+%    - Calibration of the classifier output is crucial.
+%    - Extreme weights can cause variance blow-up: use weight
+%      clipping or regularization.
+%    - Choice of architecture matters: must have good coverage of
+%      the support of both distributions.
+
+\section{Uncertainty Quantification}
+\label{sec:uq}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Why UQ matters in HEP
+%    - Physics measurements require not just a central value but
+%      a rigorous uncertainty.  ML methods add a new source of
+%      uncertainty (model uncertainty) on top of statistical and
+%      systematic uncertainties.
+%    - The ATLAS top tagger paper (Ch.4) deals explicitly with
+%      how to assign and propagate ML model uncertainties.
+%
+% 2. Types of uncertainty
+%    - Aleatoric (irreducible, data noise) vs. epistemic (reducible,
+%      model / training uncertainty).
+%    - In HEP: statistical uncertainty (finite data) is aleatoric;
+%      choice of MC generator, network architecture, training
+%      procedure are epistemic.
+%
+% 3. Ensemble methods
+%    - Train N models with different seeds / architectures.
+%    - Variance of ensemble predictions estimates epistemic uncertainty.
+%    - Used in the top tagger paper: ensemble of taggers to
+%      derive model uncertainty on the WP efficiency.
+%
+% 4. Calibration and conformal prediction
+%    - A well-calibrated model: P(Y=1 | f(x)=p) = p.
+%    - Reliability diagrams, ECE (expected calibration error).
+%    - Conformal prediction: coverage-guaranteed prediction sets
+%      without distributional assumptions — emerging in HEP.
+%    - Temperature scaling as a simple post-hoc calibration method.
+%
+% 5. Systematic uncertainties from ML
+%    - Variation of training hyperparameters.
+%    - Dependence on MC generator (Pythia vs. Herwig).
+%    - "Generator uncertainty" is a major theme in Ch.4 and Ch.6.

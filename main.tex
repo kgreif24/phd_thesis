@@ -33,9 +33,10 @@
 \usepackage{tabularx}
 
 % ----------------------------------------------------------
-% Bibliography (natbib + bibtex backend)
+% Bibliography (biblatex + biber backend)
 % ----------------------------------------------------------
-\usepackage{natbib}
+\usepackage[backend=biber, style=numeric-comp, natbib=true, sorting=none]{biblatex}
+\addbibresource{thesis.bib}
 
 % ----------------------------------------------------------
 % Miscellaneous layout
@@ -116,18 +117,18 @@
 
 % Main chapters
 \include{chapters/chapter1}
-%\include{chapters/chapter2}
-%\include{chapters/chapter3}
-%\include{chapters/chapter4}
-%\include{chapters/chapter5}
+\include{chapters/chapter2}
+\include{chapters/chapter3}
+\include{chapters/chapter4}
+\include{chapters/chapter5}
+\include{chapters/chapter6}
+\include{chapters/chapter7}
 
 % Fix bibliography page number in TOC
 \clearpage
 \phantomsection
 
-% Change citation style to match your field (abbrv is just a suggestion)
-\bibliographystyle{abbrv}
-\bibliography{thesis}
+\printbibliography
 
 % UCI manual: appendix figures/tables must NOT appear in LoF/LoT
 \captionsetup[figure]{list=no}
