@@ -24,8 +24,8 @@ Before this moment state-of-the-art computer vision models relied on hand-engine
 This breakthrough became known as the ``AlexNet moment'' and marked the beginning of the modern era of machine learning.
 
 This thesis is an attempt to understand the impact of the AlexNet moment on particle physics research in the post-Higgs era.
-It's worth dwelling very briefly on the fact that both discoveries lead to a Nobel prize in physics, the Higgs for Peter Higgs and François Englert in 2013 and AlexNet for Geoffrey Hinton in 2024.
-The nobel prize for Higgs and Englert was, by my count, the 12th Nobel prize awarded for the development of the Standard Model\footnote{Notable exlusions from this count are the Nobel prizes of Feynman, Schwinger, and Tomonaga for the QED theory which is a precursor of the Standard Model, and the Nobel prizes of Kajita and McDonald for the discovery of neutrino oscillations, which is notably not a part of the Standard Model.}.
+It's worth dwelling very briefly on the fact that both discoveries led to a Nobel Prize in physics, the Higgs for Peter Higgs and François Englert in 2013 and AlexNet for Geoffrey Hinton in 2024.
+The Nobel Prize for Higgs and Englert was, by my count, the 12th Nobel Prize awarded for the development of the Standard Model\footnote{Notable exclusions from this count are the Nobel Prizes of Feynman, Schwinger, and Tomonaga for the QED theory which is a precursor of the Standard Model, and the Nobel Prizes of Kajita and McDonald for the discovery of neutrino oscillations, which is notably not a part of the Standard Model.}.
 It was the capstone of a very fruitful and now very mature research program.
 By contrast the Nobel for AlexNet was at least in-part an ``instrumentation'' award\footnote{An excellent parallel to AlexNet is Charles Wilson's development of the cloud chamber, which was a tool developed by a meteorologist that became very useful for fundamental physics research and was awarded the Nobel a decade after it was developed.}, significant for the other discoveries it enables.
 Particle physics was one of the first scientific disciplines to make use of deep learning.
@@ -34,8 +34,8 @@ Since then there has been a remarkable growth in the number of papers applying d
 This thesis will provide a tour of some of these applications.
 Concurrently, most other sub-fields of physics have taken interest in applying deep learning tools.
 Cosmology, astrophysics, gravitational wave science, condensed matter physics, plasma physics, fluid dynamics, quantum information, and optical physics have all seen fruitful applications.
-There are few areas of active physics research that have not been effected by the AlexNet moment in some sense.
-While these applications have yet to produce a landmark discovery or new capability like the AlphaFold protein structure prediction model that was awarded the Nobel prize in chemisty in 2024, the breadth of these applications is a testatment to the power of deep learning for physics research.
+There are few areas of active physics research that have not been affected by the AlexNet moment in some sense.
+While these applications have yet to produce a landmark discovery or new capability like the AlphaFold protein structure prediction model that was awarded the Nobel Prize in chemistry in 2024, the breadth of these applications is a testament to the power of deep learning for physics research.
 
 In the remainder of the Introduction, I will outline the open problems in fundamental physics\footnote{I generally refer to the fields of particle physics and cosmology as ``fundamental physics'', given open questions do not necessarily sort neatly into the two sub-fields.}, and very briefly summarize the last 14 years of progress in machine learning and artificial intelligence.
 This review serves two purposes.
@@ -66,7 +66,7 @@ My list of the open problems is as follows:
         \textbf{Dark matter}: A wide range of astrophysical and cosmological observations, including galaxy rotation curves~\cite{Rubin:1970zza}, gravitational lensing, and the large-scale structure of the cosmic microwave background, indicate that roughly 27\% of the energy budget of the universe is composed of a non-luminous, non-baryonic form of matter.
         The Standard Model contains no candidate particle that could account for this ``dark matter''.
         Many BSM dark matter candidate particles have been proposed, but none has ever been observed in a particle physics experiment.
-        To the best of our knowledge, dark matter only interacts with the particles of the Standard Model through gravity.
+        To the best of our knowledge, dark matter appears to interact with Standard Model particles only through gravity.
     }
     \item{
         \textbf{Matter--antimatter asymmetry}: The Standard Model predicts that the Big Bang should have produced equal amounts of matter and antimatter, yet the observable universe is composed overwhelmingly of matter.
@@ -75,12 +75,12 @@ My list of the open problems is as follows:
         A new source of CP violation beyond the Standard Model is therefore required, but remains unknown.
     }
     \item{
-        \textbf{Dark energy and the hubble tension}: Cosmological observations indicate that the universe is expanding, and that the expansion is speeding up over time.
+        \textbf{Dark energy and the Hubble tension}: Cosmological observations indicate that the universe is expanding, and that the expansion is speeding up over time.
         If the universe was composed of only the baryonic matter of the Standard Model and dark matter, this expansion would not be occuring.
         Therefore there must be an additional type of energy density, termed ``dark energy'', that is driving this expansion.
         A good explanation for this dark energy is a non-zero cosmological constant $\Lambda$, however this model has significant theoretical issues as discussed below.
         Additionally measurements of the expansion rate of the universe have turned up inconsistencies.
-        There $\Lambda$CDM model of cosmology parametrizes the expansion of the universe through the Hubble constant.
+        The $\Lambda$CDM model of cosmology parametrizes the expansion of the universe through the Hubble constant.
         This constant can be measured through two probes: the cosmic microwave background~\cite{Planck:2018vyg} and local distance-ladder observations~\cite{Riess:2021jrx}.
         However these two approaches yield values of the Hubble constant $H_0$ that disagree at the 4--5$\sigma$ level.
         This tension could be caused by an unaccounted for systematic effect and is under very active research.
@@ -88,13 +88,13 @@ My list of the open problems is as follows:
     }
     \item{
         \textbf{Gravity}: The gravitational interactions are not present within the Standard Model.
-        The general theory of relativity provides an extraodinarily accurate classical theory of gravity, but none of the attempts to quantize gravity and incoporate it with the other known forces has received experimental verification.
+        The general theory of relativity provides an extraordinarily accurate classical theory of gravity, but none of the attempts to quantize gravity and incorporate it with the other known forces has received experimental verification.
         At the energy scales probed by the LHC ($\mathcal{O}$(TeV)) gravitational effects are negligible, so this is not a direct experimental puzzle for collider physics, but our everyday experience of the gravitational force is evidence of BSM physics.
     }
     \item{
         \textbf{Origin of primordial density fluctuations}: The presence of the Baryon Acoustic Oscillation (BAO) peak in the CMB power spectrum is precisely predicted by $\Lambda$CDM cosmology, but requires the presence of primordial density perturbations to seed the oscillations.
         The mechanism that formed these perturbations in the early universe is not known, though inflation provides a compelling framework which requires the presence of a BSM field.
-        Given there are competeing models and experimental evidence is scarce, this is less of a clean example of BSM physics than those listed above, but it is worth mentioning.
+        Given there are competing models and experimental evidence is scarce, this is less of a clean example of BSM physics than those listed above, but it is worth mentioning.
     }
 \end{enumerate}
 
@@ -106,7 +106,7 @@ Whether these fine-tunings are true problems or only an issue of philosophical p
 \begin{enumerate}
     \item{
         \textbf{The hierarchy problem}: The Higgs boson mass receives quantum corrections from every particle it couples to.
-        Given its difficult to imagine a quantum theory of gravity or generally any BSM model that doesn't couple to the Higgs directly or through loops, these quantum corrections should pull the Higgs mass up to the scale of the UV cutoff of the Standard Model.
+        Given it's difficult to imagine a quantum theory of gravity or generally any BSM model that doesn't couple to the Higgs directly or through loops, these quantum corrections should pull the Higgs mass up to the scale of the UV cutoff of the Standard Model.
         Instead the Higgs has a mass of 125~GeV.
         This requires either that the quantum corrections are cancelled by some new BSM physics near the electroweak scale, or that the scale of the corrections and the ``bare mass'' of the Higgs cancel nearly exactly despite their large size.
         This is the canonical example of a fine-tuning.
@@ -125,21 +125,20 @@ Whether these fine-tunings are true problems or only an issue of philosophical p
 \end{enumerate}
 
 The second category consists of problems that are not fine-tunings, at least to the degree of the problems above, but are features of the Standard Model that in some sense ``feel odd''.
-Perosonally I don't discount such feelings as irrelevant as they have produced discoveries in the past\footnote{Dirac's prediction of the positron through aesthetic considerations about negative solutions to the Dirac equation is perhaps the most relevant one. The GIM mechanism is a particle physics example of how taking a fine-tuning seriously led to new discoveries (the charm quark).}.
+Personally I don't discount such feelings as irrelevant as they have produced discoveries in the past\footnote{Dirac's prediction of the positron through aesthetic considerations about negative solutions to the Dirac equation is perhaps the most relevant one. The GIM mechanism is a particle physics example of how taking a fine-tuning seriously led to new discoveries (the charm quark).}.
 
 \begin{enumerate}
     \item{
         \textbf{The flavor puzzle}: The Standard Model contains three generations of quarks and leptons that share identical gauge quantum numbers but differ enormously in mass, with Yukawa couplings spanning nearly five orders of magnitude from the electron to the top quark.
-        No symmetry principle explains why there are exactly three generations, nor why the quark mixing angles (CKM matrix) are small while two of the neutrino mixing angles (PMNS matrix) are large.
-        These hierarchies and mixing patterns are encoded in 13 of the 19 free parameters of the Standard Model with no motivation for their values.
-        This is less of a fine-tuning and more of a structure that ``feels odd''.
-        Personally I don't discount such feelings as irrelevant
-        They have produced discoveries in the past.
+        No symmetry principle explains why there are exactly three generations, why these Yukawa coulings span such large scales, or why the quark mixing angles (CKM matrix) are small while two of the corresponding angles in the lepton sector (PMNS matrix) are large.
+        These hierarchies and mixing patterns are encoded in 13 of the 19 free parameters of the Standard Model.
+        There is no theoretical motivation for their values.
+        Instead they have been determined through experimental measurements, and their somewhat arbitrary structure is an odd feature of the Standard Model.
     }
     \item{
         \textbf{Accidental symmetries}: Several conservation laws of the Standard Model, baryon number $B$, and the individual lepton numbers $L_e$, $L_\mu$, $L_\tau$, are not imposed by the symmetries of the theory.
         Instead, they are accidents of the Standard Model gauge group, particle content, and renormalizability constraints.
-        The fact that they are present and seem to hold experimentally is another of the ``feels odd'' problems.
+        The fact that they are present and seem to hold experimentally is a curious feature of the Standard Model.
     }
     \item{
         \textbf{V-A structure of the weak interaction}: The weak interaction couples exclusively to left-handed fermions, a structure encoded in the $V-A$ (vector minus axial-vector) form of the weak current.
@@ -160,10 +159,13 @@ It is problems relating to our ability to \textit{calculate} within the Standard
         In particular, improved modeling of Standard Model processes, whether as signal in measurements or background in searches, depends on making progress in this direction.
     }
     \item{
-        \textbf{Calculatibility of non-perturbative QCD}: Quantum chromodynamics is in principle a complete theory of the strong force, but the comparatively large value of the strong coupling constant $\alpha_s$ means perturbative expansions are only valid at high energies.
+        \textbf{Non-perturbative QCD}: Quantum chromodynamics is in principle a complete theory of the strong force, but the comparatively large value of the strong coupling constant $\alpha_s$ means perturbative expansions are only valid at high energies.
         At low energies, lattice QCD provides a systematic non-perturbative approach but is computationally expensive and limited in scope.
-        This leaves us with few tools for modeling QCD dynamics at or below the QCD confinement scale of $\Lambda_{QCD} \sim 200$~MeV.
-        This difficulty is one of the central bottlenecks in the interpretation of data from the LHC.
+        This leaves us with no first-principles theoretical tools for modeling QCD dynamics at or below the QCD confinement scale of $\Lambda_{QCD} \sim 200$~MeV.
+        Instead we have empirical models whose parameters must be tuned to match to experimental data.
+        Improving these models is an active area of research, for which the cross section measurement presented in Chapter~\ref{ch:zjets} provides valuable experimental data.
+        Apart from this practical problem, the fact that experimental observations like positive mass confined states can't be understood through perturbation theory is also a deep problem of mathematical physics.
+        Proving that quantum field theories like QCD produce strictly positive mass confined states is one of the Milennium Puzzles of mathematics.
     }
 \end{enumerate}
 
@@ -173,7 +175,7 @@ It is exactly that evidence that the research in this thesis provides at a uniqu
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/ch1/particle_discoveries.pdf}
-    \caption{A timeline of the theortical prediction or explanation (green) and experimental discovery (red) of all Standard Model particles. \textbf{TODO: cite as fair use}}
+    \caption{A timeline of the theoretical prediction or explanation (green) and experimental discovery (red) of all Standard Model particles. \textbf{TODO: cite as fair use}}
     \label{fig:particle_discoveries}
 \end{figure}
 
@@ -184,7 +186,7 @@ The rate of discoveries between 1965 and 1985, the ``golden era'' of particle ph
 However, it is also interesting to examine past droughts.
 Given the gap between the discovery of the electron and the photon can hardly be considered a time of drought for fundamental physics, the 20 year gap between the discovery of the muon in 1936 and the discovery of the electron neutrino in 1956 strikes me as the longest on record, and will remain so even if the next particle after the Higgs is not discovered for another couple years.
 Whatever geopolitical forces may have been at play in that time, particle physics research is clearly not always smooth sailing.
-However the next particle is soon to be overdue, and in my opinion prospects for finding it in the next few years are not fantastic.
+However the next particle is nearly overdue, and in my opinion prospects for finding it in the next few years are not fantastic.
 With that sobering fact, I'll contrast a field in which extraordinary progress has happened in the comparative blink of an eye.
 
 
@@ -196,9 +198,9 @@ With that sobering fact, I'll contrast a field in which extraordinary progress h
 \label{sec:ml_intro}
 
 Since the AlexNet moment in 2012, the field of machine learning and artificial intelligence has undergone rapid progress.
-The technology has matured from rather simple image classification models to AI systems that feel like science fiction in 14 years.
+A brief survey of this progress and how it has entered particle physics research is as follows:
 
-\textbf{2013 - 2016}: Following AlexNet, deeper networks with many millions of parameters provided even better performance on classification tasks~\cite{Simonyan:2014vgg,He:2015resnet}.
+In the years following AlexNet, deeper networks with many millions of parameters provided even better performance on classification tasks~\cite{Simonyan:2014vgg,He:2015resnet}.
 This was an early precursor of the scaling laws that are highly relevant to the current state-of-the-art.
 The particle physics community moved quickly: the first deep learning jet taggers appeared in 2014~\cite{Cogan:2014oua,Baldi:2014kfa}, only two years after AlexNet.
 This period also saw the development of generative neural networks, which produce samples additional samples from the underlying probability distribution of the training data.
@@ -206,31 +208,31 @@ Generative Adversarial Networks (GANs)~\cite{Goodfellow:2014gan} and Variational
 The most dramatic milestone of this period came in 2016 when AlphaGo~\cite{Silver:2016alphago} defeated Lee Sedol, the world champion Go player.
 Notably, RL has yet to find widespread application in high-energy physics, but its broader trajectory is relevant to the discussion of agentic AI in the conclusion.
 
-\textbf{2017}: A next landmark was the introduction of the \textit{attention mechanism} and the Transformer architecture in 2017~\cite{Vaswani:2017attention}, which demonstrated state-of-the-art performance on machine translation tasks\footnote{It was also around this time that Google updated their Google Translate service to use neural machine translation. The development gathered enough media attention that I read about it as a first-year undergraduate. This touched off my interest in machine learning, and my decision to study physics was partially based on the fact that the CMS group was the only research group utilizing deep learning at my undergraduate institution.}.
+A next landmark was the introduction of the \textit{attention mechanism} and the Transformer architecture in 2017~\cite{Vaswani:2017attention}, which demonstrated state-of-the-art performance on machine translation tasks\footnote{It was also around this time that Google updated their Google Translate service to use neural machine translation. The development gathered enough media attention that I read about it as a first-year undergraduate. This touched off my interest in machine learning, and my decision to study physics was partially based on the fact that the CMS group was the only research group utilizing deep learning at my undergraduate institution.}.
 Attention's remarkable expressivity and the ability to parallelize the required computations on GPU resources meant Transformers replaced recurrent networks as the dominant sequence-processing architecture.
 The first HEP papers to use attention followed a few years later~\cite{Mikuni:2020wpr}, and attention is now widely used by both ATLAS and CMS for hadronic object identification.
 Many of the neural networks discussed in this thesis consist of attention backbones.
 
-\textbf{2018 - 2022}: Following the introduction of attention, the focus in ML/AI research was on scaling and generative modeling.
- (LLMs) trained on internet-scale text began to exhibit \textit{emergent} capabilities, which are not present at smaller scales but appear abruptly as model size and training compute increase~\cite{Wei:2022emergent}.
+Following the introduction of attention, the focus in ML/AI research was on scaling and generative modeling.
+Large language models (LLMs) trained on internet-scale text began to exhibit \textit{emergent} capabilities, which are not present at smaller scales but appear abruptly as model size and training compute increase~\cite{Wei:2022emergent}.
 The CLIP model~\cite{Radford:2021clip} demonstrated the ability of neural networks to process ``multi-modal'' data, for example by developing joint embeddings for text and data simultaneously.
 During this time the AI + HEP community was broadly focused on generative models.
 A lot of very rapid progress was driven by applying increasingly elaborate generative model architectures, from GANs to VAEs to normalizing flows~\cite{Durkan:2019nsf}, to diverse problems like jet generation~\cite{Butter:2019cae}, calorimeter simulation~\cite{Paganini:2017hrr}, unfolding~\cite{Datta:2018mwd, Bellagente:2020piv, Howard:2021pos}, and anomaly detection~\cite{Nachman:2020lpy, Hallin:2021wme}.
-Then another landmark occured betwen 2021 and 2022 with the introduction of diffusion models~\cite{Ho:2020ddpm,Song:2021score}.
+Then another landmark occurred between 2021 and 2022 with the introduction of diffusion models~\cite{Ho:2020ddpm,Song:2021score}.
 In the AI community, diffusion-based image generators like DALL-E~2, Stable Diffusion, and Midjourney made photorealistic image generation accessible to the general public for the first time.
 In HEP, diffusion models were quickly picked up and applied to the same set of generative tasks.
 Diffusion model based unfolding methods are a major topic in this thesis covered in Chapter~\ref{ch:unfolding}.
 It is worth pausing to appreciate the distance traveled: neural networks had gone from classifying images to \textit{generating} photorealistic images of arbitrary subjects in the space of 10 years.
 
-\textbf{2023}: Another milestone occured in late 2023 with the introduction of ChatGPT.
+Another milestone occurred in late 2023 with the introduction of ChatGPT.
 The introduction of a reinforcement learning (RL) based post-training~\cite{Ouyang:2022instructgpt} to LLMs transformed them from autocomplete engines into conversational assistants capable of writing code, reasoning through multi-step problems, and passing professional licensing examinations such as the bar exam.
 ChatGPT reached 100 million users in two months, faster than any consumer product in history, and the term ``artificial intelligence'' entered colloquial use.
 
-\textbf{2024 - 2026}: Frontier LLMs reach scales of trillions of parameters trained on many terabytes of text data.
-Simultaneously, advanced RL pipelines teach language models to use external tools, for example to edit files or search the web.
-This produces ``agentic'' AI systems that are capable of solving increasingly complicated and long-time horizon tasks autonomously.
-Massive labor market displacement due to these systems becomes a real concern, or more relavent to this thesis, some physics research papers are written almost entirely by AI systems under supervision from human experts~\cite{Schwartz:2026ekw, Guevara:2026qzd}.
-Whether or not this represents the future of scientific research, it is a rather remarkable development.
+In the past two years, frontier LLMs have reached scales of trillions of parameters trained on many terabytes of text data.
+Simultaneously, advanced RL pipelines have taught language models to use external tools, for example to edit files or search the web.
+This has produced ``agentic'' AI systems that are capable of solving increasingly complicated and long-time horizon tasks autonomously.
+Massive labor market displacement due to these systems is now a real concern, or more relevant to this thesis, some recent physics research papers were written almost entirely by AI systems under supervision from human experts~\cite{Schwartz:2026ekw, Guevara:2026qzd}.
+Regardless of whether this is the future of scientific research, it is evidence of extraordinary progress.
 I'll return to some opinions on autonomous physics research in the conclusion.
 
 Before moving on, two points about the above deserve some attention.
@@ -267,7 +269,7 @@ The remainder of this thesis is organized as follows.
 Chapter~\ref{ch:qcd} provides the theoretical background in quantum chromodynamics necessary to understand the physics measurement at the heart of this thesis.
 The treatment is selective.
 Rather than surveying the Standard Model broadly, it focuses on the aspects of QCD that are directly relevant to jet physics and jet substructure at the LHC.
-This section will also introduce some of the exotic jet substructure observables measured in Chapter~\ref{sec:zjets}.
+This section will also introduce some of the exotic jet substructure observables measured in Chapter~\ref{ch:zjets}.
 
 Chapter~\ref{ch:ml} introduces the machine learning methods that underpin the research chapters that follow.
 The goal of this chapter is to bring the reader to a working understanding of the variational latent diffusion models used in the unfolding work of Chapter~\ref{ch:unfolding}.
