@@ -1,0 +1,69 @@
+% Define some colors for grouping
+\definecolor{quarkcolor}{rgb}{0.95, 0.88, 0.88}
+\definecolor{leptoncolor}{rgb}{0.88, 0.92, 0.95}
+\definecolor{bosoncolor}{rgb}{0.92, 0.95, 0.88}
+\definecolor{higgscolor}{rgb}{0.95, 0.92, 0.82}
+\definecolor{headercolor}{rgb}{0.25, 0.25, 0.35}
+
+\begin{table}[ht]
+    \centering
+    \caption{Standard Model particles and their representations under the gauge group
+    $SU(3)_c \times SU(2)_L \times U(1)_Y$. Representations are written as
+    $(\mathbf{d_3},\, \mathbf{d_2},\, Y)$, where $d_3$ and $d_2$ are the
+    dimensions of the $SU(3)_c$ and $SU(2)_L$ representations, and $Y$ is the
+    weak hypercharge under the convention $Q = T_3 + Y/2$.
+    Three generations of fermions are implied; all carry identical quantum numbers.}
+    \label{tab:sm-reps}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{%
+      >{\raggedright}p{3.6cm}
+      >{\centering}p{2.2cm}
+      >{\centering}p{3.2cm}
+      c
+    }
+        \toprule
+        \rowcolor{headercolor}
+        \textcolor{white}{\textbf{Particle}} &
+        \textcolor{white}{\textbf{Symbol}} &
+        \textcolor{white}{\textbf{Representation}} &
+        \textcolor{white}{\textbf{Spin}} \\
+        \midrule
+        
+        \multicolumn{4}{l}{\textit{\textbf{Quarks (Left-handed doublets)}}} \\[2pt]
+        \rowcolor{quarkcolor}
+        Quark doublet & $Q_L = \binom{u}{d}_{\!L}$ & $(\mathbf{3},\,\mathbf{2},\,+\tfrac{1}{3})$ & $1/2$ \\
+        
+        \midrule
+        \multicolumn{4}{l}{\textit{\textbf{Quarks (Right-handed singlets)}}} \\[2pt]
+        \rowcolor{quarkcolor}
+        Up-type quark & $u_R$ & $(\mathbf{3},\,\mathbf{1},\,+\tfrac{4}{3})$ & $1/2$ \\
+        \rowcolor{quarkcolor}
+        Down-type quark & $d_R$ & $(\mathbf{3},\,\mathbf{1},\,-\tfrac{2}{3})$ & $1/2$ \\
+        
+        \midrule
+        \multicolumn{4}{l}{\textit{\textbf{Leptons (Left-handed doublets)}}} \\[2pt]
+        \rowcolor{leptoncolor}
+        Lepton doublet & $L_L = \binom{\nu_e}{e}_{\!L}$ & $(\mathbf{1},\,\mathbf{2},\,-1)$ & $1/2$ \\
+        
+        \midrule
+        \multicolumn{4}{l}{\textit{\textbf{Leptons (Right-handed singlets)}}} \\[2pt]
+        \rowcolor{leptoncolor}
+        Charged lepton & $e_R$ & $(\mathbf{1},\,\mathbf{1},\,-2)$ & $1/2$ \\
+        
+        \midrule
+        \multicolumn{4}{l}{\textit{\textbf{Gauge Bosons}}} \\[2pt]
+        \rowcolor{bosoncolor}
+        Gluons & $g^a_\mu$ & $(\mathbf{8},\,\mathbf{1},\,0)$ & $1$ \\
+        \rowcolor{bosoncolor}
+        $W$ bosons & $W^i_\mu$ & $(\mathbf{1},\,\mathbf{3},\,0)$ & $1$ \\
+        \rowcolor{bosoncolor}
+        $B$ boson & $B_\mu$ & $(\mathbf{1},\,\mathbf{1},\,0)$ & $1$ \\
+        
+        \midrule
+        \multicolumn{4}{l}{\textit{\textbf{Higgs Sector}}} \\[2pt]
+        \rowcolor{higgscolor}
+        Higgs doublet & $H$ & $(\mathbf{1},\,\mathbf{2},\,+1)$ & $0$ \\
+        
+        \bottomrule
+    \end{tabular}
+\end{table}

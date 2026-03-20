@@ -4,7 +4,7 @@
 
 % ---------------------------------------------------------------
 % WRITING NOTES:
-%   Target: ~8–12 pages (Week 2: Mar 23–29)
+%   Target: ~8–12 pages (Week 2: Mar 21–28)
 %   Scope: do NOT rehash all of the SM.  Assume the reader knows
 %          QED, electroweak theory, the Higgs mechanism.  Focus
 %          entirely on the QCD aspects relevant to jet substructure
@@ -14,92 +14,17 @@
 % ---------------------------------------------------------------
 % Brief preamble: SM as the scaffolding, QCD as the focus
 % ---------------------------------------------------------------
-%
-% One or two paragraphs acknowledging that the SM is the
-% theoretical foundation; we will not review it in full.
-% State clearly which pieces of QCD are needed to understand
-% the physics in this thesis: confinement → hadronization →
-% jets; perturbative QCD for cross section calculations;
-% jet substructure observables as probes of QCD dynamics.
+
+\input{tables/particle_reps.tex}
 
 \section{Jets and Jet Substructure at the LHC}
 \label{sec:jets}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. From partons to jets
-%    - QCD color confinement forces quarks/gluons to hadronize.
-%    - Jet algorithms (anti-kT is the LHC standard) cluster
-%      final-state particles into cones.  Cite Cacciari et al.
-%    - Large-R (fat) jets capture boosted heavy objects
-%      (top quarks, W/Z/H bosons) as a single jet.
-%    - Jet four-momentum, pT, eta, phi, mass.
-%
-% 2. Jet substructure motivation
-%    - At high pT, decay products of a boosted top or Higgs
-%      are collimated — their jet has rich internal structure.
-%    - Substructure variables let us distinguish "signal" fat
-%      jets (e.g., boosted tops) from the QCD multijet background.
-%    - Mention grooming (soft drop / mMDT) to remove soft wide-
-%      angle radiation and UE/pile-up contamination.
-%
-% 3. Jet substructure variables relevant to Ch.4 (top tagging)
-%    - N-subjettiness: tau_N, tau_{N-1}/tau_N ratios
-%    - Jet mass after grooming
-%    - Note: the ATLAS top tagger paper uses these as inputs
-%      alongside the full jet image / particle cloud
 
-\section{Energy Correlation Observables}
+\section{Energy-energy correlator observables}
 \label{sec:ecf}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Energy correlation functions (ECFs)
-%    - Definition: C_N^{(\beta)} sums over all N-tuples of
-%      particles, weighting by pT fractions and angular
-%      distances.  Cite Larkoski, Salam, Thaler (2013).
-%    - Key ratio observables: C_2, D_2 — sensitive to 2-prong
-%      vs. 1-prong structure; useful for W/Z vs. QCD jets.
-%    - N_2: first developed as a 2-prong tagger with better
-%      pileup resilience than D_2.
-%
-% 2. Generalized ECFs and their use in Z+jets
-%    - The Z+jets measurement (Ch.6) unfolds distributions of
-%      ECF-based observables.  Explain why they are theoretically
-%      well-motivated: they are IRC safe, calculable in pQCD.
-%    - Connect to the "four physics use cases" in Ch.6.
-%
-% 3. Analytic calculations and resummation
-%    - Brief mention: ECFs and N-subjettiness have known
-%      perturbative expansions; comparison of unfolded data
-%      to NLL/NNLL predictions is a key validation in Ch.6.
 
 \section{Intrinsic Dimensionality of Jet Observables}
 \label{sec:intdim}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. High-dimensional jet phase space
-%    - A jet with N constituents lives in a ~4N dimensional
-%      phase space.  However, IRC-safe observables inhabit a
-%      much lower-dimensional manifold.
-%    - Intrinsic dimensionality (ID) measures the effective
-%      degrees of freedom needed to describe the data manifold.
-%
-% 2. ID estimates in jet physics
-%    - Methods: two-NN estimator, participation ratio,
-%      PCA-based estimates.
-%    - Empirical results: QCD jets have low ID (~5–10) compared
-%      to the nominal high-D input space.
-%    - Implication for ML: justify why low-rank representations
-%      (latent diffusion, etc.) are appropriate for jet data.
-%    - Implication for the Z+jets measurement: motivates why
-%      high-D unfolding with Omnifold is tractable and meaningful.
-%
-% 3. Connection to generative modeling
-%    - If the data live on a low-D manifold, a latent diffusion
-%      model that first compresses to a latent space is well-
-%      matched to the data geometry.  Forward pointer to Ch.3 / Ch.5.
