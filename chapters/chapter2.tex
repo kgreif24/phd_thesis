@@ -14,10 +14,19 @@
 % Brief preamble: SM as the scaffolding, QCD as the focus
 % ---------------------------------------------------------------
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.85\linewidth, alt={Diagram of the Standard Model elementary particles, organized by quarks, leptons, gauge bosons, and the Higgs boson, with their masses, charges, and spins labeled.}]{figures/ch2/particle_content}
+  \caption{The elementary particles of the Standard Model. The dynamics of the 6 quarks and the 8 gluons (all gluon fields are represented by one box in the diagram), described by the theory of quantum chromodynamics, is most relevant to this thesis.}
+  \label{fig:sm-particles}
+\end{figure}
+
+\input{tables/particle_reps.tex}
+
 This chapter provides a very high level overview of quantum chromodynamics (QCD), with a focus on the aspects of the theory relevant to the Large Hadron Collider (LHC).
 It does not survey the Standard Model or QCD with any completeness.
 Instead the goal is to motivate two of the observables measured in Chapter~\ref{ch:zjets} from first principles.
-They will be introduced in Sections~\ref{sec:ecc} and~\ref{sec:id}.
+They will be introduced in Sections~\ref{sec:eec} and~\ref{sec:id}.
 
 QCD is our current best theory of the strong nuclear force.
 It affects the dynamics of all particles that carry color charge.
@@ -38,15 +47,6 @@ Almost all of the LHC collisions recorded by the ATLAS detector contain strong d
 In particular, the challenge is handling \textit{jets}, which are the experimental signature of the production of high transverse momentum (\pt) color-charged particles.
 Jets will be introduced in Section~\ref{sec:jets}, and two methods for studying them will be introduced in Sections~\ref{sec:eec} and~\ref{sec:id}.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.85\linewidth, alt={Diagram of the Standard Model elementary particles, organized by quarks, leptons, gauge bosons, and the Higgs boson, with their masses, charges, and spins labeled.}]{figures/ch2/particle_content}
-    \caption{The elementary particles of the Standard Model. The dynamics of the 6 quarks and the 8 gluons (all gluon fields are represented by one box in the diagram), described by the theory of quantum chromodynamics, is most relevant to this thesis.}
-    \label{fig:sm-particles}
-\end{figure}
-
-\input{tables/particle_reps.tex}
-
 \section{Jets and Jet Substructure at the LHC}
 \label{sec:jets}
 
@@ -57,82 +57,179 @@ The dynamics of quarks and gluons are governed by the QCD Lagrangian,
   \mathcal{L}_{\mathrm{QCD}} = -\frac{1}{4} G^a_{\mu\nu} G^{\mu\nu}_a + \sum_f \bar{q}_f \left( i \gamma^\mu D_\mu - m_f \right) q_f,
   \label{eqn:qcd_lagrangian}
 \end{equation}
-where the sum runs over quark flavors $f$, $D_\mu = \partial_\mu - i g_s T^a A^a_\mu$ is the covariant derivative, $g_s$ is the strong coupling constant, and $T^a$ are the generators of $\mathrm{SU}(3)$ in the fundamental representation. The gluon field strength tensor is
+where the sum runs over the six quark flavors $f$, $D_\mu = \partial_\mu - i g_s T^a A^a_\mu$ is the covariant derivative, $g_s$ is the strong coupling constant, and $T^a$ are the generators of $\mathrm{SU}(3)$ in the fundamental representation.
+The gluon field strength tensor is
 \begin{equation}
   G^a_{\mu\nu} = \partial_\mu A^a_\nu - \partial_\nu A^a_\mu + g_s f^{abc} A^b_\mu A^c_\nu,
   \label{eqn:field_strength}
 \end{equation}
 where $f^{abc}$ are the $\mathrm{SU}(3)$ structure constants and $A^a_\mu$ are the gluon fields.
 
-A critical distinction between QCD and QED is that the $f^{abc} A^b_\mu A^c_\nu$ term in Equation~\ref{eqn:field_strength} is non-zero: QCD is a non-Abelian gauge theory. This term generates cubic and quartic gluon self-interaction vertices in the Feynman rules, allowing gluons to couple directly to each other, as shown in Figure~\ref{fig:gluon-vertices}. In QED, the photon carries no electric charge and no analogous photon self-coupling exists.
+A critical distinction between QCD and QED is that the structure constants $f^{abc}$ in Equation~\ref{eqn:field_strength} are non-zero for the $\mathrm{SU}(3)$ gauge group of QCD.
+This term generates cubic and quartic gluon self-interaction vertices in the Feynman rules, allowing gluons to couple directly to each other, as shown in Figure~\ref{fig:gluon-vertices}.
+Another way of putting this is that the gluon field itself carries color charge.
+In QED, the photon carries no electric charge and no analogous photon self-coupling exists.
 
 \begin{figure}[ht]
   \centering
   \begin{subfigure}[b]{0.45\textwidth}
     \centering
-    \feynmandiagram [horizontal=a to b, layered layout] {
-      a [particle=\(g\)] -- [gluon] v,
-      b [particle=\(g\)] -- [gluon] v,
-      c [particle=\(g\)] -- [gluon] v,
-    };
+    \begin{tikzpicture}
+      \begin{feynman}
+        \vertex [particle=\(g\)] (g1) at (-1.3, 0.9);
+        \vertex [particle=\(g\)] (g2) at (-1.3, -0.9);
+        \vertex (v1) at (0, 0);
+        \vertex [particle=\(g\)] (g3) at (1.3, 0);
+        \diagram* {
+          (g1) -- [gluon] (v1) -- [gluon] (g3),
+          (g2) -- [gluon] (v1),
+        };
+      \end{feynman}
+    \end{tikzpicture}
     \caption{Three-gluon vertex ($\sim g_s f^{abc}$)}
     \label{fig:3g-vertex}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.45\textwidth}
     \centering
-    \feynmandiagram [horizontal=a to b, layered layout] {
-      a [particle=\(g\)] -- [gluon] v,
-      b [particle=\(g\)] -- [gluon] v,
-      c [particle=\(g\)] -- [gluon] v,
-      d [particle=\(g\)] -- [gluon] v,
-    };
+    \begin{tikzpicture}
+      \begin{feynman}
+        \vertex [particle=\(g\)] (g1) at (-1.3, 0.9);
+        \vertex [particle=\(g\)] (g2) at (-1.3, -0.9);
+        \vertex (v) at (0, 0);
+        \vertex [particle=\(g\)] (g3) at (1.3, 0.9);
+        \vertex [particle=\(g\)] (g4) at (1.3, -0.9);
+        \diagram* {
+          (g1) -- [gluon] (v) -- [gluon] (g3),
+          (g2) -- [gluon] (v) -- [gluon] (g4),
+        };
+      \end{feynman}
+    \end{tikzpicture}
     \caption{Four-gluon vertex ($\sim g_s^2 f^{abe} f^{cde}$)}
     \label{fig:4g-vertex}
   \end{subfigure}
-  \caption{The gluon self-interaction vertices that arise from the non-Abelian structure of QCD. Their existence, absent in QED, drives the antiscreening of the strong coupling and is ultimately responsible for asymptotic freedom and jet formation.}
+  \caption{The gluon self-interaction vertices that arise from the non-Abelian structure of QCD.}
   \label{fig:gluon-vertices}
 \end{figure}
 
-The self-coupling of gluons has a profound consequence for the running of the strong coupling constant $\alpha_s = g_s^2 / 4\pi$. In QED, the one-loop beta function is positive, meaning the coupling increases with energy as virtual fermion loops screen the bare charge. In QCD, the gluon self-interaction contributes a large negative term to the one-loop beta function,
+These self-coupling diagrams have important consequences for the running of the strong coupling constant $g_s$.
+For the electromagnetic interactions, the coefficient of the one-loop beta function is positive, meaning the coupling increases with the energy scale.
+For the strong interactions, the gluon self-interaction contributes a large negative term to the one-loop beta function,
 \begin{equation}
-  \mu \frac{d\alpha_s}{d\mu} = -\frac{\alpha_s^2}{2\pi} \left( \frac{11}{3} C_A - \frac{4}{3} T_F n_f \right) + \mathcal{O}(\alpha_s^3),
+  \mu \frac{dg_s}{d\mu} = -\frac{g_s^3}{16\pi^2} \left( \frac{11}{3} C_A - \frac{4}{3} T_F n_f \right) + \mathcal{O}(g_s^4),
   \label{eqn:beta_function}
 \end{equation}
-where $C_A = 3$ is the adjoint Casimir, $T_F = 1/2$, and $n_f$ is the number of active quark flavors. For $n_f \leq 16$ the coefficient is negative, so $\alpha_s$ decreases as the energy scale $\mu$ increases. This is \textit{asymptotic freedom} \cite{Gross:1973id, Politzer:1973fx}. At high energies, the strong coupling becomes weak and quarks and gluons propagate nearly freely; perturbation theory in $\alpha_s$ is reliable. At lower energies, $\alpha_s$ grows large and perturbation theory breaks down. Below the scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV, the strong force becomes so powerful that color-charged particles cannot propagate freely and instead \textit{hadronize} into color-neutral bound states: the mesons and baryons that make up all baryonic matter.
+where $C_A = 3$ is the adjoint Casimir, $T_F = 1/2$, and $n_f$ is the number of active quark flavors.
+The first term in the parentheses is the important one that arises from the gluon-gluon self interaction.
+For $n_f \leq 16$ the quantity in the parentheses is positive, making the overall sign negative, so $g_s$ decreases as the energy scale $\mu$ increases.
+This is in contrast to the electromagnetic interactions whose strength \textit{increases} with energy scale.
+The running of the QCD coupling constant, verified by many experimental measurements, is illustrated in Figure~\ref{fig:qcd_running}.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.75\linewidth, alt={Compilation plot of measurements of the strong coupling alpha sub s as a function of the energy scale Q, showing that the coupling decreases as Q increases over a wide range of energies.}]{figures/ch2/alphas-v-Q-2023-cropped.pdf}
+  \caption{A compilation of experimental measurements of the strong coupling $\alpha_s$ as a function of the energy scale $Q$, illustrating asymptotic freedom through the decrease of the coupling at high energies. \textbf{TODO: cite PDG}}
+  \label{fig:qcd_running}
+\end{figure}
+At high enery scales $Q$, the strong coupling (here plotting $\alpha_s$ rather than $g_s$) is less than 0.1.
+This is the perturbative QCD regime in which a perturbative expansion in powers of the strong coupling is well defined.
+Here the strong force dynamics are similar to the EM dynamics and color charged particles can freely propagate.
+At low energy scales the coupling begins to diverge.
+Below the QCD hadronization scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV, the strong force is so powerful that it becomes energetically favorable for color-charged particles to pull opposite color-charged particles out of the vacuum such that the overall color charge is neutralized.
+This is known as \textit{hadronization}, since color charged particles like quarks and gluons become bound up in composite particles known as hadrons.
+The protons and neutrons inside atomic nuclei are the most important hadrons, as they make up the vast majority of matter in the univese.
+Note that this hadronization is an inherently non-perturbative process since the strong coupling constant is large by assumption.
+The decreasing strength of the strong force with energy scale is known as asymptotic freedom\cite{Gross:1973id, Politzer:1973fx}.
+It offers a compelling example of how an energy scale (namely $\Lambda_{\mathrm{QCD}}$) can be generated by the structure of a theory rather than being put in by free parameters as is the case for many of the theoretical issues described in Chapter~\ref{ch:intro}.
 
-\subsection{Parton Showers and Infrared Divergences}
+\subsection{Parton Showers and Infrared and Collinear Divergences}
 
-Even at the high energies accessible to the LHC, where $\alpha_s$ is small and perturbation theory is valid, the production of a quark or gluon does not proceed quietly. The QCD splitting functions, which describe the probability of a parton undergoing a collinear splitting, contain divergences that qualitatively change the picture. The leading-order splitting functions for the three relevant partonic processes are
-\begin{align}
-  P_{q \to qg}(z) &= C_F \frac{1 + z^2}{1 - z}, \label{eqn:split_qqg} \\
-  P_{g \to gg}(z) &= C_A \frac{(1-z(1-z))^2}{z(1-z)}, \label{eqn:split_ggg} \\
-  P_{g \to q\bar{q}}(z) &= T_F \left[ z^2 + (1-z)^2 \right], \label{eqn:split_gqq}
-\end{align}
-where $z$ is the momentum fraction carried by one of the daughter partons, $C_F = 4/3$ is the fundamental Casimir of $\mathrm{SU}(3)$, $C_A = 3$ is the adjoint Casimir, and $T_F = 1/2$. The quark and gluon splitting functions $P_{q \to qg}$ and $P_{g \to gg}$ both diverge as $z \to 0$ or $z \to 1$, corresponding to the emission of a soft gluon (infrared divergence), and separately diverge as the emission angle $\theta \to 0$ at fixed $z$, corresponding to collinear emission. The gluon-to-quark splitting $P_{g \to q\bar{q}}$ is infrared safe but still diverges collinearly. Both the soft and collinear limits reflect the fact that the probability of emitting a soft or collinear parton is very large. Summing these emissions over a wide range of energy scales generates large logarithms of the ratio of scales that spoil the naive perturbative expansion, requiring resummation techniques to obtain reliable predictions \cite{Ellis:1991qj}.
+At high energies, quarks and gluons can propagate freely but this does not mean that the propagation is simple.
+The QCD splitting functions, which describe the probability of a parton\footnote{Quarks and gluons are often referred to as partons, since they are the consituent parts of the hadrons we observe at low energies. At high energies, the term is still used but is less descriptive since quarks and gluons can propagate freely.} to emit a gluon, have soft and collinear divergences.
+The leading-order splitting functions is given schematically by
+\begin{equation}
+  dP = \frac{\alpha_s}{\pi} C_f \frac{d\epsilon}{\epsilon}\frac{d\theta^2}{\theta^2}
+  \label{eqn:splitting}
+\end{equation}
+where $\epsilon = 1 - z$ is one minus the momentum fraction carried by one of the daughter partons $z$, $C_F = 4/3$ is the fundamental Casimir of $\mathrm{SU}(3)$, and $\theta$ is the emission angle between the daughter partons.
+This splitting function diverges as either $\epsilon$ or $\theta$ become small, corresponding the emission of a soft or collinear gluon by the parent parton\footnote{The splitting $g \rightarrow qq$ does not carry divergences, meaning that this ``flavor excitation'' is a small effect in the shower. However it is an important component in the subsequent hadronization to form color neutral objects.}.
+These divergences exist whether the parent parton is a quark or a gluon, so gluons emitted by a initiating parton can in-turn emit more gluons.
+This cascade of largely soft and collinear gluons is known as a \textit{parton shower}, which continues until all of the emitted partons reach energies near $\Lambda_{\mathrm{QCD}}$.
 
-The practical consequence is that any quark or gluon produced in an LHC collision immediately undergoes a \textit{parton shower}: a cascade of successive splittings that continues until the emitted partons reach energies near $\Lambda_{\mathrm{QCD}}$, at which point they hadronize. The collimation of this shower (the reason all the resulting hadrons travel in roughly the same direction) follows directly from the collinear divergence of the splitting functions. Emissions at large angles are heavily suppressed.
+The practical consequence is that any quark or gluon produced in an LHC collision immediately undergoes a parton shower before it can interact with a detector.
+The collimation of this shower (all the resulting quarks and gluons travel in roughly the same direction) follows directly from the collinear divergence of the splitting functions.
+Emissions at large angles are heavily suppressed.
 
 \subsection{Jets}
 
-These two sequential processes, parton showering at high energies and hadronization at low energies, together produce \textit{jets}: collimated sprays of hadrons observed in the detector. A jet is the experimental signature of a high-\pt color-charged particle produced in a hard scattering. Because the showering and hadronization processes are collinear-dominated, the energy flow of the jet is concentrated in a narrow cone around the direction of the original parton, making jets identifiable as localized deposits of energy in the calorimeter.
+These two sequential processes, parton showering at high energies and hadronization at low energies, imply that the result of the production of a high \pt quark or gluon in an LHC collision results in a collimated spray of hadrons that can interact with a detector.
+This signature is known as a \textit{jet}.
+Measurement of a jet requires that the four-vector of each hadron within the jet, typically called \textit{jet constituents}, be measured by the detector.
+The four-vector the jet itself can then be calculated by summing the four-vectors of the jet constituents, and then the four-vector of the jet can be used as a stand-in for the four-vector of the initiating parton when analyzing LHC collisions.
+This simple prescription is made much more complicated by a few experimental realities:
 
-Jets are central objects of study in this thesis. Because they are composed of many hadrons, each individually measured by the detector, jets are high-dimensional, structured objects. This complexity makes them natural applications for machine learning, and deep learning in particular has played an increasingly important role in jet physics over the past decade \cite{Larkoski:2017jix, Kogler:2018hem}.
+\begin{enumerate}
+  \item{
+    Choosing which measured hadrons to include in a jet is non-trivial.
+    In proton-proton collisions, the presence of multiple jets, multiple parton interactions, and initial and final state radiation significantly complicate this question.
+    Studying jets typically requires specifying a \textit{jet clustering algorithm}, which leads to many experimental and theoretical subtleties.
+  }
+  \item{
+    The general purpose detectors on the LHC, ATLAS and CMS, are not sensitive to the entire four-vector for an arbitrary hadron.
+    The procedure is covered in some detail in Chapter~\ref{ch:zjets}, but for now suffice to say that some details about the underlying hadrons are lost.
+    Significant approximations are made to put these details back in so that the four-vector of the jet can be calculated.
+  }
+  \item{
+    Even the parts of the four-vector that are measured are not measured with perfect resolution.
+    Some \textit{smearing} of the true kinematic quantities is inevitable, and can cause significant distortions in the four-vector of the jet.
+  }
+  \item{
+    The LHC operates with many proton-proton collisions per bunch crossing.
+    The presence of these \textit{pileup collisions} superimposed on top of the collision of interest can contaminate the jet, essentially adding hadrons to it that were not produced by the shower initiated by the parton.
+  }
+\end{enumerate}
 
-Much of the modern interest in jets centers not on the jet as a whole, treated as a single proxy for the initiating parton, but on its internal radiation pattern: \textit{jet substructure}. The program of jet substructure studies is organized around substructure observables, for which theoretical predictions can be computed in QCD through two complementary approaches.
+Each of these points adds significant complications to the experimental study of jets, even if the only goal is to infer the four-vector of the initiating parton.
+However there is a huge amount of interesting and unknown physics contained in the parton shower and hadronization.
+This physics can be probed through examining the underlying measurements of the jet constituents.
+Studying this \textit{jet substructure} requires processing the full, high-dimensional data type that describes all hadrons within a jet.
+The complexity and high dimensionality of these data types makes them natural applications for deep learning methods.
+This is why the jet substructure community saw the earliest and most enthusiastic adoption of deep learning in LHC physics \cite{Larkoski:2017jix, Kogler:2018hem}.
 
-The first approach is resummed perturbative QCD. A complete calculation involves three ingredients: (1) a fixed-order calculation in $\alpha_s$ capturing hard emissions, (2) resummation of the large logarithms arising from soft and collinear emissions, and (3) modeling of non-perturbative effects, typically through a shape function that accounts for hadronization corrections. The result is a systematically improvable prediction for the observable's cross section \cite{Dasgupta:2001sh}.
+The study of jet substructure is organized around substructure observables.
+These are quantities that can be calculated using the four-vectors of the jet constituents that captures certain features of a jet.
+Some example observables are discussed in Chapter~\ref{ch:tagging}.
+As is the case for all physics, the study of jet substructure moves forward through an interplay between theorists and experimentalists.
+Theorists make predictions of jet substructure observables within the framework of QCD, and experimentalists make measurements of these observables that can be compared to and used to refine the theory.
+As Chapter~\ref{ch:zjets} is a deep dive into the experimental side of this program, some brief description of the theory side is warranted here.
 
-The second approach is Monte Carlo event generation via parton showers. A parton shower generator recursively applies splitting kernels to produce a fully exclusive partonic final state, which is then passed through a phenomenological hadronization model \cite{Marchesini:1991ch, Sjostrand:2014zea}. This approach is fully general-purpose: it can provide predictions for any observable, including those that are too complicated for analytic resummation. The limitation is that the accuracy of parton shower predictions is harder to characterize systematically, and assigned theory uncertainties are less rigorous than those from resummed calculations.
+There are two approaches to calculating jet substructure observables within QCD.
+The first approach is to directly calculate a given observable within perturbative QCD.
+A complete calculation involves three ingredients~\cite{Larkoski:2017jix}: (1) a fixed-order calculation in $\alpha_s$ capturing hard emissions, (2) resummation of the large logarithms arising from soft and collinear emissions, and (3) modeling of non-perturbative effects, typically through a shape function that accounts for hadronization corrections.
+The result is a systematically improvable prediction for the observable's cross section \cite{Dasgupta:2001sh}.
 
-An important practical distinction between these two approaches is the form of their output. Resummed calculations provide smooth analytic predictions for inclusive cross sections; parton showers produce discrete lists of outgoing hadron four-momenta. Only the latter can be passed through a detector simulation. This difference is a subtle but important motivation for the unfolding methods discussed later in this thesis.
+The second approach is to recursively apply the splitting function in Equation~\ref{eqn:splitting}.
+Given the probability of a splitting at a given scale does not depend on splittings at any previous scales, the chain of splittings can be described as a Markov chain, and samples from the proability distribution over the final configuration of the parton shower can be obtained by Markov Chain Monte Carlo (MCMC) methods.
+Samples provided by the MCMC are a fully exclusive partonic final state, essentially a list of partons at or above the QCD hadronization scale $\Lambda_{\mathrm{QCD}}$.
+In order to compare to experimental measurements, phenomenological models of hadronization can be applied~\cite{Marchesini:1991ch, Sjostrand:2014zea}.
+Unlike the parton shower sampling, these models are not based on first principles QCD but are models with free parameters that must be \textit{tuned} to match experimental data.
+The combination of sampling parton shower configurations through MCMC followed by application of a hadronization model gives rise to ``Monte Carlo'' event generators which are capable of simulation proton-proton collisions with high accuracy~\cite{Bierlich:2022pfr,Bellm:2015jjp,Sherpa:2019gpd}.
+This approach is fully general-purpose: it can provide predictions for any observable, including those that are too complicated for analytic resummation.
+The limitation is that the accuracy of parton shower predictions is harder to characterize systematically, and assigned theory uncertainties are less rigorous than those from resummed calculations.
 
-The remainder of this chapter discusses two jet substructure observables of particular relevance to the measurements presented in Chapter~\ref{ch:zjets}: energy-energy correlators and the intrinsic dimensionality of jet phase space.
+An important practical distinction between these two approaches is the form of their output.
+Resummed calculations provide smooth analytic predictions for inclusive cross sections, while event generators produce discrete lists of outgoing hadron four-momenta.
+Only the latter can be passed through a detector simulation.
+Given highly accurate simulations of a particle's interaction with matter exist, the detector can be simulated with great accuracy~\cite{GEANT4:2002zbu, ATLAS:2010arf}.
+Chaining together a fixed order calculation (either in QCD or the SM more generally), parton shower, hadronization model, and detector simulation defines a \textit{simulation chain} capable of producing simulated collision events that resemble the data collected by the experiments at the LHC.
+This ability explains why event generators are used copiously in essentially every analysis of LHC data, while resummed calculations are only relevant within the sub-field of jet substructure and QCD.
+This difference between the two approaches is also a subtle but important motivation for the unfolding methods discussed in Chapter~\ref{ch:unfolding}.
+
+The remainder of this chapter discusses two jet substructure observables which are measured and compared to theoretical predictions in Chapter~\ref{ch:zjets}: energy-energy correlators and the intrinsic dimensionality of jets.
 
 \section{Energy-energy correlator observables}
 \label{sec:eec}
 
 
-\section{Intrinsic Dimensionality of Jet Observables}
+\section{Intrinsic Dimensionality of Jets}
 \label{sec:id}
 
