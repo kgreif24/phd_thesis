@@ -64,31 +64,60 @@ where the sum runs over quark flavors $f$, $D_\mu = \partial_\mu - i g_s T^a A^a
 \end{equation}
 where $f^{abc}$ are the $\mathrm{SU}(3)$ structure constants and $A^a_\mu$ are the gluon fields.
 
-A critical distinction between QCD and QED is that the $f^{abc} A^b_\mu A^c_\nu$ term in Equation~\ref{eqn:field_strength} is non-zero: QCD is a non-Abelian gauge theory. This term generates cubic and quartic gluon self-interaction vertices in the Feynman rules, allowing gluons to couple directly to each other. In QED, the photon carries no electric charge and no analogous photon self-coupling exists.
+A critical distinction between QCD and QED is that the $f^{abc} A^b_\mu A^c_\nu$ term in Equation~\ref{eqn:field_strength} is non-zero: QCD is a non-Abelian gauge theory. This term generates cubic and quartic gluon self-interaction vertices in the Feynman rules, allowing gluons to couple directly to each other, as shown in Figure~\ref{fig:gluon-vertices}. In QED, the photon carries no electric charge and no analogous photon self-coupling exists.
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \feynmandiagram [horizontal=a to b, layered layout] {
+      a [particle=\(g\)] -- [gluon] v,
+      b [particle=\(g\)] -- [gluon] v,
+      c [particle=\(g\)] -- [gluon] v,
+    };
+    \caption{Three-gluon vertex ($\sim g_s f^{abc}$)}
+    \label{fig:3g-vertex}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \feynmandiagram [horizontal=a to b, layered layout] {
+      a [particle=\(g\)] -- [gluon] v,
+      b [particle=\(g\)] -- [gluon] v,
+      c [particle=\(g\)] -- [gluon] v,
+      d [particle=\(g\)] -- [gluon] v,
+    };
+    \caption{Four-gluon vertex ($\sim g_s^2 f^{abe} f^{cde}$)}
+    \label{fig:4g-vertex}
+  \end{subfigure}
+  \caption{The gluon self-interaction vertices that arise from the non-Abelian structure of QCD. Their existence, absent in QED, drives the antiscreening of the strong coupling and is ultimately responsible for asymptotic freedom and jet formation.}
+  \label{fig:gluon-vertices}
+\end{figure}
 
 The self-coupling of gluons has a profound consequence for the running of the strong coupling constant $\alpha_s = g_s^2 / 4\pi$. In QED, the one-loop beta function is positive, meaning the coupling increases with energy as virtual fermion loops screen the bare charge. In QCD, the gluon self-interaction contributes a large negative term to the one-loop beta function,
 \begin{equation}
   \mu \frac{d\alpha_s}{d\mu} = -\frac{\alpha_s^2}{2\pi} \left( \frac{11}{3} C_A - \frac{4}{3} T_F n_f \right) + \mathcal{O}(\alpha_s^3),
   \label{eqn:beta_function}
 \end{equation}
-where $C_A = 3$ is the adjoint Casimir, $T_F = 1/2$, and $n_f$ is the number of active quark flavors. For $n_f \leq 16$ the coefficient is negative, so $\alpha_s$ decreases as the energy scale $\mu$ increases. This is \textit{asymptotic freedom} \cite{Gross:1973id, Politzer:1973fx}. At high energies, the strong coupling becomes weak and quarks and gluons propagate nearly freely; perturbation theory in $\alpha_s$ is reliable. At lower energies, $\alpha_s$ grows large and perturbation theory breaks down. Below the scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV, the strong force becomes so powerful that color-charged particles cannot propagate freely and instead \textit{hadronize} into color-neutral bound states -- the mesons and baryons that make up all baryonic matter.
+where $C_A = 3$ is the adjoint Casimir, $T_F = 1/2$, and $n_f$ is the number of active quark flavors. For $n_f \leq 16$ the coefficient is negative, so $\alpha_s$ decreases as the energy scale $\mu$ increases. This is \textit{asymptotic freedom} \cite{Gross:1973id, Politzer:1973fx}. At high energies, the strong coupling becomes weak and quarks and gluons propagate nearly freely; perturbation theory in $\alpha_s$ is reliable. At lower energies, $\alpha_s$ grows large and perturbation theory breaks down. Below the scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV, the strong force becomes so powerful that color-charged particles cannot propagate freely and instead \textit{hadronize} into color-neutral bound states: the mesons and baryons that make up all baryonic matter.
 
 \subsection{Parton Showers and Infrared Divergences}
 
-Even at the high energies accessible to the LHC, where $\alpha_s$ is small and perturbation theory is valid, the production of a quark or gluon does not proceed quietly. The QCD splitting functions, which describe the probability of a parton undergoing a collinear emission, contain divergences that qualitatively change the picture. The leading-order splitting function for a quark emitting a gluon ($q \to qg$) is
-\begin{equation}
-  P_{q \to qg}(z) = C_F \frac{1 + z^2}{1 - z},
-  \label{eqn:splitting_function}
-\end{equation}
-where $z$ is the fraction of the parent quark's longitudinal momentum carried by the daughter quark, and $C_F = 4/3$ is the fundamental Casimir of $\mathrm{SU}(3)$. This function diverges as $z \to 1$, corresponding to the emission of a soft gluon (infrared divergence), and as the emission angle $\theta \to 0$ at fixed $z$, corresponding to collinear emission. Both limits reflect the fact that the probability of emitting a soft or collinear gluon is very large. Summing these emissions over a wide range of energy scales generates large logarithms of the ratio of scales that spoil the naive perturbative expansion, requiring resummation techniques to obtain reliable predictions \cite{Ellis:1991qj}.
+Even at the high energies accessible to the LHC, where $\alpha_s$ is small and perturbation theory is valid, the production of a quark or gluon does not proceed quietly. The QCD splitting functions, which describe the probability of a parton undergoing a collinear splitting, contain divergences that qualitatively change the picture. The leading-order splitting functions for the three relevant partonic processes are
+\begin{align}
+  P_{q \to qg}(z) &= C_F \frac{1 + z^2}{1 - z}, \label{eqn:split_qqg} \\
+  P_{g \to gg}(z) &= C_A \frac{(1-z(1-z))^2}{z(1-z)}, \label{eqn:split_ggg} \\
+  P_{g \to q\bar{q}}(z) &= T_F \left[ z^2 + (1-z)^2 \right], \label{eqn:split_gqq}
+\end{align}
+where $z$ is the momentum fraction carried by one of the daughter partons, $C_F = 4/3$ is the fundamental Casimir of $\mathrm{SU}(3)$, $C_A = 3$ is the adjoint Casimir, and $T_F = 1/2$. The quark and gluon splitting functions $P_{q \to qg}$ and $P_{g \to gg}$ both diverge as $z \to 0$ or $z \to 1$, corresponding to the emission of a soft gluon (infrared divergence), and separately diverge as the emission angle $\theta \to 0$ at fixed $z$, corresponding to collinear emission. The gluon-to-quark splitting $P_{g \to q\bar{q}}$ is infrared safe but still diverges collinearly. Both the soft and collinear limits reflect the fact that the probability of emitting a soft or collinear parton is very large. Summing these emissions over a wide range of energy scales generates large logarithms of the ratio of scales that spoil the naive perturbative expansion, requiring resummation techniques to obtain reliable predictions \cite{Ellis:1991qj}.
 
-The practical consequence is that any quark or gluon produced in an LHC collision immediately undergoes a \textit{parton shower}: a cascade of successive collinear splittings that continues until the emitted partons reach energies near $\Lambda_{\mathrm{QCD}}$, at which point they hadronize. The collimation of this shower -- the reason all the resulting hadrons travel in roughly the same direction -- follows directly from the collinear divergence of the splitting functions. Emissions at large angles are heavily suppressed.
+The practical consequence is that any quark or gluon produced in an LHC collision immediately undergoes a \textit{parton shower}: a cascade of successive splittings that continues until the emitted partons reach energies near $\Lambda_{\mathrm{QCD}}$, at which point they hadronize. The collimation of this shower (the reason all the resulting hadrons travel in roughly the same direction) follows directly from the collinear divergence of the splitting functions. Emissions at large angles are heavily suppressed.
 
 \subsection{Jets}
 
 These two sequential processes, parton showering at high energies and hadronization at low energies, together produce \textit{jets}: collimated sprays of hadrons observed in the detector. A jet is the experimental signature of a high-\pt color-charged particle produced in a hard scattering. Because the showering and hadronization processes are collinear-dominated, the energy flow of the jet is concentrated in a narrow cone around the direction of the original parton, making jets identifiable as localized deposits of energy in the calorimeter.
 
-Jets are central objects of study in this thesis. Because they are composed of many hadrons -- each individually measured by the detector -- jets are high-dimensional, structured objects. This complexity makes them natural applications for machine learning, and deep learning in particular has played an increasingly important role in jet physics over the past decade \cite{Larkoski:2017jix, Kogler:2018hem}.
+Jets are central objects of study in this thesis. Because they are composed of many hadrons, each individually measured by the detector, jets are high-dimensional, structured objects. This complexity makes them natural applications for machine learning, and deep learning in particular has played an increasingly important role in jet physics over the past decade \cite{Larkoski:2017jix, Kogler:2018hem}.
 
 Much of the modern interest in jets centers not on the jet as a whole, treated as a single proxy for the initiating parton, but on its internal radiation pattern: \textit{jet substructure}. The program of jet substructure studies is organized around substructure observables, for which theoretical predictions can be computed in QCD through two complementary approaches.
 
