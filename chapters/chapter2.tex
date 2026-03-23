@@ -226,41 +226,80 @@ This difference between the two approaches is also a subtle but important motiva
 
 The remainder of this chapter discusses two jet substructure observables which are measured and compared to theoretical predictions in Chapter~\ref{ch:zjets}: energy-energy correlators and the intrinsic dimensionality of jets.
 
-\section{Energy-energy correlator observables}
+\section{Energy correlator observables}
 \label{sec:eec}
 
 \subsection{Definition and History}
 
-Energy correlators are a class of collider observables with a long history. They were first introduced as event-shape observables in the context of electron-positron collisions \cite{Basham:1977iq, Basham:1978bw, OPAL:1991uui, SLD:1994idb}, where they were used to study the radiation pattern of hadronic final states. One important application is the extraction of the strong coupling constant $\alpha_s$; several of the measurements compiled in Figure~\ref{fig:qcd_running} are derived from energy correlator measurements in $e^+e^-$ collisions.
+Energy correlators are a class of collider observables with a long history.
+They were first introduced as event-shape observables in the context of electron-positron collisions \cite{Basham:1977iq, Basham:1978bw, OPAL:1991uui, SLD:1994idb}, where they were used to study the radiation pattern of hadronic final states.
+One important application is the extraction of the strong coupling constant $\alpha_s$.
+Several of the measurements shown in green in Figure~\ref{fig:qcd_running} are derived from energy correlator measurements in $e^+e^-$ collisions.
 
-The $n$-point energy correlator (E$n$C) is defined as the energy-weighted $n$-point correlation function of the radiation pattern produced by a particle collision. In a rough analogy to the correlation functions of condensed matter physics, the energy correlators probe the spatial correlations among the energy deposits in the detector, with the role of the spatial coordinate played by the opening angle between particles.\footnote{The connection to the operator product expansion and light-ray operators in quantum field theory makes this analogy more than superficial; see \cite{Hofman:2008ar, Kologlu:2019mfz} for a formal treatment.} The energy weighting ensures that the observables are infrared and collinear (IRC) safe, a necessary condition for a well-defined comparison between experiment and perturbative QCD calculations. The most common correlator is the two-point correlator (EEC), though three-point (E3C) and higher correlators are also of interest.
-
-Either individual particles or clustered jets can serve as inputs \cite{ATLAS:2015yaa, ATLAS:2017qir, ATLAS:2023tgo, CMS:2024mlf}. For the two-point correlator with jet inputs, the measurement reduces to building a histogram of the opening angles between all pairs of jets in an event, with each pair weighted by the product of the jet energies (normalized to the total event energy). For particle-level inputs, or for higher-point correlators, the number of pairs (or tuples) grows combinatorially with the particle multiplicity, which makes the measurement substantially more computationally demanding \cite{Komiske:2022enw}.
+The $n$-point energy correlator (E$n$C) is defined as the energy-weighted $n$-point correlation function of the radiation pattern produced by a particle collision.
+This mathematical object is also used in cosmology to study the CMB and in condensed matter physics to study phase transitions and criticality\footnote{The connection to the operator product expansion and light-ray operators in quantum field theory makes this analogy more than superficial; see \cite{Hofman:2008ar, Kologlu:2019mfz} for a formal treatment.}.
+The siplest energy correlator is the two-point energy correlator (E2C or EEC).
+Measuring this quantity involves building a histogram of the opening angle between objects produced by a collision, with the histogram entries weighted by the product of the energies of the two objects.
+The energy weighting ensures that the observables are infrared and collinear (IRC) safe.
+Either individual particles or clustered jets can serve as inputs \cite{ATLAS:2015yaa, ATLAS:2017qir, ATLAS:2023tgo, CMS:2024mlf}.
+Most studies have focused on the properties of the EEC, but high order correlators are also of some theoretical interest.
+For high order correlators the number of pairs (or tuples) of objects grows combinatorially with the particle multiplicity, which makes the measurement substantially more computationally demanding~\cite{Alipour-fard:2024szj}.
 
 \subsection{Energy Correlators as Jet Substructure Observables}
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.65\linewidth, alt={Log-log plot of the normalized two-point energy correlator versus angular scale R sub L for CMS 2011 open data AK5 jets. The figure highlights three regions labeled Free Hadron at low R sub L, Transition at intermediate R sub L, and Quarks/Gluons at larger R sub L.}]{figures/ch2/anec_cms_open.png}
+  \caption{The two-point energy correlator measured in CMS 2011 open data for high \pt jets, showing distinct free-hadron, transition, and quark/gluon regimes as a function of the angular scale $R_L$ (called $z$ in the text). Figure adapted from Ref.~\cite{Komiske:2022enw}.}
+  \label{fig:cms-open-eec}
+\end{figure}
+
 The use of energy correlators specifically as jet substructure observables is a more recent development.
 See Ref.~\cite{Moult:2025nhu} for a recent review.
-Interest has been driven by several interlocking theoretical properties.
+Interest has been driven by a few properties of the two-point correlator in the collinear limit that can be probed using the particles within jets.
+The two-point correlator is given as
+\begin{equation}
+  EEC(z) = \frac{1}{\sigma} \sum_{i,j} \int d\sigma \frac{E_i E_j}{Q^2} \delta(z - \frac{1-|cos\theta_{ij}|}{2})
+  \label{eqn:eec}
+\end{equation}
+where $\sigma$ is the total cross section, $E_i$ is the transverse energy of the $i$-th particle, $Q$ is the sum of the transverse energies of all particles ($\sum_i E_i$), $\theta_{ij}$ is the angle between the three-momentum vectors of the $i$-th and $j$-th particles, and $z = \frac{1-cos\theta_{ij}}{2}$.
+The first property is that in perturbative QCD at high energies, the scaling behavior of the EEC as a function of the opening angle $z$ between freely propagating partons is predicted to follow a power law.
+The exponent of this power law is related to a formal field theoretical quantity known as the cusp anomalous dimension.
+This provides a direct connection between a measurable quantity and a fundamental property of QCD.
+In general, the larger the angular separation between particles $z$, the earlier in the jet formation process (or the higher the energy) is being probed.
+This means that are moderate values of $z$, where particles are contained within a jet but last interacted with each other early in the jet formation process, a power law scaling in the EEC should be observed.
 
-First, in the collinear limit, the scaling behavior of the energy correlators as a function of the opening angle $r$ is governed by the anomalous dimensions of QCD. Concretely, the EEC measured on the constituents of a jet scales as a power law in $r$, with an exponent determined by the cusp anomalous dimension of the theory. This provides a direct, field-theoretic connection between a measurable quantity and a fundamental property of QCD.
+Second, deviations from this perturbative power-law scaling encode non-perturbative effects like hadronization.
+As $z$ grows smaller, the EEC quantifies correlations between increasingly collinear particles, meaning they were emitted later in the jet formation process.
+Therefore the very small $z$ regime should be sensitive to dynamics below the scale $\Lambda_{\mathrm{QCD}}$ where hadronization occurs.
+Hadrons are color neutral and do not interact by the strong force, and so the correlation should reflect non-interacting particle.
+Namely it should have a linear dependance on the angular separation.
 
-Second, deviations from this perturbative power-law scaling at larger angles are a direct signature of hadronization. Because the perturbative description breaks down at the scale $\Lambda_{\mathrm{QCD}}$, the EEC as a function of $r$ provides a direct image of the transition from the perturbative to the non-perturbative regime of QCD \cite{Hofman:2008ar, Kologlu:2019mfz, Dixon:2019uzg, Komiske:2022enw}. Observing this transition cleanly requires jets with high transverse momentum and large particle multiplicity, so that the collinear regime is well-separated from the hadronization scale. The LHC produces such jets copiously. This was not the case at LEP, where the available center-of-mass energy limited the jet \pt, and it is one reason the energy correlators were relatively unexplored as jet substructure tools in the $e^+e^-$ era.
+The combination of these two properties mean that two distinct scaling regimes should be visible in the EEC: a power law corresponding to freely propagating partons at high energies at high $z$, and a linear scaling corresponding to non-interacting hadrons at low $z$.
+Ref.~\cite{Komiske:2022enw} first illustrated these two distinct scaling regimes using CMS open data, as shown in \cref{fig:cms-open-eec}.
+The two scaling regimes are shaded in blue and green respectively, with a transition regime corresponding to the hadronization process linking them.
+The scaling regimes are very well understood from a theoretical standpoint, but the transition between them is intractable given our current theoretical tools, motivating it as a useful object to measure experimentally.
+Observing this transition cleanly requires jets with high transverse momentum and large particle multiplicity, so that the collinear regime is well-separated from the hadronization scale.
+The LHC produces such jets copiously.
+This was not the case at LEP, where the available center-of-mass energy limited the jet \pt, which is why the energy correlators were relatively unexplored as jet substructure tools in the $e^+e^-$ era.
 
-Third, the energy correlators are among the most theoretically tractable jet substructure observables from the perspective of higher-order perturbative calculations. The EEC in $e^+e^-$ collisions has been computed to next-to-next-to-next-to-leading order (N$^3$LO), a level of perturbative accuracy that is exceptional for a jet substructure quantity \cite{Ebert:2020sfi}. Recent work has extended high-order calculations to the EEC in proton-proton collisions as well \cite{Gao:2023ivm}.
+The final property is that the energy correlators are among the most theoretically tractable jet substructure observables from the perspective of higher-order perturbative calculations.
+The EEC in $e^+e^-$ collisions has been computed to next-to-next-to-next-to-leading order (N$^3$LO), which is a very high level of accuracy for a jet substructure quantity~\cite{Ebert:2020sfi}.
+Recent work has extended high-order calculations to the EEC in proton-proton collisions as well~\cite{Gao:2023ivm}.
 
 \subsection{Experimental Status}
 
-The theoretical properties described above have made energy correlators a rapidly developing experimental topic. Several measurements have been made in recent years, though significant gaps remain.
-I only summarize energy correlator measurements using particles, rather than jets, since this is needed to access the collinear regime.
+The theoretical properties described above have made energy correlators a rapidly developing experimental topic.
+Several measurements have been made in recent years, though significant gaps remain.
+I only summarize here energy correlator measurements using particles, rather than jets, since this is needed to access the collinear regime.
 
-The most directly relevant existing measurement is the E2C and E3C measurement by the CMS collaboration in proton-proton collisions at the LHC, which also extracted a value of $\alpha_s$ \cite{CMS:2024mlf}.
-This is the only published measurement using high-\pt jets from $pp$ collisions at the LHC and serves as the primary point of comparison for the measurement presented in this thesis.
-The ALICE collaboration additionally measured the EEC in charm-tagged jets in proton-proton collisions~\cite{ALICE:2025igw}.
+The most directly relevant existing measurement is the E2C and E3C measurement by the CMS collaboration in proton-proton collisions at the LHC, which also extracted a value of $\alpha_s$~\cite{CMS:2024mlf}.
+This is the only published measurement using high \pt jets from $pp$ collisions at the LHC and serves as a primary point of comparison for EEC application of the measurement presented in this thesis.
+The ALICE collaboration additionally measured the EEC in charm-tagged jets in proton-proton collisions, but at a lower center-of-mass energy and with less luminosity~\cite{ALICE:2025igw}.
 Energy correlator measurements have also been carried out in heavy-ion~\cite{ALICE:2024dfl, CMS:2025ydi} and proton-ion~\cite{Liang-Gilman:2025gjl} collisions at the LHC.
 These measurements feature lower \pt jets, where the observed EEC distributions are modified due to interaction with the quark-gluon plasma.
 The STAR collaboration has measured the EEC at the lower center-of-mass energies available at RHIC \cite{STAR:2025jut}.
-In addition, several legacy analyses have reprocessed archived data from the ALEPH experiment at LEP \cite{Bossi:2024qeu}, where the EEC is measured with all tracks given the substantially lower particle multiplicity produced by electron-positron collisions.
+Legacy analyses have reprocessed archived data from the ALEPH experiment at LEP \cite{Bossi:2024qeu}, where the EEC is measured with all tracks given the substantially lower particle multiplicity produced by electron-positron collisions.
 Finally, preliminary results from the H1 collaboration have measured the EEC distribution in electron-proton deep inelastic scattering events using all tracks.
 This result is particularly relevant because it uses the same approach to unfolding as the measurement in this thesis.
 In will be discussed in detail in Chapter~\ref{ch:unfolding}.
@@ -268,9 +307,16 @@ In will be discussed in detail in Chapter~\ref{ch:unfolding}.
 
 \input{tables/eec_measurements.tex}
 
-Despite this progress, the existing suite of measurements has two notable gaps. First, all current LHC measurements cluster particles into jets before performing the correlator measurement. This procedure is experimentally convenient, particularly for the unfolding step discussed in Chapter~\ref{ch:unfolding}, but it introduces additional theoretical complications associated with the jet clustering. A measurement performed directly on all particles in the event, without prior jet clustering, would represent a significant step forward and would most cleanly realize the theoretical properties described above. Second, all existing measurements use only charged particles, since neutral particles such as photons and neutral pions are measured with substantially worse angular resolution by general-purpose detectors. Theoretical predictions for charged-particle-only measurements require the track function formalism \cite{Chang:2013rca, Chang:2013iba}, which introduces an additional layer of non-perturbative modeling; work on this formalism and its application to ATLAS data is ongoing \cite{ATLAS:2025qtv}.
-
-One of the primary physics contributions of the measurement presented in this thesis is to address both of these gaps simultaneously.
+Despite this progress, the existing suite of measurements has notable gaps.
+First, there is only one measurement from CMS which uses the high \pt jets provided by the LHC to measure the EEC well above the confinement scale~\cite{CMS:2024mlf}.
+A similar measurement performed by ATLAS would be a valuable contribution.
+Second, all current LHC measurements cluster particles into jets before performing the correlator measurement on the jet substructure.
+This procedure is experimentally convenient, particularly for the unfolding step discussed in Chapter~\ref{ch:unfolding}, but it introduces additional theoretical complications associated with the jet clustering.
+A measurement performed on all particles in the event, without prior jet clustering, would allow measurement of the entire perturbative scaling regime without the distribution being cut-off due to the jet radius.
+Third, all existing measurements use only charged particles, since neutral particles such as photons and neutral pions are measured with substantially worse angular resolution.
+Theoretical predictions for charged-particle-only measurements require the track function formalism~\cite{Chang:2013rca, Chang:2013iba}, which introduces an additional layer of non-perturbative modeling.
+Discussion of this is beyond the scope here, but work on this formalism and associated measurements is on-going~\cite{ATLAS:2025qtv}.
+One of the primary physics contributions of the measurement presented in this thesis is to address the first two gaps.
 
 \section{Intrinsic Dimensionality of Jets}
 \label{sec:id}
