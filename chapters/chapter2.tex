@@ -362,9 +362,15 @@ Given a set of $N$ jets equipped with the EMD, the nearest-neighbor intrinsic di
   \mu_{k,ij} = \frac{\mathrm{EMD}(k, \mathrm{NN}_j(k))}{\mathrm{EMD}(k, \mathrm{NN}_i(k))},
   \label{eqn:mu_ratio}
 \end{equation}
-where $\mathrm{NN}_i(k)$ denotes the $i$th nearest neighbor of jet $k$ in the EMD metric. In what follows, I set $j = 2i$ throughout, so each ratio compares distances at two scales that differ by a factor of two. The index $i$ sets the scale being probed: small $i$ corresponds to short-distance structure, and large $i$ (at most $N/2$) to long-distance structure. The intrinsic dimension at scale $i$ is then estimated by maximizing the likelihood over the collection of ratios $\{\mu_{k,ij}\}$ across all jets $k$.
+where $\mathrm{NN}_i(k)$ denotes the $i$th nearest neighbor of jet $k$ in the EMD metric. In what follows, I set $j = 2i$ throughout, so each ratio compares distances at two scales that differ by a factor of two. The index $i$ sets the scale being probed: small $i$ corresponds to short-distance structure, and large $i$ (at most $N/2$) to long-distance structure.
 
-The geometry underlying these ratios is illustrated in Figure~\ref{fig:nnid_illustration}. In a $d$-dimensional space, the ratio $\mu_{k,ij}$ follows a Pareto distribution whose shape parameter encodes $d$; maximizing the likelihood over all jets yields the estimated intrinsic dimension at that scale.
+The geometry underlying these ratios is illustrated in Figure~\ref{fig:nnid_illustration}. In a $d$-dimensional space, the ratio $\mu_{k,ij}$ follows a Pareto distribution whose shape parameter encodes $d$. The intrinsic dimension at scale $i$ is estimated by minimizing the negative log-likelihood,
+\begin{align}
+ L &= -\sum_{k=1}^{N} \log f(\mu_{k,ij}; d) \notag \\
+ &= -N \log d + (1 + d)\sum_{k=1}^{N} \log \mu_{k,ij} - (j - i - 1)\sum_{k=1}^{N} \log\left(1 - \mu_{k,ij}^d\right),
+ \label{eqn:likelihood}
+\end{align}
+where $f(\mu_{k,ij}; d)$ is the Pareto probability density evaluated at the ratio for jet $k$. Minimizing Equation~\ref{eqn:likelihood} over $d$ across all jets $k$ yields the estimated intrinsic dimension at scale $i$.
 
 \begin{figure}[ht]
   \centering
@@ -381,21 +387,21 @@ As a first look at the NNID of jet data, Figure~\ref{fig:nnid_generators} shows 
 
 \begin{figure}[ht]
   \centering
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\linewidth, alt={NNID versus median EMD at low EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_low}
     \caption{Low EMD scales}
     \label{fig:nnid_low}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\linewidth, alt={NNID versus median EMD at intermediate EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_mid}
     \caption{Intermediate EMD scales}
     \label{fig:nnid_mid}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.32\textwidth}
+  \\[1em]
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\linewidth, alt={NNID versus median EMD at high EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_high}
     \caption{High EMD scales}
