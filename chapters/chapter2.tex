@@ -323,3 +323,89 @@ One of the primary physics contributions of the measurement presented in this th
 \section{Intrinsic Dimensionality of Jets}
 \label{sec:id}
 
+The energy-energy correlators discussed in Section~\ref{sec:eec} are jet substructure observables with a direct connection to the formal structure of QCD: their scaling behavior is tied to anomalous dimensions, and their non-perturbative corrections encode hadronization physics. The intrinsic dimensionality of jets is a fundamentally different kind of observable. It is motivated not by a specific prediction of QCD but by a basic question about the structure of the data themselves. Connections to the underlying theory are not yet understood, and the measurement presented in this thesis is the first of its kind.
+
+\subsection{The Manifold Hypothesis and Intrinsic Dimension}
+
+High-dimensional data in many scientific domains do not uniformly fill the ambient space; rather, they tend to cluster near a lower-dimensional manifold embedded within it. This observation, known as the manifold hypothesis, implies that fewer coordinates are needed to faithfully describe a data point than the naive dimensionality of its representation would suggest. The intrinsic dimension (ID) of a dataset is a quantification of the dimension of this underlying manifold.
+
+The intrinsic dimension is a scale-dependent quantity. At very large length scales, a data manifold appears as a featureless point: the effective dimension is zero. As the length scale decreases, more geometric structure becomes visible and the estimated dimension increases. This dependence is illustrated in Figure~\ref{fig:id_scale}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.85\linewidth, alt={Illustration of the scale dependence of the intrinsic dimension of a dataset, showing that at large distances the data appear zero-dimensional while at smaller scales their manifold structure is revealed.}]{figures/ch2/id_scale}
+  \caption{Illustration of the scale dependence of the intrinsic dimension. At large length scales the data appear as a single point (zero dimensions); at smaller scales the geometry of the underlying data manifold becomes visible and the estimated dimension increases.}
+  \label{fig:id_scale}
+\end{figure}
+
+A variety of estimators have been developed to compute the intrinsic dimension of a dataset \cite{10.1109/T-C.1971.223208, PhysRevLett.50.346, NIPS2004_74934548, CERUTI20142569, Albergante:2019ijcnn}. They can be grouped into three broad families.
+
+Principal component analysis (PCA) methods count the number of statistically significant eigenvalues of the data covariance matrix. They assume the data lie on a linear subspace, which limits their applicability to curved manifolds \cite{10.1109/T-C.1971.223208}.
+
+Fractal and correlation dimension methods exploit the scaling of the number of data points contained within a ball of radius $r$ as $r$ varies. The correlation dimension of Grassberger and Procaccia \cite{PhysRevLett.50.346} is the most widely used estimator in this family. It was the first applied to jets as a substructure observable \cite{Komiske:2019fks}.
+
+Nearest-neighbor maximum likelihood methods apply a maximum likelihood estimator to the distribution of distances between neighboring data points \cite{NIPS2004_74934548}. This is currently the most widely used class of intrinsic dimension estimator in machine learning, and it is the approach used in this thesis. It was recently proposed as a test statistic for searches for physics beyond the Standard Model at the LHC \cite{DAgnolo:2025qqr}. A fourth family, based on concentration-of-measure phenomena in high-dimensional spaces, has been developed but not yet applied to particle physics data \cite{CERUTI20142569, Albergante:2019ijcnn}.
+
+\subsection{The Energy Mover's Distance}
+
+Most intrinsic dimension estimators require a metric: a notion of pairwise distance between data points. For jet data, the natural choice is the Energy Mover's Distance (EMD), introduced in \cite{Komiske:2019fks}. The EMD between two jets $\mathcal{E}$ and $\mathcal{E}'$ is defined as the minimum amount of ``work'' required to rearrange the energy flow of one jet into the other,
+\begin{equation}
+  \mathrm{EMD}(\mathcal{E}, \mathcal{E}') = \min_{\{f_{ij}\}} \sum_{i,j} f_{ij} \frac{\theta_{ij}}{R} + \left| \sum_i E_i - \sum_j E'_j \right|,
+  \label{eqn:emd}
+\end{equation}
+where $f_{ij} \geq 0$ is the optimal transport plan moving energy from particle $i$ in one jet to particle $j$ in the other, $\theta_{ij}$ is the angular distance between them, $R$ is the jet radius, and the second term penalizes any difference in total energy. The EMD is infrared and collinear safe: adding a soft or collinear splitting to either jet produces only a small change in the distance. This makes it a physically well-motivated metric for jet data.
+
+\subsection{The Nearest-Neighbor Intrinsic Dimension Estimator}
+
+Given a set of $N$ jets equipped with the EMD, the nearest-neighbor intrinsic dimension (NNID) estimator \cite{NIPS2004_74934548, DAgnolo:2025qqr} constructs a likelihood from the ratios of distances to successive nearest neighbors. For a jet $k$, define the distance ratio
+\begin{equation}
+  \mu_{k,ij} = \frac{\mathrm{EMD}(k, \mathrm{NN}_j(k))}{\mathrm{EMD}(k, \mathrm{NN}_i(k))},
+  \label{eqn:mu_ratio}
+\end{equation}
+where $\mathrm{NN}_i(k)$ denotes the $i$th nearest neighbor of jet $k$ in the EMD metric. In what follows, I set $j = 2i$ throughout, so each ratio compares distances at two scales that differ by a factor of two. The index $i$ sets the scale being probed: small $i$ corresponds to short-distance structure, and large $i$ (at most $N/2$) to long-distance structure. The intrinsic dimension at scale $i$ is then estimated by maximizing the likelihood over the collection of ratios $\{\mu_{k,ij}\}$ across all jets $k$.
+
+The geometry underlying these ratios is illustrated in Figure~\ref{fig:nnid_illustration}. In a $d$-dimensional space, the ratio $\mu_{k,ij}$ follows a Pareto distribution whose shape parameter encodes $d$; maximizing the likelihood over all jets yields the estimated intrinsic dimension at that scale.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.7\linewidth, alt={Illustration of the nearest-neighbor intrinsic dimension estimator in a two-dimensional space, showing a reference point and its nearest neighbors at two successive distance scales.}]{figures/ch2/nnid_illustration}
+  \caption{Illustration of the NNID estimator in a simple two-dimensional space. For a reference point (center), the distances to the $i$th nearest neighbor and the $j$th nearest neighbor define the ratio $\mu_{k,ij}$. The distribution of these ratios across many reference points encodes the intrinsic dimension of the data manifold.}
+  \label{fig:nnid_illustration}
+\end{figure}
+
+To attach a physical meaning to the scale index $i$, one can compute the median EMD between a jet and its $i$th nearest neighbor across the dataset. Plotting the NNID estimate against this median EMD produces a curve showing how the apparent dimensionality of the jet phase space varies with the distance scale probed. In practice, the calculation must also accommodate per-event weights, which arise from the unfolding procedure discussed in Chapter~\ref{ch:unfolding}; each jet's contribution to the likelihood is scaled by its weight, and the nearest-neighbor counting is replaced by its weighted analogue.
+
+\subsection{Generator-Level Results}
+
+As a first look at the NNID of jet data, Figure~\ref{fig:nnid_generators} shows the NNID as a function of median EMD computed at truth level, comparing predictions from two Monte Carlo generators: \textsc{MadGraph} and \textsc{Sherpa}. The results are shown in three panels covering different regions of the EMD scale in order to resolve the fine structure of the curve.
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth, alt={NNID versus median EMD at low EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_low}
+    \caption{Low EMD scales}
+    \label{fig:nnid_low}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth, alt={NNID versus median EMD at intermediate EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_mid}
+    \caption{Intermediate EMD scales}
+    \label{fig:nnid_mid}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth, alt={NNID versus median EMD at high EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_high}
+    \caption{High EMD scales}
+    \label{fig:nnid_high}
+  \end{subfigure}
+  \caption{Nearest-neighbor intrinsic dimension (NNID) as a function of the median EMD scale, computed at truth level for \textsc{MadGraph} (solid) and \textsc{Sherpa} (dashed). The three panels show the same curve over different ranges of the EMD axis to resolve fine structure. Differences between the generators are most pronounced at very low EMD scales, reflecting differences in the modeling of soft and collinear radiation.}
+  \label{fig:nnid_generators}
+\end{figure}
+
+The two generators agree broadly at intermediate scales but show visible differences at very low EMD values, where the modeling of soft and collinear radiation is most sensitive to the specifics of the parton shower and hadronization implementation. This generator dependence is one of the systematic uncertainties that must be accounted for in the experimental measurement.
+
+The first experimental measurement of the intrinsic dimensionality of jets is presented in this thesis. Rather than using the jet data to extract a parameter of the Standard Model or test a specific theoretical prediction, the NNID measurement asks a more basic question: what is the effective dimensionality of the phase space occupied by jet data, and how does it vary with scale? Evaluating the degree to which the Standard Model simulation can reproduce the answer constitutes a new and complementary approach to probing jet physics at the LHC.
+
