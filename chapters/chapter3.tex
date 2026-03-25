@@ -20,33 +20,39 @@ Instead only the information needed to understand the particular deep learning m
 \section{Overview: ML as a Paradigm Shift}
 \label{sec:ml-overview}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Framing
-%    - Classical programming: explicit rules → output.
-%    - ML paradigm: data + optimization → learned rules.
-%    - This shift is especially powerful when the rules are
-%      too complex to write by hand (e.g., "what does a
-%      boosted top jet look like?").
-%
-% 2. Taxonomy: supervised / unsupervised / generative / RL
-%    - Supervised: labeled training data; loss = task loss.
-%    - Unsupervised: learning structure without labels.
-%    - Generative: model p(x); sample new data.
-%    - Reinforcement: agent + reward signal (less relevant here
-%      but mention in the context of agentic AI in Ch.7).
-%
-% 3. Why HEP is a natural fit
-%    - Enormous labeled datasets from simulation (MC generators
-%      like Pythia, Herwig, Sherpa) — no labeling cost.
-%    - High-dimensional, structured data (jets as point clouds
-%      or images; events as graphs).
-%    - Physical symmetries (Lorentz invariance, permutation
-%      invariance of jet constituents) can be built into the
-%      architecture → inductive bias.
-%    - Fast, accurate simulation enables supervised learning
-%      in a way that most other fields cannot match.
+Classical software is built on explicit rules: a human expert encodes domain knowledge as a sequence of instructions, and a computer evaluates those instructions on an input to produce an output.
+This approach works well when the rules are known and can be stated precisely.
+It fails, however, when the rules are either too complex to write down or not known at all.
+Machine learning addresses this failure mode by inverting the paradigm: rather than specifying the rules, one specifies the desired input-output relationship through a dataset of examples and then uses optimization to find a function that approximates it.
+The power of this shift becomes most apparent in domains where the relevant structure is real but inscrutable to human inspection.
+Identifying a boosted top quark in a busy hadron collider environment is a canonical example: no human expert can write down the decision boundary in the high-dimensional space of jet constituent momenta, but a neural network trained on simulated signal and background events can learn it directly from data.
+
+The space of machine learning methods is broad, and it is useful to organize it by the structure of the available training information.
+In \textit{supervised learning}, each training example consists of an input paired with a label, and the objective is to learn a function that maps inputs to labels.
+Classification and regression are the most common supervised tasks.
+In \textit{unsupervised learning}, no labels are provided, and the goal is to learn useful structure in the input distribution itself, for example through clustering or dimensionality reduction.
+\textit{Generative modeling} is a closely related setting in which the explicit objective is to learn the probability distribution $p(x)$ over inputs well enough to draw new samples from it or evaluate likelihoods.
+Finally, \textit{reinforcement learning} (RL) optimizes the behavior of an agent interacting with an environment according to a reward signal.
+RL is responsible for landmark results including AlphaGo~\cite{Silver:2016alphago} and the post-training of modern large language models~\cite{Ouyang:2022instructgpt}.
+Its direct applications within HEP remain limited, though its broader trajectory is relevant to the discussion of agentic AI in Chapter~\ref{ch:conclusion}.
+Each of these paradigms appears in the research chapters that follow, though supervised learning and generative modeling receive the most attention.
+
+High-energy physics presents an unusually favorable setting for machine learning, for several reasons.
+The first is the availability of large, automatically labeled training datasets.
+Monte Carlo event generators such as \textsc{Pythia}~\cite{Sjostrand:2014zea}, \textsc{Herwig}~\cite{Bellm:2015jjp}, and \textsc{Sherpa}~\cite{Gleisberg:2008ta} simulate the full chain of a particle collision, from the hard scatter through parton showering and hadronization to detector response.
+Each simulated event carries a ground-truth label by construction, and generating many millions of such events is routine.
+This is in sharp contrast to fields like medical imaging, where labeling is expensive and human-bottlenecked.
+The labeling cost that limited early computer vision datasets simply does not exist in the same way in HEP.
+
+The second reason is that HEP data has a natural high-dimensional, structured representation that plays well with modern neural network architectures.
+A jet can be represented as an unordered set of constituent four-momenta, an image in the $(\eta, \phi)$ plane, or a graph with particles as nodes and pairwise relationships as edges.
+These representations are natively handled by graph neural networks (GNNs) and transformers, respectively.
+Furthermore, the known symmetries of the data can be built directly into the network architecture as \textit{inductive biases}.
+Lorentz invariance, permutation invariance of jet constituents, and translational equivariance in $(\eta, \phi)$ are all symmetries that can be imposed architecturally, which tends to improve both sample efficiency and generalization.
+The concept of encoding physics into network design is a recurring theme in this thesis.
+
+Together, these properties make HEP one of the most computationally well-posed domains for machine learning.
+The chapters that follow develop this observation in detail, covering supervised jet tagging (Chapter~\ref{ch:tagging}), generative and density-ratio-based unfolding (Chapters~\ref{ch:unfolding}--\ref{ch:zjets}), and the architectural building blocks underlying both (the remainder of this chapter).
 
 \section{Neural Networks and Deep Learning}
 \label{sec:dl}
