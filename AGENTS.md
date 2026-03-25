@@ -180,6 +180,8 @@ Current contents:
 
 Add field-specific notation, theorem environments, etc. here.
 
+Note using the "\pt" command to write the abbreviation for transverse momentum should not be done in math mode. E.g. use "\pt" and not "$\pt$".
+
 ---
 
 ## Bibliography

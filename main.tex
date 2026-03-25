@@ -24,6 +24,7 @@
 % ----------------------------------------------------------
 % Graphics, tables, captions
 % ----------------------------------------------------------
+\usepackage[table]{xcolor}  % \definecolor, \rowcolor, \textcolor
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{booktabs}      % professional-quality tables (toprule/midrule/bottomrule)
@@ -37,6 +38,12 @@
 % ----------------------------------------------------------
 \usepackage[backend=biber, style=numeric-comp, natbib=true, sorting=none]{biblatex}
 \addbibresource{thesis.bib}
+
+% ----------------------------------------------------------
+% Feynman diagrams
+% ----------------------------------------------------------
+\usepackage{tikz}
+\usepackage[compat=1.1.0]{tikz-feynman}
 
 % ----------------------------------------------------------
 % Miscellaneous layout
