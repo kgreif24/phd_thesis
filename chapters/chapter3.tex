@@ -13,47 +13,49 @@
 %         connect back to the HEP application.
 % ---------------------------------------------------------------
 
-This Chapter serves as a general introduction to the deep learning methods used throughout the remainder of the thesis.
-Like Chapter~\ref{ch:qcd}, the goal is not to be thorough.
+This Chapter serves as a general introduction to the deep learning methods used throughout the remainder of the thesis\footnote{Note that this can be thought of as the ``instrumentation'' chapter of this thesis, which might otherwise be dedicated to information on the ATLAS detector.}.
+Like \Cref{ch:qcd}, the goal is not to be thorough.
 Instead only the information needed to understand the particular deep learning methods applied to particle physics data in this thesis will be covered.
 
 \section{Overview: ML as a Paradigm Shift}
 \label{sec:ml-overview}
 
 Machine learning is the idea that complex rules or behaviors can be learned directly from data by optimization algorithms, rather than programmed explicitly by human experts.
-In classical data analysis, a domain expert encodes their knowledge as a fixed set of rules or hand-engineered features that are then applied to data.
-This works well when the relevant structure is well understood and compact enough to be written down.
-It fails when the decision boundary is real but too complex to specify by hand.
-Identifying a boosted top quark in the high-dimensional space of jet constituent momenta is a prototypical example: no expert-designed feature set captures this boundary as well as a function learned directly from labeled examples.
-This shift from explicit programming to data-driven optimization is the central idea of machine learning.
+In classical data analysis, a domain expert encodes their knowledge as a fixed set of rules that are then applied to data to extract a quantitative summary of the information.
+It is worth emphasizing that this approach often works very well.
+Particle physicists have become very adept at choosing relevant features of the data and learning from them.
+However this approach is rarely optimal, especially in cases where the optimal solution exists but is too complex to specify by hand.
+To draw an example from \Cref{ch:tagging}, no expert-designed feature set captures the correct decision-surface for classifying jets initiated by boosted top quarks from the light quark and gluon jet background.
+This is due to a lack of knowledge about certain features of the jet formation process (e.g. hadronization), but also just due to complexity.
+Specifying the optimal feature by hand is probably not possible, but machine learning methods allow this complexity to be learned from the data.
 
-The field organizes naturally into several paradigms based on the structure of the available training information.
-\textit{Supervised learning} trains a model using labeled examples, where each input is paired with a target output.
-Classification and regression are the canonical supervised tasks, and most of the jet taggers discussed in Chapter~\ref{ch:tagging} fall into this category.
-\textit{Unsupervised learning} operates without labels, with the goal of learning structure in the input distribution itself.
-Generative models that learn to reproduce $p_{\text{data}}$ without access to class labels are a prominent example and are the focus of much of Chapter~\ref{ch:unfolding}.
-\textit{Self-supervised learning} is a hybrid approach in which the supervisory signal is derived from the data itself rather than from external annotation.
-This is most commonly used to learn general-purpose representations rather than to solve a specific downstream task.
-In HEP, self-supervised pretraining underlies recent foundation models for jet physics, which use techniques such as masked particle modeling to learn representations of jet constituents that transfer across tasks.
-Finally, \textit{reinforcement learning} (RL) trains an agent to maximize a reward signal through interaction with an environment.
-RL is responsible for landmark results in game playing~\cite{Silver:2016alphago} and is the basis for the post-training pipelines of modern large language models~\cite{Ouyang:2022instructgpt}.
-Direct applications of RL within HEP have so far been limited~\cite{TODO:jake}, though its relevance is growing alongside the agentic AI systems discussed in Chapter~\ref{ch:conclusion}.
+Machine learning methods organize naturally into several paradigms based on the structure of the available training information:
+
+\begin{itemize}
+    \item \textit{Supervised learning} trains a model using labeled examples, where each input is paired with a target output.
+    Classification and regression are the canonical supervised tasks, and the most widely used in particle physics.
+    \Cref{ch:tagging} is entirely dedicated to the jet tagging classification task.
+    \item \textit{Unsupervised learning} operates without labels, with the goal of learning structure in the input data. Generative models that learn to produce samples from $p_{\text{data}}$ without access to class labels are a prominent example and are the focus of much of \cref{ch:unfolding}.
+    \item \textit{Self-supervised learning} is a hybrid approach in which the supervisory signal is derived from the data itself rather than from external annotation. This is most commonly used to learn general-purpose representations rather than to solve a specific downstream task. In HEP, self-supervised pretraining underlies some recent foundation models for jet physics, which use techniques such as masked particle modeling to learn representations of jet constituents that transfer across tasks~\cite{Golling:2024abg,Birk:2024knn}.
+    \item \textit{Reinforcement learning} (RL) trains an agent to maximize a reward signal through interaction with an environment. The key feature of RL is that it does not require a differentiable training objective, though some methods construct a surrogate in practice. RL is responsible for landmark results in game playing~\cite{Silver:2016alphago} and is the basis for the post-training pipelines of modern large language models~\cite{Ouyang:2022instructgpt}. Direct applications of RL within HEP have so far been limited~\cite{Baretz:2025zsv}, though its relevance is growing alongside the agentic AI systems discussed in \cref{ch:conclusion}.
+\end{itemize}
 
 Machine learning is not a new idea in particle physics.
-Boosted decision trees (BDTs) have been in use in HEP since the early 2000s, and were applied to the single top quark discovery at the Tevatron~\cite{Abazov:2006gd,Aaltonen:2009jj}.\footnote{The history of BDTs in HEP is instructive.
-At the time of the single top discovery, BDTs outperformed the artificial neural networks then in use and were the standard tool for event classification.
+Boosted decision trees (BDTs) have been in use in HEP since 2004, and were applied to the single top quark discovery at the Tevatron~\cite{D0:2006ngk,CDF:2009itk}.\footnote{The history of BDTs in HEP is interesting.
+The original application of BDTs illustrated that they \textit{outperformed} artificial neural networks.
 Following the deep learning revolution initiated by AlexNet, BDTs were largely supplanted by neural networks, which proved far more expressive on the high-dimensional data common in HEP.
-Interestingly, BDTs have seen something of a resurgence in recent years, driven primarily by their remarkable training speed relative to neural networks.}
-What changed with the deep learning era was not the concept of learned classifiers but the scale of the models, the complexity of the tasks they could handle, and the range of paradigms available beyond supervised classification.
+Quite recently, BDTs have seen something of a resurgence in recent years, driven by their remarkable training speed relative to neural networks, and their robustness against noisy or irrelevant features in the density ratio estimation tasks covered in \cref{sec:dre}~\cite{Finke:2023ltw}.}
+What changed with the deep learning era was not the concept of learned classifiers but the scale of the models.
+Neural networks scale better than BDTs, and so could handle the more complicated tasks that have driven much of the interest in ML in recent years.
 
 The success of machine learning in HEP rests on two structural advantages.
-The first is access to high-quality simulated data produced by Monte Carlo event generators such as \textsc{Pythia}~\cite{Sjostrand:2014zea}, \textsc{Herwig}~\cite{Bellm:2015jjp}, and \textsc{Sherpa}~\cite{Gleisberg:2008ta}.
-These generators simulate the complete chain of a collision event, from the hard scatter through parton showering and hadronization to detector response, and each simulated event carries ground-truth labels by construction.
-This is a significant advantage over most other application domains: the manual labeling bottleneck that constrained early computer vision datasets does not arise in the same way in HEP.
-Label assignment in HEP has its own subtleties, which are discussed in the context of top tagging in Chapter~\ref{ch:tagging}, but effective labels can often be set using straightforward generator-level rules.
-The second advantage is that HEP data, while high-dimensional and complex, is generated by physical processes that are well understood and are known to respect specific symmetries.
-Lorentz invariance, permutation invariance of jet constituents, and translational equivariance in the $(\eta, \phi)$ plane are all properties that can be encoded directly into a network architecture as inductive biases, improving sample efficiency and generalization.
-The combination of abundant labeled simulation and physics-informed architecture design makes HEP a particularly well-posed setting for machine learning.
+The first is access to high-quality simulated data produced by the Monte Carlo event generators discussed in \cref{sec:jets}.
+These simulated datasets carry \textit{truth level} information that can be used to derive effective training labels.
+This is a significant advantage over other application domains where manual labeling is a significant bottleneck.
+Label assignment in HEP has its own subtleties, which are discussed in the context of top tagging in \Cref{ch:tagging}, but effective labels can often be set using straightforward generator-level rules.
+The second advantage is that HEP data is generated by physical processes that are well understood and are known to respect specific symmetries.
+Lorentz invariance, permutation invariance of jet constituents, and translational equivariance in the $(\eta, \phi)$ plane are all properties that have been used to aid neural network optimization.
+These properties could equally well be learned from the data and the community is starting to explore this direction, but exploiting them was a major benefit to early deep learning applications in HEP.
 
 Given that deep neural networks are the dominant paradigm in machine learning at present, the remainder of this chapter provides an overview of the core network architectures and training methods used throughout this thesis.
 
@@ -117,7 +119,7 @@ Given that deep neural networks are the dominant paradigm in machine learning at
 %    - Flows require bijective transformations → architectural
 %      constraints.  GANs are unstable.  VAEs are blurry.
 %    - Diffusion models sidestep these issues at the cost of
-%      sequential sampling.  Forward pointer to Section \ref{sec:diffusion}.
+%      sequential sampling.  Forward pointer to \cref{sec:diffusion}.
 
 \section{Diffusion Models}
 \label{sec:diffusion}
