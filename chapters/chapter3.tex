@@ -98,7 +98,7 @@ Both functions are shown in \Cref{fig:activations}.
     \label{fig:activations}
 \end{figure}
 
-A celebrated theoretical result known as the universal approximation theorem states that an MLP with a single hidden layer of sufficient width can approximate any continuous function on a compact domain to arbitrary precision~\cite{TODO:cybenko,TODO:hornik}.
+A celebrated theoretical result known as the universal approximation theorem states that an MLP with a single hidden layer of sufficient width can approximate any continuous function on a compact domain to arbitrary precision~\cite{cybenko1989approximation,hornik1989multilayer}.
 This result is important because it establishes that the MLP family is expressive enough, in principle, to represent any function one might want to learn.
 In practice, however, the theorem is of limited utility: it guarantees only that such a solution \textit{exists}, not that gradient-based optimization will find it.
 Empirically, deeper networks (more layers at moderate width) tend to optimize more reliably than very wide shallow ones, and more sophisticated architectures beyond plain MLPs optimize better still.
@@ -160,7 +160,7 @@ The learning rate $\eta$ is a critical hyperparameter: too large, and the optimi
 A common strategy is to use a \textit{learning rate scheduler} that reduces $\eta$ over the course of training, for example by multiplying it by a constant factor after a fixed number of steps (step decay) or by warming it up linearly before decaying it (cosine annealing).
 
 Modern practice almost universally replaces plain SGD with \textit{adaptive optimizers}, which maintain per-parameter estimates of gradient statistics to rescale updates automatically.
-The Adam optimizer~\cite{TODO:kingma_adam} computes exponentially decaying averages of the gradient $m_t$ and the squared gradient $v_t$:
+The Adam optimizer~\cite{kingma2014adam} computes exponentially decaying averages of the gradient $m_t$ and the squared gradient $v_t$:
 \begin{align}
     m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t, \label{eqn:adam_m} \\
     v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2, \label{eqn:adam_v}
@@ -197,7 +197,7 @@ Training is stopped at the point of minimum validation loss.\footnote{The relati
 \end{figure}
 
 Two widely used regularization techniques beyond early stopping are \textit{dropout} and \textit{weight decay}.
-Dropout~\cite{TODO:srivastava_dropout} randomly sets a fraction $p$ of neuron activations to zero during each forward pass at training time, with all units restored at inference.
+Dropout~\cite{hinton2012improving} randomly sets a fraction $p$ of neuron activations to zero during each forward pass at training time, with all units restored at inference.
 This forces the network to learn redundant representations and prevents co-adaptation of units, acting as an implicit ensemble over exponentially many sub-networks.
 Weight decay adds a penalty proportional to $\|\theta\|^2$ to the loss, shrinking parameters toward zero and discouraging the network from relying on any single large weight.
 From a Bayesian perspective this corresponds to placing a zero-mean Gaussian prior on the parameters.
@@ -313,14 +313,28 @@ The outputs of all heads are concatenated and projected back to dimension $d$:
 \end{equation}
 where $\text{head}_h = \text{Attention}(X W_{Q,h}, X W_{K,h}, X W_{V,h})$ and $W_O \in \mathbb{R}^{d \times d}$ is a learned output projection.
 Multi-head attention allows the network to jointly attend to information from different representation subspaces, with each head learning to capture a different aspect of the relationships between elements.
-A diagram of this operation is shown in \Cref{fig:multihead_attention}.\footnote{The diagram at \texttt{figures/ch3/self-attention-recap.png} was referenced but not found in the repository. Please add this figure. Attribution: Alammar, J (2018). The Illustrated Transformer [Blog post]. Retrieved from \url{https://jalammar.github.io/illustrated-transformer/}}
+A diagram of this operation is shown in \Cref{fig:multihead_attention}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth, alt={Diagram of scaled dot-product attention and multi-head attention. On the left, the single-head attention mechanism shows queries, keys, and values fed through a matrix multiply, scale, softmax, and final matrix multiply. On the right, the multi-head variant shows H parallel attention heads whose outputs are concatenated and linearly projected.}]{figures/ch3/self-attention-recap}
+    \caption{Scaled dot-product attention (left) and multi-head attention (right). Multi-head attention runs $H$ independent attention heads in parallel, concatenates their outputs, and applies a learned linear projection. Adapted from \citet{Alammar2018}.}
+    \label{fig:multihead_attention}
+\end{figure}
 
 The \textit{transformer block} combines multi-head attention with a pointwise MLP (called the feed-forward network, or FFN), layer normalization, and residual connections:
 \begin{align}
     \mathbf{X}' &= \text{LayerNorm}\!\left( X + \text{MultiHead}(X) \right), \label{eqn:transformer_attn} \\
     \mathbf{X}'' &= \text{LayerNorm}\!\left( \mathbf{X}' + \text{FFN}(\mathbf{X}') \right). \label{eqn:transformer_ffn}
 \end{align}
-A transformer network is built by stacking $L$ such blocks, with the output of each block serving as the input to the next.\footnote{A diagram of the transformer block architecture was referenced at \texttt{figures/ch3/transformer\_block\_diagram.pdf} but was not found in the repository. Please add this figure.}
+A transformer network is built by stacking $L$ such blocks, with the output of each block serving as the input to the next, as illustrated in \Cref{fig:transformer_block}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.45\linewidth, alt={Diagram of a single transformer block. Tokens enter from the bottom and pass through a multi-head self-attention sublayer followed by layer normalization with a residual connection, then through a feed-forward network sublayer followed by a second layer normalization with another residual connection, before exiting at the top.}]{figures/ch3/transformer_block_diagram}
+    \caption{A single transformer block. Each block applies multi-head self-attention and a position-wise feed-forward network (FFN), each wrapped in a residual connection and layer normalization. A full transformer is formed by stacking $L$ such blocks.}
+    \label{fig:transformer_block}
+\end{figure}
 
 A key property of self-attention as defined in \Cref{eqn:attention} is that it is \textit{permutation equivariant}: permuting the rows of $X$ permutes the rows of the output in the same way, and the attention computation itself is unchanged.
 In natural language processing this is a problem, because word order carries meaning; it is addressed by adding \textit{positional encodings} to the input that break permutation symmetry.
