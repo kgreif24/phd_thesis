@@ -1,0 +1,33 @@
+
+\section{Density Ratio Estimation and Reweighting}
+\label{sec:dre}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. The core statistical trick
+%    - Given two distributions p(x) and q(x), we often want
+%      the ratio r(x) = p(x)/q(x) without knowing either
+%      density explicitly.
+%    - Key insight: a binary classifier trained to distinguish
+%      samples from p vs. q learns r(x) implicitly, because
+%      the optimal classifier output is r(x)/(1 + r(x)).
+%
+% 2. Classifier-based density ratio estimation
+%    - Train f_\theta(x) -> [0,1] with BCE loss.
+%    - Recover r(x) = f(x)/(1 - f(x)).
+%    - Works in high dimensions where direct density estimation fails.
+%
+% 3. Applications in HEP
+%    - Monte Carlo reweighting: correct simulation to data.
+%    - Importance sampling: reweight one generator to another.
+%    - Omnifold (Ch.5): iterative density ratio estimation for
+%      unbinned unfolding — this is the key application.
+%    - CARL (Cranmer et al.) as a foundational reference.
+%
+% 4. Practical considerations
+%    - Calibration of the classifier output is crucial.
+%    - Extreme weights can cause variance blow-up: use weight
+%      clipping or regularization.
+%    - Choice of architecture matters: must have good coverage of
+%      the support of both distributions.

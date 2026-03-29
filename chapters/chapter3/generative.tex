@@ -1,0 +1,31 @@
+
+\section{Generative Models}
+\label{sec:generative}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Variational Autoencoders (VAEs)
+%    - Encoder q_\phi(z|x), decoder p_\theta(x|z).
+%    - ELBO objective; reparameterization trick.
+%    - Limitation: blurry samples due to pixel-wise MSE.
+%    - HEP use: fast calorimeter simulation (e.g., CaloVAE).
+%
+% 2. Generative Adversarial Networks (GANs)
+%    - Generator vs. discriminator; minimax game.
+%    - Training instability; mode collapse.
+%    - HEP use: CaloGAN, jet generation.
+%
+% 3. Normalizing flows
+%    - Bijective f: x <-> z with tractable Jacobian.
+%    - Change of variables formula: log p(x) = log p(z) + log|det J|.
+%    - Coupling layers (RealNVP, Glow); autoregressive flows (MAF).
+%    - HEP use: fast simulation (SurVAE, NF-based shower generators),
+%      inference (nflows for posterior estimation).
+%    - Key property: exact density evaluation — useful for reweighting.
+%
+% 4. Motivation for moving to diffusion
+%    - Flows require bijective transformations → architectural
+%      constraints.  GANs are unstable.  VAEs are blurry.
+%    - Diffusion models sidestep these issues at the cost of
+%      sequential sampling.  Forward pointer to \cref{sec:diffusion}.

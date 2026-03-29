@@ -1,0 +1,33 @@
+
+\section{Uncertainty Quantification}
+\label{sec:uq}
+
+% ---------------------------------------------------------------
+% Sub-topics to cover:
+%
+% 1. Why UQ matters in HEP
+%    - Physics measurements require not just a central value but
+%      a rigorous uncertainty.  ML methods add a new source of
+%      uncertainty (model uncertainty) on top of statistical and
+%      systematic uncertainties.
+%    - The ATLAS top tagger paper (Ch.4) deals explicitly with
+%      how to assign and propagate ML model uncertainties.
+%
+% 2. Types of uncertainty
+%    - Aleatoric (irreducible, data noise) vs. epistemic (reducible,
+%      model / training uncertainty).
+%    - In HEP: statistical uncertainty (finite data) is aleatoric;
+%      choice of MC generator, network architecture, training
+%      procedure are epistemic.
+%
+% 3. Ensemble methods
+%    - Train N models with different seeds / architectures.
+%    - Variance of ensemble predictions estimates epistemic uncertainty.
+%    - Used in the top tagger paper: ensemble of taggers to
+%      derive model uncertainty on the WP efficiency.
+%
+%
+% 5. Systematic uncertainties from ML
+%    - Variation of training hyperparameters.
+%    - Dependence on MC generator (Pythia vs. Herwig).
+%    - "Generator uncertainty" is a major theme in Ch.4 and Ch.6.
