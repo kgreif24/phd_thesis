@@ -62,33 +62,273 @@ Given that deep neural networks are the dominant paradigm in machine learning at
 \section{Neural Networks and Deep Learning}
 \label{sec:dl}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Multi-layer perceptrons (MLPs)
-%    - Composition of affine + nonlinear layers.
-%    - Universal approximation theorem (intuition only).
-%    - Activation functions: ReLU, GELU.
-%
-% 2. Training basics
-%    - Loss function; stochastic gradient descent; backprop.
-%    - Regularization: dropout, weight decay, batch norm.
-%    - Practical tips: learning rate scheduling, early stopping.
-%
-% 3. Convolutional Neural Networks (CNNs)
-%    - Translational equivariance; weight sharing.
-%    - Early HEP use: jet images (Cogan et al., de Oliveira et al.)
-%
-% 4. Graph Neural Networks (GNNs)
-%    - Jets as point clouds / graphs; node + edge features.
-%    - Message passing; DeepSets as a special case (sum aggregation).
-%    - ParticleNet (DGCNN-based), PELICAN as examples.
-%
-% 5. Transformers
-%    - Self-attention: queries, keys, values.
-%    - Permutation invariance for free — natural for jet constituents.
-%    - Particle Transformer (ParT) — state-of-the-art jet tagger.
-%    - Connection to large pre-trained models (forward pointer to Ch.4).
+\subsection{Multi-Layer Perceptrons}
+\label{sec:mlp}
+
+The multi-layer perceptron (MLP) is the foundational building block of modern deep learning.
+An MLP maps an input vector $\mathbf{x} \in \mathbb{R}^{d_{\text{in}}}$ to an output vector through a sequence of $L$ layers, each of which applies an affine transformation followed by a pointwise nonlinearity.
+The computation at layer $\ell$ is
+\begin{equation}
+    \mathbf{h}^{(\ell)} = \sigma\!\left( W^{(\ell)} \mathbf{h}^{(\ell-1)} + \mathbf{b}^{(\ell)} \right),
+    \label{eqn:mlp_layer}
+\end{equation}
+where $\mathbf{h}^{(0)} = \mathbf{x}$, $W^{(\ell)} \in \mathbb{R}^{d_\ell \times d_{\ell-1}}$ is the weight matrix, $\mathbf{b}^{(\ell)} \in \mathbb{R}^{d_\ell}$ is the bias vector, and $\sigma$ is a nonlinear activation function applied elementwise.
+The output of the final layer, often without a nonlinearity or with a task-specific one (e.g.\ a softmax for classification), is the network's prediction.
+The full set of weights and biases $\theta = \{W^{(\ell)}, \mathbf{b}^{(\ell)}\}_{\ell=1}^{L}$ are the learnable parameters of the network.
+A diagram of this architecture is shown in \Cref{fig:mlp}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/ch3/mlp.pdf}
+    \caption{Diagram of a multi-layer perceptron with two hidden layers. Each node in a given layer is connected to every node in the adjacent layer (fully connected). The input layer receives the feature vector $\mathbf{x}$, and the output layer produces the network's prediction.}
+    \label{fig:mlp}
+\end{figure}
+
+The choice of activation function $\sigma$ is important.
+Early networks used the sigmoid and hyperbolic tangent functions, but these suffer from vanishing gradients in deep networks.
+The \textit{rectified linear unit} (ReLU), defined as $\text{ReLU}(z) = \max(0, z)$, became the standard activation for hidden layers due to its simplicity and empirical effectiveness.
+A smoother alternative is the \textit{Gaussian error linear unit} (GELU), defined as $\text{GELU}(z) = z \cdot \Phi(z)$ where $\Phi$ is the standard normal CDF.
+GELU has become the preferred activation in many modern architectures, including transformers.
+Both functions are shown in \Cref{fig:activations}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/ch3/activation_functions.pdf}
+    \caption{The ReLU and GELU activation functions. ReLU is piecewise linear and computationally cheap. GELU is smooth and has become standard in transformer-based architectures.}
+    \label{fig:activations}
+\end{figure}
+
+A celebrated theoretical result known as the universal approximation theorem states that an MLP with a single hidden layer of sufficient width can approximate any continuous function on a compact domain to arbitrary precision~\cite{TODO:cybenko,TODO:hornik}.
+This result is important because it establishes that the MLP family is expressive enough, in principle, to represent any function one might want to learn.
+In practice, however, the theorem is of limited utility: it guarantees only that such a solution \textit{exists}, not that gradient-based optimization will find it.
+Empirically, deeper networks (more layers at moderate width) tend to optimize more reliably than very wide shallow ones, and more sophisticated architectures beyond plain MLPs optimize better still.
+This is a central reason why deep learning is not simply a matter of scaling up MLPs; architecture design matters.
+MLPs nevertheless remain indispensable as components within larger architectures, appearing for example as the pointwise feed-forward sublayers in every transformer block.
+
+\subsection{Training Neural Networks}
+\label{sec:training}
+
+Training a neural network means finding parameter values $\theta$ that minimize a scalar loss function $\mathcal{L}(\theta)$ computed over a training dataset.
+For a binary classification task with inputs $\mathbf{x}_i$ and labels $y_i \in \{0, 1\}$, the standard choice is the binary cross-entropy (BCE) loss,
+\begin{equation}
+    \mathcal{L}_{\text{BCE}}(\theta) = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log f_\theta(\mathbf{x}_i) + (1 - y_i) \log\!\left(1 - f_\theta(\mathbf{x}_i)\right) \right],
+    \label{eqn:bce}
+\end{equation}
+where $f_\theta(\mathbf{x}_i) \in (0,1)$ is the network's predicted probability that example $i$ belongs to class 1 (typically the output of a sigmoid activation).
+The BCE loss penalizes confident wrong predictions heavily and has a well-understood probabilistic interpretation: minimizing it is equivalent to maximizing the log-likelihood of the data under a Bernoulli model.
+
+\subsubsection{Backpropagation}
+
+Minimizing $\mathcal{L}(\theta)$ requires computing its gradient with respect to $\theta$.
+For a network with $L$ layers, this is accomplished by the \textit{backpropagation} algorithm, which applies the chain rule of calculus layer by layer, propagating gradient information from the output back to the input.
+Concretely, define the pre-activation at layer $\ell$ as $\mathbf{z}^{(\ell)} = W^{(\ell)} \mathbf{h}^{(\ell-1)} + \mathbf{b}^{(\ell)}$, so that $\mathbf{h}^{(\ell)} = \sigma(\mathbf{z}^{(\ell)})$.
+The gradient of the loss with respect to the weights of layer $\ell$ is
+\begin{equation}
+    \frac{\partial \mathcal{L}}{\partial W^{(\ell)}} = \boldsymbol{\delta}^{(\ell)} \left(\mathbf{h}^{(\ell-1)}\right)^\top,
+    \label{eqn:backprop_W}
+\end{equation}
+where the error signal $\boldsymbol{\delta}^{(\ell)}$ is defined recursively as
+\begin{equation}
+    \boldsymbol{\delta}^{(\ell)} = \left( \left(W^{(\ell+1)}\right)^\top \boldsymbol{\delta}^{(\ell+1)} \right) \odot \sigma'\!\left(\mathbf{z}^{(\ell)}\right),
+    \label{eqn:backprop_delta}
+\end{equation}
+with $\boldsymbol{\delta}^{(L)}$ initialized from the derivative of the loss with respect to the network output and $\odot$ denoting elementwise multiplication.
+In practice, all modern deep learning frameworks (PyTorch, JAX, TensorFlow) implement automatic differentiation, which computes gradients through arbitrary compositions of differentiable tensor operations without the user needing to implement \Cref{eqn:backprop_W,eqn:backprop_delta} explicitly.\footnote{The three major frameworks differ in how they implement automatic differentiation. TensorFlow 1.x and Theano used \textit{static computation graphs}: the full computational graph is defined and compiled before any data is processed. PyTorch uses \textit{dynamic computation graphs} (define-by-run), where the graph is constructed on the fly during the forward pass, making debugging much more natural. JAX takes a different approach, exposing automatic differentiation as a first-class function transformation (\texttt{jax.grad}) that can be composed with other transforms such as vectorization (\texttt{jax.vmap}) and JIT compilation (\texttt{jax.jit}).}
+
+\subsubsection{Gradient Descent and Optimization}
+
+Given gradients of the loss, the parameters are updated by gradient descent:
+\begin{equation}
+    \theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}(\theta),
+    \label{eqn:gd}
+\end{equation}
+where $\eta > 0$ is the learning rate.
+The geometric intuition is that the negative gradient points in the direction of steepest descent on the loss surface, and each update steps the parameters in that direction.
+This is illustrated in \Cref{fig:gradient_descent}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.65\linewidth]{figures/ch3/gradient_descent.pdf}
+    \caption{Geometric intuition for gradient descent on a two-dimensional loss surface. Starting from an initial parameter configuration, each update moves in the direction of steepest descent, converging toward a local minimum.}
+    \label{fig:gradient_descent}
+\end{figure}
+
+Gradient descent as stated in \Cref{eqn:gd} computes the loss over the full dataset at each step, which is computationally prohibitive for large datasets.
+In practice, \textit{stochastic gradient descent} (SGD) replaces the full-dataset gradient with a gradient estimated from a randomly sampled \textit{mini-batch} of $B$ examples.
+This introduces noise into the gradient estimate but dramatically reduces the per-step computational cost and, empirically, often aids generalization.
+The learning rate $\eta$ is a critical hyperparameter: too large, and the optimization diverges; too small, and convergence is prohibitively slow.
+A common strategy is to use a \textit{learning rate scheduler} that reduces $\eta$ over the course of training, for example by multiplying it by a constant factor after a fixed number of steps (step decay) or by warming it up linearly before decaying it (cosine annealing).
+
+Modern practice almost universally replaces plain SGD with \textit{adaptive optimizers}, which maintain per-parameter estimates of gradient statistics to rescale updates automatically.
+The Adam optimizer~\cite{TODO:kingma_adam} computes exponentially decaying averages of the gradient $m_t$ and the squared gradient $v_t$:
+\begin{align}
+    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t, \label{eqn:adam_m} \\
+    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2, \label{eqn:adam_v}
+\end{align}
+where $g_t = \nabla_\theta \mathcal{L}$ is the gradient at step $t$ and $\beta_1, \beta_2 \in (0,1)$ are decay rates (typically $0.9$ and $0.999$).
+Bias-corrected estimates $\hat{m}_t = m_t / (1 - \beta_1^t)$ and $\hat{v}_t = v_t / (1-\beta_2^t)$ are used to compute the parameter update $\theta \leftarrow \theta - \eta \, \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon)$.
+The effect is that parameters with consistently large gradients receive smaller updates and those with small or noisy gradients receive larger ones, making Adam robust to the gradient scale disparities that arise in deep networks.
+A limitation of pure gradient descent is that convergence to a \textit{global} minimum is not guaranteed.
+In high-dimensional parameter spaces, however, this concern is less severe than in low dimensions: local minima are rare, and the dominant obstacles are saddle points, which adaptive optimizers tend to escape efficiently.
+
+\subsubsection{Generalization and Regularization}
+
+A model trained to minimize the training loss may not perform well on unseen data if it has memorized particular features of the training set rather than learning the underlying function.
+This phenomenon is called \textit{overfitting}, and the tradeoff between a model's ability to fit training data (low bias) and its sensitivity to specific training examples (high variance) is called the \textit{bias-variance tradeoff}.
+\Cref{fig:bias_variance} illustrates this tradeoff: a model with too little capacity underfits and has high bias, while a model with too much capacity that is not properly regularized overfits and has high variance.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/ch3/bias_variance.pdf}
+    \caption{Illustration of the bias-variance tradeoff. An underfit model (left) has high bias and fails to capture the true structure in the data. An overfit model (right) has high variance and memorizes noise rather than the underlying function. The goal is to find the intermediate regime (center) that generalizes well.}
+    \label{fig:bias_variance}
+\end{figure}
+
+In practice, generalization is monitored by partitioning available data into three disjoint splits: a \textit{training set} used to compute gradients, a \textit{validation set} used to monitor performance on held-out data during training, and a \textit{test set} used for a single final evaluation after training is complete.
+\textit{Early stopping} is a regularization strategy that terminates training when the validation loss stops improving, preventing the network from continuing to overfit the training set.
+\Cref{fig:early_stopping} shows a typical training curve illustrating this procedure: the training loss decreases monotonically, while the validation loss decreases initially but then begins to rise as the model overfits.
+Training is stopped at the point of minimum validation loss.\footnote{The relationship between model capacity, dataset size, and generalization in modern overparameterized networks is more subtle than the classical bias-variance picture suggests. Very large models that are trained well past the point of interpolating the training data sometimes exhibit \textit{double descent}: a second regime in which increasing capacity or training time actually improves generalization. This phenomenon, sometimes called ``benign overfitting'', is an active area of theoretical research and complicates naive application of the classical bias-variance tradeoff to large neural networks.}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/ch3/early_stopping.pdf}
+    \caption{Training and validation loss curves illustrating early stopping. The model is saved at the epoch of minimum validation loss (dashed vertical line), before the validation loss begins to rise due to overfitting.}
+    \label{fig:early_stopping}
+\end{figure}
+
+Two widely used regularization techniques beyond early stopping are \textit{dropout} and \textit{weight decay}.
+Dropout~\cite{TODO:srivastava_dropout} randomly sets a fraction $p$ of neuron activations to zero during each forward pass at training time, with all units restored at inference.
+This forces the network to learn redundant representations and prevents co-adaptation of units, acting as an implicit ensemble over exponentially many sub-networks.
+Weight decay adds a penalty proportional to $\|\theta\|^2$ to the loss, shrinking parameters toward zero and discouraging the network from relying on any single large weight.
+From a Bayesian perspective this corresponds to placing a zero-mean Gaussian prior on the parameters.
+
+\subsection{Convolutional Neural Networks}
+\label{sec:cnn}
+
+The multi-layer perceptron treats its input as a flat vector and applies fully connected weight matrices, which have no knowledge of any spatial structure the input may possess.
+Convolutional neural networks (CNNs) address this by exploiting \textit{translational symmetry}: features that are useful at one spatial location should be equally useful at another.
+This is enforced through \textit{weight sharing}, where a single learned filter is applied at every position in the input rather than using a separate set of weights per position.
+
+Concretely, a CNN layer applies a bank of $F$ learned filters $\{k_f\}_{f=1}^F$, each of spatial extent $K \times K$ and depth equal to the number of input channels $C_{\text{in}}$, to produce an output feature map with $F = C_{\text{out}}$ channels.
+The output at spatial position $(i, j)$ and output channel $f$ is
+\begin{equation}
+    h_{f,i,j} = \sigma\!\left( \sum_{c=1}^{C_{\text{in}}} \sum_{p=0}^{K-1} \sum_{q=0}^{K-1} k_{f,c,p,q} \cdot x_{c,\, i+p,\, j+q} + b_f \right),
+    \label{eqn:conv2d}
+\end{equation}
+where $x_{c,i,j}$ is the input at channel $c$ and position $(i,j)$, and $k_{f,c,p,q}$ are the filter weights.
+The number of channels $C_{\text{out}}$ controls the richness of the feature representation at each spatial location.
+In the input layer this is typically 3 (RGB color channels), but it grows to hundreds or thousands in the deeper layers of large networks.
+This channel dimension is the direct analogue of the hidden dimension in transformers, which will be introduced in \Cref{sec:attention}.
+The filter is typically applied with a \textit{stride} $s > 1$, meaning it advances by $s$ pixels at each step, reducing the spatial resolution of the output.
+
+A complementary operation is \textit{pooling}, which summarizes local spatial regions by taking their maximum (\textit{max pooling}) or average (\textit{average pooling}).
+Pooling reduces the spatial dimensions of feature maps and encourages the network to extract progressively more abstract, higher-level features as depth increases.\footnote{A diagram illustrating the 2D convolution and max pooling operations was referenced in the outline at \texttt{figures/ch3/convolution\_diagram.pdf}, but this file was not found in the repository. Please add this figure.}
+
+Training very deep CNNs was found to be impeded by vanishing gradients, which cause gradient signals to decay exponentially as they are propagated through many layers during backpropagation.
+A key architectural innovation that addressed this was the \textit{residual} or \textit{skip} connection~\cite{He:2015resnet}, in which the output of a block of operations is added to its input:
+\begin{equation}
+    \mathbf{h}_{\text{out}} = \mathcal{F}(\mathbf{h}_{\text{in}}) + \mathbf{h}_{\text{in}},
+    \label{eqn:residual}
+\end{equation}
+where $\mathcal{F}$ denotes one or more layers of computation.
+The skip connection creates a direct gradient path from the output to the input of each block, making it possible to train networks with hundreds of layers.
+The structure of a single residual block is shown in \Cref{fig:resblock}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.35\linewidth]{figures/ch3/ResBlock.png}
+    \caption{A single residual block. The block applies two convolutional layers to its input and adds the result to the original input via a skip connection. This design allows gradient signals to propagate cleanly through very deep networks.}
+    \label{fig:resblock}
+\end{figure}
+
+The \textit{ResNet} architecture~\cite{He:2015resnet} chains many such residual blocks together, as shown in \Cref{fig:resnet}, and was the dominant image classification architecture for several years following its introduction in 2015.
+In the context of HEP, jet images --- representations of jets as two-dimensional arrays of energy deposits in the $(\eta, \phi)$ detector plane~\cite{Cogan:2014oua,deOliveira:2017pjk} --- made CNNs a natural architectural choice.
+ResNet-based top taggers were nearly state of the art as recently as 2019~\cite{Kasieczka:2019dbj}.
+They were ultimately superseded by graph neural networks and then transformers, which handle the permutation invariance of jet constituents more naturally, but CNNs remain an important part of the architectural history of jet physics.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/ch3/resnet.png}
+    \caption{The ResNet architecture, composed of stacked residual blocks. Each block adds its input to its output via a skip connection, enabling training of very deep networks. Figure adapted from~\cite{He:2015resnet}.}
+    \label{fig:resnet}
+\end{figure}
+
+\subsection{Graph Neural Networks}
+\label{sec:gnn}
+
+A natural representation of a jet is not an image but an unordered set or \textit{point cloud}: the collection of measured particle four-momenta $\{p_i^\mu\}$ of its constituents.
+Graph neural networks (GNNs) operate directly on such set-structured inputs by interpreting them as graphs, where each particle is a node and learned operations propagate information along edges connecting particles to their neighbors.
+
+GNNs can generally be understood as instances of the \textit{message-passing} framework~\cite{Battaglia:2018mnb}, in which node representations are updated by aggregating messages from neighboring nodes.
+In this framework the update at node $i$ after one message-passing step is
+\begin{equation}
+    \mathbf{h}_i' = \phi_{\text{node}}\!\left( \mathbf{h}_i,\; \bigoplus_{j \in \mathcal{N}(i)} \phi_{\text{edge}}(\mathbf{h}_i, \mathbf{h}_j) \right),
+    \label{eqn:message_passing}
+\end{equation}
+where $\mathbf{h}_i$ is the current feature vector of node $i$, $\mathcal{N}(i)$ is its neighborhood, $\phi_{\text{edge}}$ is a learned edge function that computes a message from each neighbor, $\bigoplus$ is a permutation-invariant aggregation (e.g.\ sum or max), and $\phi_{\text{node}}$ is a learned update function.
+
+The ParticleNet architecture~\cite{Qu:2019gqs}, which is central to the jet tagging work in \Cref{ch:tagging}, uses a specific message-passing operation called \textit{edge convolution} (EdgeConv).
+In EdgeConv, the edge message from node $j$ to node $i$ is computed from both the absolute feature of node $j$ and the \textit{relative} feature between $j$ and $i$:
+\begin{equation}
+    \mathbf{h}_i' = \frac{1}{|\mathcal{N}(i)|} \sum_{j \in \mathcal{N}(i)} \phi_{\text{edge}}\!\left( \mathbf{h}_i,\; \mathbf{h}_j - \mathbf{h}_i \right),
+    \label{eqn:edgeconv}
+\end{equation}
+where $\phi_{\text{edge}}$ is a small MLP.
+The inclusion of relative features $\mathbf{h}_j - \mathbf{h}_i$ captures pairwise relationships between particles explicitly and was found to be particularly useful for HEP data, where differences in four-momentum between jet constituents carry direct physical meaning~\cite{Qu:2019gqs}.
+
+Graph attention networks generalize this pattern by replacing the uniform averaging in \Cref{eqn:edgeconv} with learned, input-dependent weights over the neighborhood.
+This is closely related to the attention mechanism covered in \Cref{sec:attention}, and can be thought of as attention with some entries of the attention matrix explicitly zeroed out (only particles within a local neighborhood attend to each other).
+The greater flexibility and superior scaling of full attention has led attention-based networks to largely supplant GNNs in state-of-the-art jet tagging.
+
+\subsection{Attention and Transformers}
+\label{sec:attention}
+
+The attention mechanism and the transformer architecture built on it are the backbone of essentially every state-of-the-art AI system in use today: large language models, image generation, speech recognition, and, increasingly, particle physics.
+It is worth covering this architecture in some detail.
+
+Attention was originally introduced to augment recurrent neural networks for machine translation~\cite{Vaswani:2017attention}.
+The key idea was to allow the decoder, when generating each output token, to selectively weight all positions in the input sequence according to their relevance to the current decoding step, rather than compressing the entire input into a fixed-size vector.
+The next conceptual step was \textit{self-attention}, in which every position in a sequence attends to every other position, enabling direct modeling of long-range dependencies without the sequential bottleneck of recurrent networks.
+
+Given an input sequence of $N$ vectors, each of dimension $d$, arranged as a matrix $X \in \mathbb{R}^{N \times d}$, self-attention computes three linear projections:
+\begin{equation}
+    Q = X W_Q, \quad K = X W_K, \quad V = X W_V,
+    \label{eqn:qkv}
+\end{equation}
+where $W_Q, W_K, W_V \in \mathbb{R}^{d \times d_k}$ are learned weight matrices, producing queries $Q$, keys $K$, and values $V$.
+The attention output is then
+\begin{equation}
+    \text{Attention}(Q, K, V) = \text{softmax}\!\left( \frac{Q K^\top}{\sqrt{d_k}} \right) V.
+    \label{eqn:attention}
+\end{equation}
+The matrix $Q K^\top / \sqrt{d_k} \in \mathbb{R}^{N \times N}$ is the \textit{attention matrix}: entry $(i,j)$ measures the affinity between position $i$ (query) and position $j$ (key).
+Applying a softmax row-wise converts these affinities into a probability distribution over positions, and multiplying by $V$ produces a weighted sum of value vectors for each position.
+The $\sqrt{d_k}$ scaling factor prevents the dot products from growing large in magnitude for high-dimensional projections, which would push the softmax into a saturated regime with near-zero gradients.
+
+In practice, self-attention is applied in parallel across $H$ independent \textit{attention heads}, each with its own projection matrices and a smaller key dimension $d_k = d / H$.
+The outputs of all heads are concatenated and projected back to dimension $d$:
+\begin{equation}
+    \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_H) \, W_O,
+    \label{eqn:multihead}
+\end{equation}
+where $\text{head}_h = \text{Attention}(X W_{Q,h}, X W_{K,h}, X W_{V,h})$ and $W_O \in \mathbb{R}^{d \times d}$ is a learned output projection.
+Multi-head attention allows the network to jointly attend to information from different representation subspaces, with each head learning to capture a different aspect of the relationships between elements.
+A diagram of this operation is shown in \Cref{fig:multihead_attention}.\footnote{The diagram at \texttt{figures/ch3/self-attention-recap.png} was referenced but not found in the repository. Please add this figure. Attribution: Alammar, J (2018). The Illustrated Transformer [Blog post]. Retrieved from \url{https://jalammar.github.io/illustrated-transformer/}}
+
+The \textit{transformer block} combines multi-head attention with a pointwise MLP (called the feed-forward network, or FFN), layer normalization, and residual connections:
+\begin{align}
+    \mathbf{X}' &= \text{LayerNorm}\!\left( X + \text{MultiHead}(X) \right), \label{eqn:transformer_attn} \\
+    \mathbf{X}'' &= \text{LayerNorm}\!\left( \mathbf{X}' + \text{FFN}(\mathbf{X}') \right). \label{eqn:transformer_ffn}
+\end{align}
+A transformer network is built by stacking $L$ such blocks, with the output of each block serving as the input to the next.\footnote{A diagram of the transformer block architecture was referenced at \texttt{figures/ch3/transformer\_block\_diagram.pdf} but was not found in the repository. Please add this figure.}
+
+A key property of self-attention as defined in \Cref{eqn:attention} is that it is \textit{permutation equivariant}: permuting the rows of $X$ permutes the rows of the output in the same way, and the attention computation itself is unchanged.
+In natural language processing this is a problem, because word order carries meaning; it is addressed by adding \textit{positional encodings} to the input that break permutation symmetry.
+For particle physics, however, permutation equivariance is exactly the right inductive bias.
+Jets are composed of unordered sets of particles, and the physics of jet formation is permutation symmetric.
+This means the transformer architecture can be applied to HEP data without any modification to handle set structure, a point recognized early in the HEP community~\cite{Mikuni:2020wpr}.
+Transformer-based jet taggers such as the Particle Transformer (ParT)~\cite{Qu:2022mxj} are the current state of the art on most HEP tagging benchmarks.
+The dominance of attention in both the general AI landscape and in HEP is a direct consequence of its flexibility, its natural fit to set-structured data, and its ability to scale efficiently on modern GPU hardware.
 
 \section{Generative Models}
 \label{sec:generative}
