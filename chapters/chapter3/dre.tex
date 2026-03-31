@@ -32,20 +32,30 @@ Writing the expectations as integrals gives
     \mathcal{L}(f) = -\int \!\left[p(x)\log f(x) + q(x)\log(1-f(x))\right] dx.
     \label{eqn:bce_integral}
 \end{equation}
-Since the integrand factors pointwise, we can minimize $\mathcal{L}(f)$ by minimizing at each $x$ independently.
-For a fixed $x$, the quantity to minimize over $f \in (0,1)$ is
+To find the minimizer we take the functional derivative of $\mathcal{L}$ with respect to $f$.
+Perturbing $f \to f + \epsilon\,\eta$ for an arbitrary test function $\eta$ and expanding to first order in $\epsilon$,
+\begin{align}
+    \mathcal{L}(f + \epsilon\,\eta)
+    &= -\int\!\left[p(x)\log(f(x)+\epsilon\,\eta(x))
+       + q(x)\log(1-f(x)-\epsilon\,\eta(x))\right]dx \notag\\
+    &= \mathcal{L}(f)
+       - \epsilon\int\!\left[\frac{p(x)}{f(x)} - \frac{q(x)}{1-f(x)}\right]\eta(x)\,dx
+       + \mathcal{O}(\epsilon^2).
+    \label{eqn:functional_perturb}
+\end{align}
+The functional derivative is therefore
 \begin{equation}
-    h(f) = -p(x)\log f - q(x)\log(1-f).
-    \label{eqn:bce_pointwise}
+    \frac{\delta \mathcal{L}}{\delta f(x)} = -\frac{p(x)}{f(x)} + \frac{q(x)}{1-f(x)}.
+    \label{eqn:functional_deriv}
 \end{equation}
-Setting $dh/df = 0$:
+Setting $\delta\mathcal{L}/\delta f(x) = 0$ for all $x$ gives
 \begin{equation}
-    -\frac{p(x)}{f} + \frac{q(x)}{1 - f} = 0
+    \frac{p(x)}{f^*(x)} = \frac{q(x)}{1-f^*(x)}
     \;\implies\;
     f^*(x) = \frac{p(x)}{p(x) + q(x)}.
     \label{eqn:optimal_classifier}
 \end{equation}
-This is a global minimum since $d^2h/df^2 = p(x)/f^2 + q(x)/(1-f)^2 > 0$.
+This is a global minimum: the second functional derivative $\delta^2\mathcal{L}/\delta f(x)^2 = p(x)/f(x)^2 + q(x)/(1-f(x))^2 > 0$ everywhere.
 The likelihood ratio is then recovered from the optimal classifier output by a simple algebraic rearrangement:
 \begin{equation}
     r(x) = \frac{p(x)}{q(x)} = \frac{f^*(x)}{1 - f^*(x)}.
