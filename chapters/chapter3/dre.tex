@@ -33,17 +33,25 @@ Writing the expectations as integrals gives
     \label{eqn:bce_integral}
 \end{equation}
 To find the minimizer we take the functional derivative of $\mathcal{L}$ with respect to $f$.
-Perturbing $f \to f + \epsilon\,\eta$ for an arbitrary test function $\eta$ and expanding to first order in $\epsilon$,
+Perturbing $f \to f + \epsilon\,\eta$ for an arbitrary test function $\eta$, the two logarithms in the integrand expand to first order in $\epsilon$ as
+\begin{align}
+    \log\!\left(f(x) + \epsilon\,\eta(x)\right)
+        &= \log f(x) + \frac{\epsilon\,\eta(x)}{f(x)} + \mathcal{O}(\epsilon^2), \label{eqn:log_expand1}\\
+    \log\!\left(1 - f(x) - \epsilon\,\eta(x)\right)
+        &= \log(1-f(x)) - \frac{\epsilon\,\eta(x)}{1-f(x)} + \mathcal{O}(\epsilon^2). \label{eqn:log_expand2}
+\end{align}
+Substituting into $\mathcal{L}(f+\epsilon\,\eta)$ and collecting terms by order in $\epsilon$,
 \begin{align}
     \mathcal{L}(f + \epsilon\,\eta)
-    &= -\int\!\left[p(x)\log(f(x)+\epsilon\,\eta(x))
-       + q(x)\log(1-f(x)-\epsilon\,\eta(x))\right]dx \notag\\
+    &= -\int\!\left[p(x)\left(\log f(x) + \frac{\epsilon\,\eta(x)}{f(x)}\right)
+       + q(x)\left(\log(1-f(x)) - \frac{\epsilon\,\eta(x)}{1-f(x)}\right)\right]dx
+       + \mathcal{O}(\epsilon^2) \notag\\
     &= \mathcal{L}(f)
        - \epsilon\int\!\left[\frac{p(x)}{f(x)} - \frac{q(x)}{1-f(x)}\right]\eta(x)\,dx
        + \mathcal{O}(\epsilon^2).
     \label{eqn:functional_perturb}
 \end{align}
-The functional derivative is therefore
+The functional derivative is read off as the coefficient of $\eta(x)$ in the first-order term:
 \begin{equation}
     \frac{\delta \mathcal{L}}{\delta f(x)} = -\frac{p(x)}{f(x)} + \frac{q(x)}{1-f(x)}.
     \label{eqn:functional_deriv}
