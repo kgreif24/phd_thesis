@@ -2,4 +2,71 @@
 \section{Density Ratio Estimation}
 \label{sec:dre}
 
+The generative modeling methods of the previous two sections provide ways to model $p_\text{data}(x)$ directly, either by sampling from it or by evaluating its density.
+This section introduces a complementary approach that sidesteps direct density modeling entirely and instead estimates the \textit{ratio} of two densities.
+Density ratio estimation turns out to be a considerably simpler problem than density estimation, and the methods described here are used extensively in deep learning applications to HEP.
+They are central to the cross-section measurement presented in \Cref{ch:zjets}.
 
+\subsection{The Likelihood Ratio Trick}
+\label{sec:lrt}
+
+Given two probability densities $p(x)$ and $q(x)$, the likelihood ratio is defined as
+\begin{equation}
+    r(x) = \frac{p(x)}{q(x)}.
+    \label{eqn:likelihood_ratio}
+\end{equation}
+The key result is that $r(x)$ can be estimated from samples alone, without ever computing either density explicitly, by training a binary classifier to distinguish between them.
+
+\subsubsection{Proof: the Optimal BCE Classifier Recovers the Likelihood Ratio}
+
+Consider a classifier $f_\theta(x) \in (0,1)$ trained on a balanced dataset of samples from $p(x)$ (label $y=1$) and $q(x)$ (label $y=0$) using the BCE loss:
+\begin{equation}
+    \mathcal{L}(f) = -\mathbb{E}_{x \sim p}\!\left[\log f(x)\right]
+                    -\mathbb{E}_{x \sim q}\!\left[\log(1 - f(x))\right].
+    \label{eqn:bce_dre}
+\end{equation}
+We seek the function $f^*$ that minimizes this loss over all measurable functions.
+Writing the expectations as integrals gives
+\begin{equation}
+    \mathcal{L}(f) = -\int \!\left[p(x)\log f(x) + q(x)\log(1-f(x))\right] dx.
+    \label{eqn:bce_integral}
+\end{equation}
+Since the integrand factors pointwise, we can minimize $\mathcal{L}(f)$ by minimizing at each $x$ independently.
+For a fixed $x$, the quantity to minimize over $f \in (0,1)$ is
+\begin{equation}
+    h(f) = -p(x)\log f - q(x)\log(1-f).
+    \label{eqn:bce_pointwise}
+\end{equation}
+Setting $dh/df = 0$:
+\begin{equation}
+    -\frac{p(x)}{f} + \frac{q(x)}{1 - f} = 0
+    \;\implies\;
+    f^*(x) = \frac{p(x)}{p(x) + q(x)}.
+    \label{eqn:optimal_classifier}
+\end{equation}
+This is a global minimum since $d^2h/df^2 = p(x)/f^2 + q(x)/(1-f)^2 > 0$.
+The likelihood ratio is then recovered from the optimal classifier output by a simple algebraic rearrangement:
+\begin{equation}
+    r(x) = \frac{p(x)}{q(x)} = \frac{f^*(x)}{1 - f^*(x)}.
+    \label{eqn:ratio_from_classifier}
+\end{equation}
+The optimal classifier output is therefore a monotonic function of the likelihood ratio.
+Any classifier trained to minimize BCE loss is implicitly learning to estimate $r(x)$, up to this monotonic rescaling.
+This result is sometimes called the \textit{likelihood ratio trick}~\cite{Cranmer:2015bka,Andreassen:2019nnm}.
+
+\subsection{Reweighting and Applications in HEP}
+\label{sec:dre_hep}
+
+The practical consequence of \Cref{eqn:ratio_from_classifier} is that a trained classifier can be used to reweight a set of samples drawn from $q(x)$ to match the distribution $p(x)$.
+Assigning each sample $x_i \sim q$ a weight $w_i = r(x_i) = f^*(x_i) / (1 - f^*(x_i))$ makes the weighted distribution equal to $p(x)$ in expectation.
+
+Reweighting samples between probability distributions is not a new idea in HEP.
+A standard method is to derive correction factors as ratios of one-dimensional histograms, which is a simple form of density ratio estimation in a single variable.
+The limitation is evident: histogram-based reweighting does not generalize to more than a few dimensions before statistical power is exhausted.
+
+The likelihood ratio trick bypasses this limitation entirely.
+Because the classifier can be any neural network, it scales to high and even variable-dimensional inputs.
+Graph networks and transformers, which naturally handle variable-length sets of particle four-momenta, can serve as the classifier backbone, making the method applicable to full event-level data without any binning or dimensionality reduction.
+The method has been applied to Monte Carlo reweighting~\cite{Cranmer:2015bka}, where a simulation is reweighted to better match data, and to unbinned unfolding, where it is iterated to correct for detector effects.
+The latter application, the Omnifold algorithm~\cite{Andreassen:2019cjw}, is the method used for the cross-section measurement in \Cref{ch:zjets}.
+A concrete illustration of the quality of the reweighting in the first step of that procedure is given in \Cref{ch:zjets}.
