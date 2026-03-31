@@ -43,8 +43,9 @@ Perturbing $f \to f + \epsilon\,\eta$ for an arbitrary test function $\eta$, the
 Substituting into $\mathcal{L}(f+\epsilon\,\eta)$ and collecting terms by order in $\epsilon$,
 \begin{align}
     \mathcal{L}(f + \epsilon\,\eta)
-    &= -\int\!\left[p(x)\left(\log f(x) + \frac{\epsilon\,\eta(x)}{f(x)}\right)
-       + q(x)\left(\log(1-f(x)) - \frac{\epsilon\,\eta(x)}{1-f(x)}\right)\right]dx
+    &= -\int\!\Bigl[p(x)\Bigl(\log f(x) + \frac{\epsilon\,\eta(x)}{f(x)}\Bigr)
+       \notag\\
+    &\qquad + q(x)\Bigl(\log(1-f(x)) - \frac{\epsilon\,\eta(x)}{1-f(x)}\Bigr)\Bigr]\,dx
        + \mathcal{O}(\epsilon^2) \notag\\
     &= \mathcal{L}(f)
        - \epsilon\int\!\left[\frac{p(x)}{f(x)} - \frac{q(x)}{1-f(x)}\right]\eta(x)\,dx
@@ -56,36 +57,31 @@ The functional derivative is read off as the coefficient of $\eta(x)$ in the fir
     \frac{\delta \mathcal{L}}{\delta f(x)} = -\frac{p(x)}{f(x)} + \frac{q(x)}{1-f(x)}.
     \label{eqn:functional_deriv}
 \end{equation}
-Setting $\delta\mathcal{L}/\delta f(x) = 0$ for all $x$ gives
+Setting $\delta\mathcal{L}/\delta f(x) = 0$ for all $x$ gives the stationary point condition for the functional $\mathcal{L}$:
 \begin{equation}
     \frac{p(x)}{f^*(x)} = \frac{q(x)}{1-f^*(x)}
     \;\implies\;
     f^*(x) = \frac{p(x)}{p(x) + q(x)}.
     \label{eqn:optimal_classifier}
 \end{equation}
-This is a global minimum: the second functional derivative $\delta^2\mathcal{L}/\delta f(x)^2 = p(x)/f(x)^2 + q(x)/(1-f(x))^2 > 0$ everywhere.
+This is a global minimum since the second functional derivative evaluated at $f^*$ is positive\footnote{In fact the second derivative is positive everywhere, making optimization of the BCE loss a ``convex'' problem. Working out the second functional derivative and showing this is left as an exercise for the reader. Note however that this does not mean that the loss with respect to the parameters of the classifier is convex!}.
 The likelihood ratio is then recovered from the optimal classifier output by a simple algebraic rearrangement:
 \begin{equation}
     r(x) = \frac{p(x)}{q(x)} = \frac{f^*(x)}{1 - f^*(x)}.
     \label{eqn:ratio_from_classifier}
 \end{equation}
-The optimal classifier output is therefore a monotonic function of the likelihood ratio.
 Any classifier trained to minimize BCE loss is implicitly learning to estimate $r(x)$, up to this monotonic rescaling.
-This result is sometimes called the \textit{likelihood ratio trick}~\cite{Cranmer:2015bka,Andreassen:2019nnm}.
+Using a network trained with a BCE loss to estimate the likelihood ratio is sometimes called the \textit{likelihood ratio trick}~\cite{Cranmer:2015bka,Andreassen:2019nnm}.
 
 \subsection{Reweighting and Applications in HEP}
 \label{sec:dre_hep}
 
-The practical consequence of \Cref{eqn:ratio_from_classifier} is that a trained classifier can be used to reweight a set of samples drawn from $q(x)$ to match the distribution $p(x)$.
-Assigning each sample $x_i \sim q$ a weight $w_i = r(x_i) = f^*(x_i) / (1 - f^*(x_i))$ makes the weighted distribution equal to $p(x)$ in expectation.
+The practical consequence of \Cref{eqn:ratio_from_classifier} is that a trained classifier can be used to reweight a set of samples drawn from $q(x)$ to match the distribution $p(x)$, or vice versa since the inverse of the likelihood ratio is also a monotonic rescaling of $f^*(x)$.
+Assigning each sample $x_i \sim q$ a weight $w_i = r(x_i) = f^*(x_i) / (1 - f^*(x_i))$ makes the weighted distribution equal to $p(x)$.
 
-Reweighting samples between probability distributions is not a new idea in HEP.
+Reweighting samples from one probability distribution to samples from another is not a new idea in HEP.
 A standard method is to derive correction factors as ratios of one-dimensional histograms, which is a simple form of density ratio estimation in a single variable.
-The limitation is evident: histogram-based reweighting does not generalize to more than a few dimensions before statistical power is exhausted.
-
-The likelihood ratio trick bypasses this limitation entirely.
-Because the classifier can be any neural network, it scales to high and even variable-dimensional inputs.
-Graph networks and transformers, which naturally handle variable-length sets of particle four-momenta, can serve as the classifier backbone, making the method applicable to full event-level data without any binning or dimensionality reduction.
-The method has been applied to Monte Carlo reweighting~\cite{Cranmer:2015bka}, where a simulation is reweighted to better match data, and to unbinned unfolding, where it is iterated to correct for detector effects.
-The latter application, the Omnifold algorithm~\cite{Andreassen:2019cjw}, is the method used for the cross-section measurement in \Cref{ch:zjets}.
-A concrete illustration of the quality of the reweighting in the first step of that procedure is given in \Cref{ch:zjets}.
+Of course this does not generalize to more than a few dimensions given the curse of dimensionality.
+The likelihood ratio trick bypasses the need to bin and so scales to very high dimensions.
+The distributions can even be \textit{variable-dimensional} and the method is still applicable, since neural network architectures like graphs and transformers naturally handle variable-length sets.
+In the context of this thesis, the most relevant application of the likelihood ratio trick is the Omnifold algorithm~\cite{Andreassen:2019cjw}, which is the method used for the cross-section measurement in \Cref{ch:zjets}.
