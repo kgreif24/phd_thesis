@@ -2,52 +2,43 @@
 \section{Diffusion and Flow-Matching Models}
 \label{sec:diffusion}
 
-Diffusion models and flow-matching models are the current state of the art in generative modeling, having displaced GANs, VAEs, and normalizing flows on most high-fidelity generation benchmarks.
-Both can be understood as improvements that address the core limitations identified in the previous section: the training instability of GANs, the Gaussian mean-prediction bias of VAEs, and the architectural constraints of normalizing flows.
-The key idea shared by both families is to decompose a complex single-step transformation between a noise distribution and the data distribution into many small, tractable steps, allowing the model to be both highly expressive and stably trained.
+Diffusion models and flow-matching models are the current state of the art in standard generative modeling tasks like image generation.
+Both decompose the complex single-step transformation between a latent-variable distribution and the data distribution modeled by the decoder network of a VAE into many small, tractable steps.
+This is similar to flow based models, except the ``forward'' mapping between the latent-variable and data distributions is not required to be bijective.
+Instead the mapping from the data distribution to the latent-variable distribution is fixed, not learned, and the model learns only the reverse mapping.
 
 % -------------------------------------------------------------------
 \subsection{Denoising Diffusion Probabilistic Models}
 \label{sec:ddpm}
 
-Diffusion models~\cite{Ho:2020ddpm,TODO:sohl_dickstein} frame generation as the reversal of a \textit{forward process} that progressively destroys the structure of a data sample by adding Gaussian noise.
-The forward process is a fixed (not learned) Markov chain over $T$ discrete time steps:
+In diffusion models~\cite{sohl2015deep,Ho:2020ddpm}, the forward process is the progression addition of Gaussian noise to a data sample.
+More specifically this is a Markov chain over $T$ discrete time steps:
 \begin{equation}
     q(x_t \mid x_{t-1}) = \mathcal{N}\!\left(x_t;\; \sqrt{1 - \beta_t}\, x_{t-1},\; \beta_t I\right),
     \label{eqn:forward_step}
 \end{equation}
 where $\{\beta_t\}_{t=1}^T$ is a fixed \textit{noise schedule} with $0 < \beta_t \ll 1$.
-Each step mixes the previous sample toward zero mean while adding a small amount of isotropic Gaussian noise.
 The joint forward distribution over the full chain is
 \begin{equation}
     q(x_{1:T} \mid x_0) = \prod_{t=1}^{T} q(x_t \mid x_{t-1}).
     \label{eqn:forward_joint}
 \end{equation}
-By choosing the noise schedule so that $\prod_{t=1}^T (1 - \beta_t) \to 0$, the marginal $q(x_T \mid x_0) \approx \mathcal{N}(0, I)$ for sufficiently large $T$: the data is destroyed into pure noise.
-
-A useful closed form for the marginal at arbitrary $t$ follows from defining $\alpha_t = 1 - \beta_t$ and $\bar\alpha_t = \prod_{s=1}^t \alpha_s$:
-\begin{equation}
-    q(x_t \mid x_0) = \mathcal{N}\!\left(x_t;\; \sqrt{\bar\alpha_t}\, x_0,\; (1 - \bar\alpha_t) I\right).
-    \label{eqn:forward_marginal}
-\end{equation}
-Equivalently, a noisy sample at step $t$ can be written in closed form as
-\begin{equation}
-    x_t = \sqrt{\bar\alpha_t}\, x_0 + \sqrt{1 - \bar\alpha_t}\, \varepsilon, \qquad \varepsilon \sim \mathcal{N}(0, I).
-    \label{eqn:xt_reparam}
-\end{equation}
-This reparameterization is important: it allows a noisy training sample at any time step to be constructed directly from $x_0$ and a single noise draw, without simulating the full chain.
+By choosing the noise schedule so that $\prod_{t=1}^T (1 - \beta_t) \to 0$, the probability of $x$ at time step $T$ becomes $q(x_T \mid x_0) \approx \mathcal{N}(0, I)$ for sufficiently large $T$.
+In other words, adding increasingly high variance noise to the data sample will eventually results in a pure-noise sample.
+This pure noise distribution can be sampled from easily, analogous to the standard Gaussian latent variable distribution in a normalizing flow model.
+The goal of a diffusion model is then to learn the reverse of this process, that evolves a pure-noise sample back to the data distribution.
+In what follows the definitions $\alpha_t = 1 - \beta_t$ and $\bar\alpha_t = \prod_{s=1}^t \alpha_s$ will be used in place of $\beta_t$ to simplify the notation.
 
 \subsubsection{The DDPM Objective as a Hierarchical ELBO}
 
-The generative model learns the reverse process
+In the standard denoising diffusion probabilistic model (DDPM) objective, the generative model learns the reverse process
 \begin{equation}
-    p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\!\left(x_{t-1};\; \mu_\theta(x_t, t),\; \Sigma_\theta(x_t, t)\right),
+    p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\!\left(x_{t-1};\; \mu_\theta(x_t, t),\; \sigma_t^2 I\right),
     \label{eqn:reverse_step}
 \end{equation}
-which is parameterized by a neural network.
+which is parameterized by a neural network $\mu_\theta$ and a diagonal variance matrix which evolves with time $\sigma_t^2 I$.
 Starting from $p(x_T) = \mathcal{N}(0, I)$, iteratively applying \Cref{eqn:reverse_step} for $t = T, T-1, \ldots, 1$ produces a sample from the learned data distribution.
-The model is trained by maximizing a lower bound on $\log p_\theta(x_0)$.
-
+The model is trained by maximizing a lower bound on $\log p_\theta(x_0)$, as was the case for VAEs.
 The training objective has the same ELBO structure derived in \Cref{sec:vae}, but applied to a hierarchical latent variable model with $T$ latent variables $x_1, \ldots, x_T$:
 \begin{align}
     \log p_\theta(x_0)
@@ -56,7 +47,10 @@ The training objective has the same ELBO structure derived in \Cref{sec:vae}, bu
     &\quad - \sum_{t=2}^{T} \underbrace{D_\text{KL}\!\left(q(x_{t-1} \mid x_t, x_0) \;\|\; p_\theta(x_{t-1} \mid x_t)\right)}_{L_{t-1}}.
     \label{eqn:ddpm_elbo}
 \end{align}
-The first term is a reconstruction term at $t=1$; the second is a boundary term that is negligible when the schedule is well-chosen; the sum over $L_{t-1}$ is the main contribution.
+The first term is a reconstruction term at $t=1$.
+The second term enforces that the posterior at time step $T$ is the pure-noise distribution.
+This is a constant term that does not depend on the model parameters $\theta$ given the noise process is not learned in the standard DDPM objective.
+The important terms are contained in the sum over $t$.
 Each $L_{t-1}$ compares the learned reverse step $p_\theta(x_{t-1} \mid x_t)$ against the \textit{fixed} forward-process posterior $q(x_{t-1} \mid x_t, x_0)$, which is tractable because the forward process is Gaussian:
 \begin{equation}
     q(x_{t-1} \mid x_t, x_0)
@@ -72,11 +66,20 @@ with
     \tilde\beta_t = \frac{1 - \bar\alpha_{t-1}}{1 - \bar\alpha_t}\,\beta_t.
     \label{eqn:posterior_mean}
 \end{equation}
-Crucially, the posterior \Cref{eqn:forward_posterior} is \textit{fixed} and Gaussian: the diffusion model replaces the learned approximate posterior of the VAE with a fixed stochastic process.
-Each term $L_{t-1}$ is the KL divergence between two Gaussians and reduces to a squared difference of their means.
+Crucially, the forward-process posterior \Cref{eqn:forward_posterior}\footnote{Note this is not to be confused with the latent-variable posterior $q_\phi(z|x)$ which is learned by the encoder network in a VAE.} is \textit{fixed} and Gaussian.
+Each term $L_{t-1}$ is the KL divergence between two Gaussians and reduces to a standard MSE loss between the predicted and true means.
 
 \subsubsection{The Noise Prediction Objective}
 
+DDPM models typically do not attempt to predict the mean of $\tilde\mu_t(x_t, x_0)$ directly, but instead predict the noise that was added at time step $t$.
+This is just a reparametrization, somewhat similar to the reparametrization trick used in VAEs but used here only used because it empirically gives better sample quality.
+Given the forward process is fixed in DDPM there is no need to backpropagate through the random sampling to train the posterior, as in a VAE.
+The reparametrization is
+\begin{equation}
+    x_t = \sqrt{\bar\alpha_t}\,x_0 + \sqrt{1 - \bar\alpha_t}\,\varepsilon,
+    \label{eqn:xt_reparam}
+\end{equation}
+where $\varepsilon \sim \mathcal{N}(0, I)$.
 Substituting \Cref{eqn:xt_reparam} into the posterior mean \Cref{eqn:posterior_mean} and parameterizing the reverse process mean as
 \begin{equation}
     \mu_\theta(x_t, t)
@@ -90,7 +93,7 @@ where $\varepsilon_\theta$ is a neural network that predicts the noise $\varepsi
 \end{equation}
 The full training objective is therefore a sum of MSE losses, each comparing the network's predicted noise to the true noise injected at time step $t$.
 In practice, Ho et al.~\cite{Ho:2020ddpm} found that uniform random sampling of $t$ at each training step, rather than summing all terms, works well and further simplifies training.
-The resulting algorithm is:
+The training algorithm is:
 \begin{enumerate}
     \item Sample $x_0 \sim p_\text{data}$, $t \sim \text{Uniform}(1, T)$, $\varepsilon \sim \mathcal{N}(0, I)$.
     \item Construct $x_t = \sqrt{\bar\alpha_t}\,x_0 + \sqrt{1 - \bar\alpha_t}\,\varepsilon$ via \Cref{eqn:xt_reparam}.
@@ -105,33 +108,32 @@ The overall structure of the forward and reverse processes is illustrated in \Cr
     \label{fig:ddpm}
 \end{figure}
 
-\subsubsection{Expressivity and the Removal of the Gaussian Mean Bias}
+In practice DDPM models produce much higher sample quality than VAEs, despite the fact they are optimizing very similar objectives.
+One explanation for this is that DDPM models predict only the mean of the forward-process posterior $q(x_{t-1} \mid x_t, x_0)$ at each time step, which is unimodal and Gaussian by construction.
+This side-steps the inability of VAEs to model multimodal likelihoods as discussed in \Cref{sec:vae}.
+The drawback is that model inference must be run many times to generate a new sample.
 
-A key conceptual advantage of diffusion models over VAEs is that the reverse process is not required to predict the mean of the full posterior $p_\text{data}(x_0 \mid x_T)$ in a single step.
-Instead it predicts the mean of the posterior $q(x_{t-1} \mid x_t, x_0)$ at each small step, which by construction (\Cref{eqn:forward_posterior}) is unimodal and Gaussian.
-Over many steps, the composition of these simple Gaussian steps can produce samples from a highly multimodal distribution.
-The Gaussian mean-prediction bias identified in the VAE discussion is therefore not a fundamental limitation of diffusion models, which is part of the theoretical justification for their superior sample quality.
-
-\subsubsection{Sampling via Reverse-Process SDEs}
+\subsubsection{DDPM Sampling}
 
 To generate a new sample, one draws $x_T \sim \mathcal{N}(0, I)$ and iterates the learned reverse step for $t = T, \ldots, 1$.
-This sequential sampling procedure is the main practical cost of diffusion models: generating a single sample requires $T$ (typically hundreds to thousands) forward passes through the network, compared to one for a normalizing flow or GAN.
-A key theoretical insight is that the forward process in \Cref{eqn:forward_step} can be interpreted as the discretization of a \textit{stochastic differential equation} (SDE)~\cite{Song:2021score}.
-The SDE perspective reveals that every forward SDE has a corresponding \textit{probability flow ODE} with identical marginal distributions $q(x_t)$ at every time $t$:
+Formally the forward process \Cref{eqn:forward_step} can be interpreted as the discretization of a \textit{stochastic differential equation} (SDE)~\cite{Song:2021score}.
+The reverse of this process is also an SDE, which can be solved by numerical methods using the noise predictions from the model as input.
+An example is the PNDM solver~\cite{liu2022pseudo} used in Ref.~\cite{Shmakov:2023kjj}, but many other solvers exist.
+Ref.~\cite{Song:2021score} also shows that every forward SDE has a corresponding \textit{probability flow ODE} with identical marginal distributions $q(x_t)$ at every time $t$:
 \begin{equation}
     dx = \left[f(x, t) - \tfrac{1}{2}g(t)^2\,\nabla_x \log q_t(x)\right] dt,
     \label{eqn:prob_flow_ode}
 \end{equation}
 where $f$ and $g$ are the drift and diffusion coefficients of the forward SDE and $\nabla_x \log q_t(x)$ is the \textit{score function} of the marginal distribution at time $t$.
 Since $\varepsilon_\theta(x_t, t) \approx -\sqrt{1 - \bar\alpha_t}\,\nabla_{x_t} \log q_t(x_t)$, a trained diffusion model can solve either the stochastic reverse SDE or the deterministic probability flow ODE.
-The ODE solution, which requires fewer function evaluations, is the continuous-time generalization of normalizing flows~\cite{TODO:chen_neuralode}.
-This connection shows that diffusion models subsume normalizing flows as a special case and inherit their exact likelihood computation, while lifting the bijectivity constraint that limited flow architectures.
+The ODE solution can be understood as the continuous-time generalization of normalizing flows~\cite{chen2018neural}.
+This connection is more made apparent in the flow matching models in the next section.
 
 % -------------------------------------------------------------------
 \subsection{Flow Matching}
 \label{sec:flow_matching}
 
-Flow matching~\cite{lipman2022flow} is a closely related but conceptually distinct framework that trains a model to directly predict the \textit{vector field} that transports a noise distribution to the data distribution, rather than predicting added noise.
+Flow matching~\cite{lipman2022flow} is a closely related framework that trains a model to directly predict the \textit{vector field} that transports a noise distribution to the data distribution, rather than predicting added noise.
 The starting point is the \textit{continuity equation}: if $p_t(x)$ is a time-dependent density evolving under the vector field $v_t(x)$, then
 \begin{equation}
     \frac{\partial p_t}{\partial t} + \nabla \cdot (p_t\,v_t) = 0.
@@ -139,8 +141,7 @@ The starting point is the \textit{continuity equation}: if $p_t(x)$ is a time-de
 \end{equation}
 Given a source distribution $p_0 = \mathcal{N}(0, I)$ and a target $p_1 = p_\text{data}$, the goal is to learn a neural network $u_\theta(x, t)$ that approximates the vector field $v_t$ generating a probability path $\{p_t\}_{t \in [0,1]}$ connecting them.
 
-The marginal vector field $v_t(x)$ is generally intractable to compute directly.
-The key insight of conditional flow matching (CFM) is that the \textit{conditional} vector field $u_t(x \mid x_1)$, which generates the conditional path $p_t(x \mid x_1)$ for a fixed data point $x_1$, has the same expected gradient and yields an equivalent training objective~\cite{lipman2022flow}:
+The marginal vector field $v_t(x)$ is generally intractable to compute directly, but the \textit{conditional} vector field $u_t(x \mid x_1)$, which generates the conditional path $p_t(x \mid x_1)$ for a fixed data point $x_1$, has the same expected gradient as the marginal vector field and yields an equivalent training objective~\cite{lipman2022flow}:
 \begin{equation}
     \mathcal{L}_\text{CFM}(\theta)
     = \mathbb{E}_{t,\,x_1 \sim p_\text{data},\,x_t \sim p_t(\cdot \mid x_1)}
@@ -148,16 +149,16 @@ The key insight of conditional flow matching (CFM) is that the \textit{condition
     \label{eqn:cfm_loss}
 \end{equation}
 The conditional vector field $u_t(x \mid x_1)$ depends on the choice of conditional probability path.
-With Gaussian conditional paths $p_t(x \mid x_1) = \mathcal{N}(x;\, \mu_t(x_1),\, \sigma_t^2 I)$, the CFM objective is equivalent to the diffusion score-matching objective~\cite{lipman2022flow}.
-
-A practically important alternative is to use \textit{linear} (optimal transport) paths, defined by the straight interpolation
+With Gaussian conditional paths $p_t(x \mid x_1) = \mathcal{N}(x;\, \mu_t(x_1),\, \sigma_t^2 I)$, the CFM objective is equivalent to the DDPM objective~\cite{lipman2022flow}.
+Alternatively one could just interpolate between the samples between the noise and target data points,
 \begin{equation}
     x_t = (1 - t)\,x_0 + t\,x_1, \qquad x_0 \sim \mathcal{N}(0, I),
     \label{eqn:linear_path}
 \end{equation}
 for which the conditional vector field is simply $u_t(x \mid x_1) = x_1 - x_0$.
-These straight paths are shorter on average than the curved trajectories traced by diffusion SDEs, which means fewer integration steps are needed to generate a sample accurately.
-\Cref{fig:flow_matching} illustrates the contrast between diffusion trajectories and linear flow-matching paths.
+The straight paths in data space are much simpler to integrate than the curved trajectories that result from Gaussian conditional paths.
+This means flow matching models trained with these paths typically require fewer neural function evaluations to generate a sample accurately.
+\Cref{fig:flow_matching} illustrates the difference between diffusion trajectories and linear flow-matching paths.
 
 \begin{figure}[ht]
     \centering
@@ -170,27 +171,30 @@ These straight paths are shorter on average than the curved trajectories traced 
 \subsection{Applications in HEP and Comparative Performance}
 \label{sec:diffusion_hep}
 
-Diffusion models were adopted quickly within HEP after they demonstrated state-of-the-art performance on image generation tasks.
-The first applications targeted fast calorimeter shower simulation~\cite{Mikuni:2022xry,Amram:2023onf}, replacing the computationally expensive \textsc{Geant4} full simulation~\cite{GEANT4:2002zbu} with a generative model that achieves comparable fidelity in a fraction of the time.
-Diffusion and flow-matching models have since been applied to anomaly detection and unbinned unfolding, the latter being a central topic of \Cref{ch:unfolding}.
+Diffusion models were adopted quickly within HEP after they demonstrated state-of-the-art performance on image generation tasks in 2021~\cite{Ho:2020ddpm,Song:2021score}.
+The first applications targeted fast calorimeter shower simulation~\cite{Mikuni:2022xry,Amram:2023onf}, as task which aims to train a model to generate calorimeter showers based on a training set generated from the realistic but expensive \textsc{Geant4} simulation used by most particle physics experimental collaborations~\cite{GEANT4:2002zbu}.
+Diffusion and flow-matching models have since been applied to anomaly detection and unfolding, the latter being a central topic of \Cref{ch:unfolding}.
+Given calorimeter simulation is the most obviously useful application of generative models in HEP and provides a very useful benchmark, it's worth showing some results a community challenge in this domain here.
+The Calorimeter Simulation Challenge (CaloChallenge)~\cite{Krause:2024avx} required participants to train models that could generate calorimeter shows for three increasingly complicated and granular calorimeter geometries.
+Some results from datasets 2 and 3 are shown in \Cref{fig:calochallenge_ds2,fig:calochallenge_ds3}.
+The plots show the multi-class log posterior (a measure of sample quality, with higher being more similar to the ground GEANT4 simulation) versus generation time per shower (lower is better).
+The takeaway from these plots is that diffusion (such as CaloDiffusion~\cite{Amram:2023onf}) and flow-matching (such as CaloDREAM~\cite{Favaro:2024rle}) models achieve the best sample quality, but at the cost of relatively slow sampling.
+Of course they are still far faster than the GEANT simulation.
+Interestingly normalizing-flow-based methods like CaloPointFlow~\cite{Schnake:2024mip} are competitive and substantially faster to sample from.
+There is some possibility that diffusion and flow matching models are actually generating samples with higher quality than is needed for downstream tasks, in which case using simpler models would be more efficient.
+However in other generative tasks in HEP, such as anomaly detection or the unfolding task discussed in \Cref{ch:unfolding}, sample quality is essential and sampling speed is essentially irrelevant.
+In these tasks, diffusion and flow-matching models are the current state of the art.
 
-The Calorimeter Simulation Challenge (CaloChallenge)~\cite{Krause:2024avx} provides a systematic community benchmark for comparing generative models on calorimeter simulation across datasets of increasing dimensionality and complexity.
-Results from this challenge are shown in \Cref{fig:calochallenge_ds2,fig:calochallenge_ds3}.
-Conditional flow matching models achieve the best overall sample fidelity on these benchmarks, but normalizing-flow-based methods~\cite{Schnake:2024mip} are competitive and substantially faster to sample from, given their single-pass inference.
-
-\begin{figure}[ht]
+\begin{figure}[t]
     \centering
-    \includegraphics[width=0.75\linewidth]{figures/ch3/ds2_logpost_time.png}
-    \caption{CaloChallenge Dataset 2: log-posterior score (higher is better) versus generation time per shower for several generative model families. Figure from~\cite{Krause:2024avx}, published in an IOP journal; reproduced with permission.}
+    \includegraphics[width=1.0\linewidth]{figures/ch3/ds2_logpost_time.png}
+    \caption{CaloChallenge Dataset 2: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling speed. The normalizing flow based models (CaloINN) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
     \label{fig:calochallenge_ds2}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[t]
     \centering
-    \includegraphics[width=0.75\linewidth]{figures/ch3/ds3_logpost_time.png}
-    \caption{CaloChallenge Dataset 3: log-posterior score versus generation time per shower. Dataset 3 is higher-dimensional than Dataset 2, and the performance gap between diffusion/flow-matching models and other methods widens. Figure from~\cite{Krause:2024avx}, published in an IOP journal; reproduced with permission.}
+    \includegraphics[width=1.0\linewidth]{figures/ch3/ds3_logpost_time.png}
+    \caption{CaloChallenge Dataset 3: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling speed. The normalizing flow based models (CaloPointFlow) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
     \label{fig:calochallenge_ds3}
 \end{figure}
-
-Beyond calorimeter simulation, there is growing evidence that CFM objectives outperform diffusion on HEP generative tasks more broadly~\cite{Favaro:2024rle,Petitjean:2025tgk}, likely because straighter probability paths require fewer integration steps and are less susceptible to discretization error.
-An explicit comparison of diffusion and flow-matching objectives in the context of unbinned unfolding will be presented in \Cref{ch:unfolding}.
