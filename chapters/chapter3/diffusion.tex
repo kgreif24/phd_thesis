@@ -1,35 +1,5 @@
 
-\section{Diffusion Models}
+\section{Diffusion and Flow-Matching Models}
 \label{sec:diffusion}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Score-based / SMLD models
-%    - Noise perturbation at multiple scales; score matching.
-%    - Song \& Ermon (2019): Generative Modeling by Estimating
-%      Gradients of the Data Distribution.
-%    - Score function s_\theta(x) ≈ \nabla_x \log p(x).
-%
-% 2. Denoising Diffusion Probabilistic Models (DDPMs)
-%    - Forward process: q(x_t | x_{t-1}) = N(x_t; sqrt(1-beta)x_{t-1}, beta I).
-%    - Reverse process: p_\theta(x_{t-1} | x_t) learned by a UNet.
-%    - Ho et al. (2020) — key equations; ELBO derivation (high level).
-%    - Connection to score matching via x_0-prediction vs. eps-prediction.
-%
-% 3. Latent Diffusion Models (LDMs)
-%    - Two-stage: (a) train a VAE to compress x -> z;
-%                 (b) train a diffusion model in latent space z.
-%    - Rombach et al. (2022) — Stable Diffusion; key architectural
-%      choices: cross-attention for conditioning.
-%    - Why latent space? Much lower dimensionality → faster training
-%      and sampling; also aligns with the low ID of jet data (Ch.2).
-%
-% 4. The VLD architecture for unfolding
-%    - Forward pointer to Ch.5 where VLD is described in full.
-%    - Mention here: VLD = Variational Latent Diffusion, designed
-%      specifically for particle physics unfolding.  It conditions
-%      the diffusion model on detector-level observables and generates
-%      samples from the inferred particle-level distribution.
-%    - Highlight what makes VLD novel: unbinned, high-dimensional,
-%      generative output that can be histogrammed in any observable.
+
