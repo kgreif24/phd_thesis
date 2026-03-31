@@ -315,6 +315,6 @@ The transformer block is illustrated in \Cref{fig:transformer_block}.
 A key property of self-attention as defined in \Cref{eqn:attention} is that it is \textit{permutation equivariant}: permuting the rows of $X$ permutes the rows of the output in the same way, and the attention computation itself is unchanged.
 In natural language processing this is a problem because word order carries meaning.
 This is why Ref \cite{Vaswani:2017attention} added \textit{positional encodings} to the input that break permutation symmetry.
-However for HEP data permutation equivariance is often a very useful inductive bias.
+However for HEP data permutation equivariance is often a very useful inductive bias~\cite{Komiske:2018cqr}.
 Jets and events are composed of unordered sets of particles, where the order of the particles is typically not meaningful\footnote{An exception to this will be covered in the set-to-set unfolding work in \Cref{ch:unfolding}}.
 This means the transformer architecture can be applied to HEP data directly~\cite{Mikuni:2020wpr}, which is why transformers are so widely used in HEP whereas their direct predecessors, RNNs, are not.
