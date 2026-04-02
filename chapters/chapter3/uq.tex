@@ -2,7 +2,7 @@
 \section{Uncertainty Quantification}
 \label{sec:uq}
 
-Uncertainty quantification for HEP applications of deep learning are very problem specific, so it's difficult to give a general overview of the methods.
+Uncertainty quantification for HEP applications of deep learning is very problem-specific, so it's difficult to give a general overview of the methods.
 This section covers the main types of uncertainty considered in the deep learning literature and how they map on to HEP problems.
 The primary goal is to discuss the quantification methods, which are widely used in \Cref{ch:tagging,ch:zjets}.
 \Cref{fig:uncertainty_types} provides visual intuition for each category of uncertainties on a toy problem.
@@ -20,9 +20,9 @@ The primary goal is to discuss the quantification methods, which are widely used
 
 Aleatoric uncertainty is the uncertainty inherent in the data-generating process.
 This uncertainty is a property of the problem, not the data or methods.
-The left hand panel of \cref{fig:uncertainty_types} shows a toy regression problem with the aleatoric uncertainty corresponding to the noise in the data points that make them deviation from the true function shown in gray.
+The left hand panel of \cref{fig:uncertainty_types} shows a toy regression problem with the aleatoric uncertainty corresponding to the noise in the data points that make them deviate from the true function shown in gray.
 This noise could have many sources in real world problems.
-As a concrete example, in the jet classification task discussed in \Cref{ch:tagging} both top quark initiatied and light quark or gluon initiated jets have a non-zero probability of producing a given jet configuration.
+As a concrete example, in the jet classification task discussed in \Cref{ch:tagging} both top quark initiated and light quark or gluon initiated jets have a non-zero probability of producing a given jet configuration.
 Some configurations are much more likely to be due to a top quark versus a light quark or gluon, but there is no way to decisively answer within the problem as posed.
 The correct model output, which for binary classification is related to the likelihood as shown in \cref{sec:dre}, reflects this and assigns some non-zero probability to both classes.
 This spread is an example of aleatoric uncertainty.
@@ -64,8 +64,8 @@ Bayesian neural networks have seen limited use in HEP~\cite{Bollweg:2019skg} rel
 \label{sec:domain_shift}
 
 Domain shift occurs when probability distribution governing the data used in evaluation differs from the distribution governing the data used in training.
-This type of uncertainty is visualized in the right hand panel of \cref{fig:uncertainty_types} where the testing data (red) is not drawn from the sample distribution as the training data (blue).
-This the most common type of uncertainty in HEP.
+This type of uncertainty is visualized in the right hand panel of \cref{fig:uncertainty_types} where the testing data (red) is not drawn from the same distribution as the training data (blue).
+This is the most common type of uncertainty in HEP.
 In particular experimental systematic uncertainties typically fall in this category.
 A particularly relevant example for \Cref{ch:tagging} is that jet tagging models are typically trained on simulation but applied on data.
 Typically models show worse performance on data and this difference needs to be quantified by a \textit{scale factor} for the tagger to be used in measurements and searches.
@@ -82,10 +82,10 @@ However in many applications this is easiest and most correct approach, and is u
 An alternative is to train the model to be robust to known sources of domain shift.
 This can be done by including data with known domain shifts applied in the training set.
 An additional step that can be taken to reduce the domain shift uncertainty is to explicitly decorrelate the model output against these shifts.
-This is often done in HEP so that systematic variations do not effect the model output.
+This is often done in HEP so that systematic variations do not affect the model output.
 This has been studied in the context of jet taggers and other classifiers~\cite{Kasieczka:2020yyl,ATLAS:2025dkv,Ghosh:2021hrh}.
 Decorrelation results in smaller domain shift uncertainties but typically at the cost of performance.
-This may still be a desireable tradeoff, for example jet taggers are typically decorrelated against the jet mass observable to avoid artificial sculpting of mass distributions.
+This may still be a desirable tradeoff, for example jet taggers are typically decorrelated against the jet mass observable to avoid artificial sculpting of mass distributions.
 
 
 \paragraph{Parametrized models.}

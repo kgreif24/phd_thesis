@@ -11,7 +11,7 @@ Instead the mapping from the data distribution to the latent-variable distributi
 \subsection{Denoising Diffusion Probabilistic Models}
 \label{sec:ddpm}
 
-In diffusion models~\cite{sohl2015deep,Ho:2020ddpm}, the forward process is the progression addition of Gaussian noise to a data sample.
+In diffusion models~\cite{sohl2015deep,Ho:2020ddpm}, the forward process is the progressive addition of Gaussian noise to a data sample.
 More specifically this is a Markov chain over $T$ discrete time steps:
 \begin{equation}
     q(x_t \mid x_{t-1}) = \mathcal{N}\!\left(x_t;\; \sqrt{1 - \beta_t}\, x_{t-1},\; \beta_t I\right),
@@ -24,7 +24,7 @@ The joint forward distribution over the full chain is
     \label{eqn:forward_joint}
 \end{equation}
 By choosing the noise schedule so that $\prod_{t=1}^T (1 - \beta_t) \to 0$, the probability of $x$ at time step $T$ becomes $q(x_T \mid x_0) \approx \mathcal{N}(0, I)$ for sufficiently large $T$.
-In other words, adding increasingly high variance noise to the data sample will eventually results in a pure-noise sample.
+In other words, adding increasingly high variance noise to the data sample will eventually result in a pure-noise sample.
 This pure noise distribution can be sampled from easily, analogous to the standard Gaussian latent variable distribution in a normalizing flow model.
 The goal of a diffusion model is then to learn the reverse of this process, that evolves a pure-noise sample back to the data distribution.
 In what follows the definitions $\alpha_t = 1 - \beta_t$ and $\bar\alpha_t = \prod_{s=1}^t \alpha_s$ will be used in place of $\beta_t$ to simplify the notation.
@@ -72,7 +72,7 @@ Each term $L_{t-1}$ is the KL divergence between two Gaussians and reduces to a 
 \subsubsection{The Noise Prediction Objective}
 
 DDPM models typically do not attempt to predict the mean of $\tilde\mu_t(x_t, x_0)$ directly, but instead predict the noise that was added at time step $t$.
-This is just a reparametrization, somewhat similar to the reparametrization trick used in VAEs but used here only used because it empirically gives better sample quality.
+This is just a reparametrization, somewhat similar to the reparametrization trick used in VAEs but used here only because it empirically gives better sample quality.
 Given the forward process is fixed in DDPM there is no need to backpropagate through the random sampling to train the posterior, as in a VAE.
 The reparametrization is
 \begin{equation}
@@ -127,7 +127,7 @@ Ref.~\cite{Song:2021score} also shows that every forward SDE has a corresponding
 where $f$ and $g$ are the drift and diffusion coefficients of the forward SDE and $\nabla_x \log q_t(x)$ is the \textit{score function} of the marginal distribution at time $t$.
 Since $\varepsilon_\theta(x_t, t) \approx -\sqrt{1 - \bar\alpha_t}\,\nabla_{x_t} \log q_t(x_t)$, a trained diffusion model can solve either the stochastic reverse SDE or the deterministic probability flow ODE.
 The ODE solution can be understood as the continuous-time generalization of normalizing flows~\cite{chen2018neural}.
-This connection is more made apparent in the flow matching models in the next section.
+This connection is made more apparent in the flow matching models in the next section.
 
 % -------------------------------------------------------------------
 \subsection{Flow Matching}
@@ -150,7 +150,7 @@ The marginal vector field $v_t(x)$ is generally intractable to compute directly,
 \end{equation}
 The conditional vector field $u_t(x \mid x_1)$ depends on the choice of conditional probability path.
 With Gaussian conditional paths $p_t(x \mid x_1) = \mathcal{N}(x;\, \mu_t(x_1),\, \sigma_t^2 I)$, the CFM objective is equivalent to the DDPM objective~\cite{lipman2022flow}.
-Alternatively one could just interpolate between the samples between the noise and target data points,
+Alternatively one could just interpolate between the noise and target data points,
 \begin{equation}
     x_t = (1 - t)\,x_0 + t\,x_1, \qquad x_0 \sim \mathcal{N}(0, I),
     \label{eqn:linear_path}
@@ -172,10 +172,10 @@ This means flow matching models trained with these paths typically require fewer
 \label{sec:diffusion_hep}
 
 Diffusion models were adopted quickly within HEP after they demonstrated state-of-the-art performance on image generation tasks in 2021~\cite{Ho:2020ddpm,Song:2021score}.
-The first applications targeted fast calorimeter shower simulation~\cite{Mikuni:2022xry,Amram:2023onf}, as task which aims to train a model to generate calorimeter showers based on a training set generated from the realistic but expensive \textsc{Geant4} simulation used by most particle physics experimental collaborations~\cite{GEANT4:2002zbu}.
+The first applications targeted fast calorimeter shower simulation~\cite{Mikuni:2022xry,Amram:2023onf}, a task which aims to train a model to generate calorimeter showers based on a training set generated from the realistic but expensive \textsc{Geant4} simulation used by most particle physics experimental collaborations~\cite{GEANT4:2002zbu}.
 Diffusion and flow-matching models have since been applied to anomaly detection and unfolding, the latter being a central topic of \Cref{ch:unfolding}.
 Given calorimeter simulation is the most obviously useful application of generative models in HEP and provides a very useful benchmark, it's worth showing some results a community challenge in this domain here.
-The Calorimeter Simulation Challenge (CaloChallenge)~\cite{Krause:2024avx} required participants to train models that could generate calorimeter shows for three increasingly complicated and granular calorimeter geometries.
+The Calorimeter Simulation Challenge (CaloChallenge)~\cite{Krause:2024avx} required participants to train models that could generate calorimeter showers for three increasingly complicated and granular calorimeter geometries.
 Some results from datasets 2 and 3 are shown in \Cref{fig:calochallenge_ds2,fig:calochallenge_ds3}.
 The plots show the multi-class log posterior (a measure of sample quality, with higher being more similar to the ground GEANT4 simulation) versus generation time per shower (lower is better).
 The takeaway from these plots is that diffusion (such as CaloDiffusion~\cite{Amram:2023onf}) and flow-matching (such as CaloDREAM~\cite{Favaro:2024rle}) models achieve the best sample quality, but at the cost of relatively slow sampling.
@@ -188,13 +188,13 @@ In these tasks, diffusion and flow-matching models are the current state of the 
 \begin{figure}[t]
     \centering
     \includegraphics[width=1.0\linewidth]{figures/ch3/ds2_logpost_time.png}
-    \caption{CaloChallenge Dataset 2: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling speed. The normalizing flow based models (CaloINN) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
+    \caption{CaloChallenge Dataset 2: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling time. The normalizing flow based models (CaloINN) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
     \label{fig:calochallenge_ds2}
 \end{figure}
 
 \begin{figure}[t]
     \centering
     \includegraphics[width=1.0\linewidth]{figures/ch3/ds3_logpost_time.png}
-    \caption{CaloChallenge Dataset 3: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling speed. The normalizing flow based models (CaloPointFlow) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
+    \caption{CaloChallenge Dataset 3: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling time. The normalizing flow based models (CaloPointFlow) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
     \label{fig:calochallenge_ds3}
 \end{figure}

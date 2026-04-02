@@ -18,7 +18,7 @@ In what follows I will cover three specific generative models of the post-AlexNe
 \label{sec:gan}
 
 Generative Adversarial Networks (GANs)~\cite{Goodfellow:2014gan} were introduced in 2014.
-GANs are unique since they do not try to explicity model a likelihood of the training data.
+GANs are unique since they do not try to explicitly model a likelihood of the training data.
 Instead they set up an adversarial game between two networks: a \textit{generator} $G_\phi(z)$ that maps a noise vector $z \sim p(z)$ (typically a standard Gaussian) to a sample in data space, and a \textit{discriminator} $D_\psi(x) \in (0,1)$ that outputs the probability that its input is a real data point rather than a generator sample.
 
 The two networks are trained simultaneously according to the minimax objective
@@ -28,7 +28,7 @@ The two networks are trained simultaneously according to the minimax objective
     \label{eqn:gan}
 \end{equation}
 The discriminator is trained to distinguish real from generated samples, while the generator is trained to produce samples that fool the discriminator.
-Asuming the game is ``well balanced'' and the generator has sufficient capacity, the generator distribution will eventually match $p_\text{data}$ and the discriminator can do no better than random guessing.
+Assuming the game is ``well balanced'' and the generator has sufficient capacity, the generator distribution will eventually match $p_\text{data}$ and the discriminator can do no better than random guessing.
 There is no explicit likelihood in \Cref{eqn:gan}.
 The generator is never required to assign a density to the data, only to produce samples that are indistinguishable from it, so GANs are not capable of density estimation for example.
 GANs are conceptually simple and capable of producing high-quality samples, but the training is notoriously difficult.
@@ -52,7 +52,7 @@ The marginal likelihood is
     \label{eqn:marginal}
 \end{equation}
 Direct maximum likelihood training would require evaluating this integral using an MCMC estimator for every mini-batch of data, which is intractable for high-dimensional $z$.
-Attempting to model the posterior instead would produce the same issue, since by Bayes rule the posterior is inversely propertional to $p(x)$ which is the exact density we seek to model to begin with.
+Attempting to model the posterior instead would produce the same issue, since by Bayes rule the posterior is inversely proportional to $p(x)$ which is the exact density we seek to model to begin with.
 The VAE sidesteps this intractable posterior by introducing an \textit{encoder} network $q_\phi(z | x)$ that approximates the true posterior $p_\theta(z | x)$, and then optimizing a lower bound on the log-likelihood.
 
 \subsubsection{Derivation of the ELBO}
@@ -182,7 +182,7 @@ RQS coupling layers are the current standard in most flow-based models applied t
 Normalizing flows are a niche topic in the broader deep learning community.
 The requirement that $f_\theta$ be bijective forces the latent and data spaces to have the same dimension, preventing the dimensionality reduction that makes VAEs and other latent variable models useful for representation learning.
 This architectural constraint also limits scalability to very high-dimensional data.
-Hpwever HEP data are relatively low-dimensional.
+However, HEP data are relatively low-dimensional.
 Jet and event data typically involve tens to a few hundred dimensions rather than the millions of pixels in natural images, and flow models perform very well on these medium dimensional tasks.
 Normalizing flows have been applied across a broad range of HEP tasks, including fast detector simulation~\cite{Krause:2021ilc}, unfolding~\cite{Bellagente:2020piv}, and anomaly detection~\cite{Hallin:2021wme}.
 They have only recently been displaced as the go-to generative model for HEP applications by diffusion and flow-matching models, which I'll turn to next.

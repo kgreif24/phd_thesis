@@ -28,11 +28,11 @@ The lines connecting the circles represent the weight matrices, while the biases
 \end{figure}
 
 In principle the activation function $\sigma$ can be any non-linear function, but in practice the choice can be important for network training.
-Examples of activation functions are plotted in \Cref{fig:activations}
+Examples of activation functions are plotted in \Cref{fig:activations}.
 Early networks utilized the sigmoid or hyperbolic tangent activations, but these led to \textit{vanishing gradients} in deep networks where multiplying together gradients taken through multiple activations (see \cref{sec:training}) led to an exponential decay in the magnitude of the gradients at the first hidden layer as the network depth increased.
-The \textit{rectified linear unit} (ReLU), defined as $\text{ReLU}(z) = \max(0, z)$, became the standard activation following the AlexNet moment given it's gradient is either 0 or 1, meaning no exponential decay,
-ReLU activations however introduce problems of their own, such as the \textit{dying ReLU problem} where if a neuron's value becomes very negative due to some large gradient early in training its gradients are zeroed throughout the rest of training.
-ReLU based MLPs also have a zero second derivative, which can be limiting in specific applications.
+The \textit{rectified linear unit} (ReLU), defined as $\text{ReLU}(z) = \max(0, z)$, became the standard activation following the AlexNet moment given its gradient is either 0 or 1, meaning no exponential decay.
+ReLU activations, however, introduce problems of their own, such as the \textit{dying ReLU problem} where if a neuron's value becomes very negative due to some large gradient early in training its gradients are zeroed throughout the rest of training.
+ReLU-based MLPs also have a zero second derivative, which can be limiting in specific applications.
 Recently smoother non-linearities have become common.
 The most important one is the \textit{Gaussian error linear unit} (GELU), defined as $\text{GELU}(z) = z \cdot \Phi(z)$ where $\Phi$ is the standard normal CDF.
 GELU has become the preferred activation in many modern architectures, including the transformer networks used in \cref{ch:zjets}.
@@ -50,8 +50,8 @@ The MLP is in principle flexible enough to approximate any function, even for ex
 In practice, however, the theorem is of limited utility: it guarantees only that such a solution \textit{exists}, not that gradient-based optimization will find it.
 Empirically, deeper MLPs (more layers at moderate width) tend to optimize more reliably than very wide shallow ones, and more sophisticated architectures beyond plain MLPs optimize better still.
 This is why the history of deep learning is not just scaling up MLPs.
-Architecture design does matter, and though there are some theoretical motivations for why this might be the case~\cite{jacot2018neural} there is not a rigourous theory explaining why some networks optimize better than others.
-The MLP architecture on its own is little used in modern deep learning, but they are used as components in graph and transformer architectures.
+Architecture design does matter, and though there are some theoretical motivations for why this might be the case~\cite{jacot2018neural} there is not a rigorous theory explaining why some networks optimize better than others.
+The MLP architecture on its own is little used in modern deep learning, but it is used as a component in graph and transformer architectures.
 
 \subsection{Training Neural Networks}
 \label{sec:training}
@@ -63,7 +63,7 @@ For a binary classification task with inputs $\mathbf{x}_i$ and labels $y_i \in 
     \label{eqn:bce}
 \end{equation}
 where $f_\theta(\mathbf{x}_i) \in (0,1)$ is the network's predicted probability that example $i$ belongs to class 1 (typically the output of a sigmoid activation).
-The BCE loss has a well-understood probablistic interpretation.
+The BCE loss has a well-understood probabilistic interpretation.
 Minimizing it is equivalent to maximizing the log-likelihood of the data given their labels are described by a Bernoulli random variable.
 
 \subsubsection{Backpropagation}
@@ -129,13 +129,13 @@ This ensures that parameters with consistently large gradients receive smaller u
 
 A model trained to minimize the training loss may not perform well on unseen data if it has ``memorized'' the specific data points rather than learning the underlying function.
 This is called \textit{overfitting}, and the tradeoff between a model's ability to fit training data (low bias) and its sensitivity to specific training examples (high variance) is called the \textit{bias-variance tradeoff}.
-\Cref{fig:bias_variance} illustrates overfitting and the bias variance tradeoff in a 1D regression problem.
+\Cref{fig:bias_variance} illustrates overfitting and the bias-variance tradeoff in a 1D regression problem.
 A model with too little capacity (e.g. too few polynomial degrees) underfits and has high bias, while a model with too much capacity (e.g. too many polynomial degrees) that is not properly regularized overfits and has high variance.
 
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.8\linewidth, alt={Three scatter plots with fitted curves illustrating the bias-variance tradeoff. The left plot shows an underfit model with a straight line that misses the curved trend in the data (high bias). The center plot shows a well-fit smooth curve that captures the underlying trend. The right plot shows an overfit model with a highly wiggly curve that passes through noise (high variance).}]{figures/ch3/bias_variance.pdf}
-    \caption{Illustration of the bias-variance tradeoff in the context of a 1D regression problem fitting a polynomial model. An underfit model with one polynominal degree (left) has high bias and fails to capture the true structure in the data. An overfit model with many polynomial degrees (right) has high variance and memorizes noise rather than the underlying function. The goal is to find the intermediate regime (center) that generalizes well.}
+    \caption{Illustration of the bias-variance tradeoff in the context of a 1D regression problem fitting a polynomial model. An underfit model with one polynomial degree (left) has high bias and fails to capture the true structure in the data. An overfit model with many polynomial degrees (right) has high variance and memorizes noise rather than the underlying function. The goal is to find the intermediate regime (center) that generalizes well.}
     \label{fig:bias_variance}
 \end{figure}
 
@@ -143,7 +143,7 @@ In practice, generalization is monitored by partitioning available data into thr
 \textit{Early stopping} is a regularization strategy that terminates training when the validation loss stops improving, preventing the network from continuing to overfit the training set.
 \Cref{fig:early_stopping} shows a typical training curve illustrating this procedure.
 The training loss decreases monotonically except for noise caused by the stochastic gradients computed on mini-batches, while the validation loss decreases initially but then begins to rise as the model overfits.
-Training is stopped at the point of minimum validation loss after some number of epochs, called the \textit{patience}, to account for the noise in the validation loss.\footnote{The relationship between model capacity, dataset size, and generalization in modern overparameterized networks with many more parameters than training examples is more subtle than the usage bias-variance tradeoff picture. Very large models that are trained well past the point of interpolating the training data sometimes exhibit \textit{double descent}: a second regime in which increasing capacity or training time actually improves generalization.}
+Training is stopped at the point of minimum validation loss after some number of epochs, called the \textit{patience}, to account for the noise in the validation loss.\footnote{The relationship between model capacity, dataset size, and generalization in modern overparameterized networks with many more parameters than training examples is more subtle than the usual bias-variance tradeoff picture. Very large models that are trained well past the point of interpolating the training data sometimes exhibit \textit{double descent}: a second regime in which increasing capacity or training time actually improves generalization.}
 
 \begin{figure}[t]
     \centering
@@ -161,7 +161,7 @@ From a Bayesian perspective this corresponds to placing a zero-mean Gaussian pri
 \label{sec:cnn}
 
 The multi-layer perceptron treats its input as a flat vector and applies fully connected weight matrices, which have no implicit bias for any spatial structure in the input data.
-Convolutional neural networks (CNNs) address this by encoding \textit{translational symmetry} into the network architecture, meaning that a feature at one spatial location should not effect the network output if shifted to another location.
+Convolutional neural networks (CNNs) address this by encoding \textit{translational symmetry} into the network architecture, meaning that a feature at one spatial location should not affect the network output if shifted to another location.
 This is enforced through \textit{weight sharing}, where a single learned filter is applied at every position in the input rather than using a separate set of weights per position.
 CNNs were first developed for computer vision tasks using image data as input.
 Specifically AlexNet was an early example of a CNN architecture.
@@ -208,7 +208,7 @@ The structure of a single residual block is shown in \Cref{fig:resblock}.
 The \textit{ResNet} architecture~\cite{He:2015resnet} chains many residual blocks together, as shown in \Cref{fig:resnet}.
 The ``ID blocks'' shown in the Figure correspond to skip connections.
 ResNet was the dominant image classification architecture for several years following its introduction in 2015.
-The first application of CNNs in HEP was for jet tagging tasks as disccused in \Cref{ch:tagging}, where the energy deposits in a calorimeter were interpreted as a 2D image and used as input to CNN models~\cite{Cogan:2014oua,deOliveira:2017pjk}.
+The first application of CNNs in HEP was for jet tagging tasks as discussed in \Cref{ch:tagging}, where the energy deposits in a calorimeter were interpreted as a 2D image and used as input to CNN models~\cite{Cogan:2014oua,deOliveira:2017pjk}.
 ResNet-based top taggers were nearly state of the art as recently as 2019~\cite{Kasieczka:2019dbj}.
 They were ultimately superseded by graph neural networks and then transformers, but CNNs are an important part of the history of deep learning applications in HEP.
 
@@ -257,7 +257,7 @@ This includes the AI systems developed for HEP data, so it is worth covering thi
 Attention was originally introduced to augment recurrent neural networks (RNNs) for machine translation~\cite{bahdanau2014neural, luong2015effective, cheng2016long, lin2017structured}.
 The key idea was to allow the decoder, when generating each output token, to selectively weight all positions in the input sequence according to their relevance to the current decoding step, rather than compressing the entire input into a fixed-size vector.
 The next conceptual step was to remove the recurrence entirely and simply compute attention between all items in the input sequence, with the relative positions of the items provided to the attention mechanism as positional encodings.
-This was the contribution of the famous ``Attention Is All You Need'' paper~\cite{Vaswani:2017attention}\footnote{Arguably the citation count of this paper relative to the intial papers that actually introduced attention is evidence of the Matthew effect in science, in which papers with high citation counts attract even more citations as time goes on. The Vaswani paper became the point of reference for early transformer models like BERT and GPT. That made it the starting point for anyone learning about attention and ensured it would keep being cited in the future. Despite this success Vaswani et al. did not actually invent attention; that credit belongs to Bahdanau et al. and Luong et al. This is an interesting parallel to the development of perturbative QED calculations, which were originally developed by Schwinger and Tomonaga independently but systematized and made broadly usable by Feynman who now receives most of the credit.}.
+This was the contribution of the famous ``Attention Is All You Need'' paper~\cite{Vaswani:2017attention}\footnote{Arguably the citation count of this paper relative to the initial papers that actually introduced attention is evidence of the Matthew effect in science, in which papers with high citation counts attract even more citations as time goes on. The Vaswani paper became the point of reference for early transformer models like BERT and GPT. That made it the starting point for anyone learning about attention and ensured it would keep being cited in the future. Despite this success Vaswani et al. did not actually invent attention; that credit belongs to Bahdanau et al. and Luong et al. This is an interesting parallel to the development of perturbative QED calculations, which were originally developed by Schwinger and Tomonaga independently but systematized and made broadly usable by Feynman who now receives most of the credit.}.
 This self-attention operation, without any additional recurrent operations computed on the input sequence, is the backbone of the transformer architecture applied at many points in this thesis and so is worth covering in detail.
 
 Given an input set of $N$ vectors, each of dimension $d$, arranged as a matrix $X \in \mathbb{R}^{N \times d}$, self-attention computes three linear projections:
@@ -314,7 +314,7 @@ The transformer block is illustrated in \Cref{fig:transformer_block}.
 
 A key property of self-attention as defined in \Cref{eqn:attention} is that it is \textit{permutation equivariant}: permuting the rows of $X$ permutes the rows of the output in the same way, and the attention computation itself is unchanged.
 In natural language processing this is a problem because word order carries meaning.
-This is why Ref \cite{Vaswani:2017attention} added \textit{positional encodings} to the input that break permutation symmetry.
+This is why Ref.~\cite{Vaswani:2017attention} added \textit{positional encodings} to the input that break permutation symmetry.
 However for HEP data permutation equivariance is often a very useful inductive bias~\cite{Komiske:2018cqr}.
-Jets and events are composed of unordered sets of particles, where the order of the particles is typically not meaningful\footnote{An exception to this will be covered in the set-to-set unfolding work in \Cref{ch:unfolding}}.
+Jets and events are composed of unordered sets of particles, where the order of the particles is typically not meaningful\footnote{An exception to this will be covered in the set-to-set unfolding work in \Cref{ch:unfolding}.}.
 This means the transformer architecture can be applied to HEP data directly~\cite{Mikuni:2020wpr}, which is why transformers are so widely used in HEP whereas their direct predecessors, RNNs, are not.

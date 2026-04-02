@@ -6,7 +6,7 @@ Machine learning is the idea that complex rules or behaviors can be learned dire
 In classical data analysis, a domain expert encodes their knowledge as a fixed set of rules that are then applied to data to extract a quantitative summary of the information.
 It is worth emphasizing that this approach often works very well.
 Particle physicists have become very adept at choosing relevant features of the data and learning from them.
-However this approach is rarely optimal, especially in cases where the optimal solution exists but is too complex to specify by hand.
+However, this approach is rarely optimal, especially in cases where the optimal solution exists but is too complex to specify by hand.
 To draw an example from \Cref{ch:tagging}, no expert-designed feature set captures the correct decision-surface for classifying jets initiated by boosted top quarks from the light quark and gluon jet background.
 This is due to a lack of knowledge about certain features of the jet formation process (e.g. hadronization), but also just due to complexity.
 Specifying the optimal feature by hand is probably not possible, but machine learning methods allow this complexity to be learned from the data.
@@ -26,7 +26,7 @@ Machine learning is not a new idea in particle physics.
 Boosted decision trees (BDTs) have been in use in HEP since 2004, and were applied to the single top quark discovery at the Tevatron~\cite{D0:2006ngk,CDF:2009itk}.\footnote{The history of BDTs in HEP is interesting.
 The original application of BDTs illustrated that they \textit{outperformed} artificial neural networks.
 Following the deep learning revolution initiated by AlexNet, BDTs were largely supplanted by neural networks, which proved far more expressive on the high-dimensional data common in HEP.
-Quite recently, BDTs have seen something of a resurgence in recent years, driven by their remarkable training speed relative to neural networks, and their robustness against noisy or irrelevant features in the density ratio estimation tasks covered in \cref{sec:dre}~\cite{Finke:2023ltw}.}
+More recently, BDTs have seen something of a resurgence, driven by their remarkable training speed relative to neural networks, and their robustness against noisy or irrelevant features in the density ratio estimation tasks covered in \cref{sec:dre}~\cite{Finke:2023ltw}.}
 What changed with the deep learning era was not the concept of learned classifiers but the scale of the models.
 Neural networks scale better than BDTs, and so could handle the more complicated tasks that have driven much of the interest in ML in recent years.
 
