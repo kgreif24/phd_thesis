@@ -1,0 +1,95 @@
+
+\section{Uncertainty Quantification}
+\label{sec:uq}
+
+Uncertainty quantification for HEP applications of deep learning is very problem-specific, so it's difficult to give a general overview of the methods.
+This section covers the main types of uncertainty considered in the deep learning literature and how they map on to HEP problems.
+The primary goal is to discuss the quantification methods, which are widely used in \Cref{ch:tagging,ch:zjets}.
+\Cref{fig:uncertainty_types} provides visual intuition for each category of uncertainties on a toy problem.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/ch3/uncertainty_types.pdf}
+    \caption{Illustration of the three categories of uncertainty on a toy regression problem: aleatoric uncertainty (irreducible scatter in the data), epistemic uncertainty (model uncertainty due to limited training data, for example in regions of phase space where no data is available), and domain shift (mismatch between training and evaluation distributions).}
+    \label{fig:uncertainty_types}
+\end{figure}
+
+% -------------------------------------------------------------------
+\subsection{Aleatoric Uncertainty}
+\label{sec:aleatoric}
+
+Aleatoric uncertainty is the uncertainty inherent in the data-generating process.
+This uncertainty is a property of the problem, not the data or methods.
+The left hand panel of \cref{fig:uncertainty_types} shows a toy regression problem with the aleatoric uncertainty corresponding to the noise in the data points that make them deviate from the true function shown in gray.
+This noise could have many sources in real world problems.
+As a concrete example, in the jet classification task discussed in \Cref{ch:tagging} both top quark initiated and light quark or gluon initiated jets have a non-zero probability of producing a given jet configuration.
+Some configurations are much more likely to be due to a top quark versus a light quark or gluon, but there is no way to decisively answer within the problem as posed.
+The correct model output, which for binary classification is related to the likelihood as shown in \cref{sec:dre}, reflects this and assigns some non-zero probability to both classes.
+This spread is an example of aleatoric uncertainty.
+Reducing this uncertainty requires reframing the problem, for example by adding a new detector subsystem that provides additional discriminating information.
+Given aleatoric uncertainty is a feature of the question rather than the method, quantification of it is usually not important in HEP, so these uncertainties will not be discussed much in this thesis.
+
+% -------------------------------------------------------------------
+\subsection{Epistemic Uncertainty}
+\label{sec:epistemic}
+
+Epistemic uncertainty arises from limitations of the machine learning model itself.
+Sources include finite training data, limited model capacity, and optimization failures.
+An example of epistemic uncertainty is the inability of a model to generalize outside of the support of its training data, as shown in the center panel of \cref{fig:uncertainty_types}.
+Epistemic uncertainty is in principle reducible by collecting more data, using a more expressive architecture, or improving training.
+In HEP, the relevance of epistemic uncertainty depends heavily on the task.
+In jet tagging, epistemic uncertainties are present and result in sub-optimal classification performance, but the model is still useful.
+For example using very simple cut based jet tagging methods would have very large epistemic uncertainty since they are poor estimators of the likelihood ratio, but this does not prevent them from being used to define signal regions and perform measurements.
+However in applications like unfolding, neural simulation based inference (NSBI), and anomaly detection, the model outputs are used directly in the statistical analysis and epistemic uncertainty can have a significant impact on the result.
+For example in NSBI, the model outputs are used directly as a test statistic in statistical tests to determine confidence intervals on the parameter of interest.
+Failure of the model to fully capture the true test statistic (usually the likelihood ratio) will produce an un-accounted for systematic bias in the measurement.
+In this case assessing and eliminating epistemic uncertainty is crucial.
+A few methods are used to estimate epistemic uncertainty in practice, but given there is limited theoretical understanding of gradient descent applied to neural networks there are no fully robust methods.
+In HEP applications where epistemic uncertainty is important, auxiliary cross checks are typically needed to ensure the epistemic uncertainty is small or captured by appropriate systematics, as will be the case in \Cref{ch:zjets}.
+
+\paragraph{Ensembling:}
+The simplest and most widely used method is to train multiple independent models and treat the spread of their outputs as an estimate of the model uncertainty.
+The models are independent in that they have different weight initializations and different mini-batch sampling in the optimization process.
+This approach has been applied in ATLAS measurements, for example in Refs.~\cite{ATLAS:2024xxl, ATLAS:2025clx}.
+Ensembling provides a practical uncertainty estimate with relatively little overhead, but it is important to note that it captures only a subset of the full epistemic uncertainty.
+For example if the models lack sufficient capacity to capture the true optimum function, this will not be reflected by the ensemble.
+
+\paragraph{Bayesian neural networks.}
+Another approach is to place a prior distribution over the model weights and compute the posterior given the training data.
+The posterior encodes a specific type of epistemic uncertainty due to limited training data.
+Bayesian neural networks have seen limited use in HEP~\cite{Bollweg:2019skg} relative to ensembling, in part because the approximations involved can be difficult to validate and the computational cost is higher.
+
+% -------------------------------------------------------------------
+\subsection{Domain Shift}
+\label{sec:domain_shift}
+
+Domain shift occurs when probability distribution governing the data used in evaluation differs from the distribution governing the data used in training.
+This type of uncertainty is visualized in the right hand panel of \cref{fig:uncertainty_types} where the testing data (red) is not drawn from the same distribution as the training data (blue).
+This is the most common type of uncertainty in HEP.
+In particular experimental systematic uncertainties typically fall in this category.
+A particularly relevant example for \Cref{ch:tagging} is that jet tagging models are typically trained on simulation but applied on data.
+Typically models show worse performance on data and this difference needs to be quantified by a \textit{scale factor} for the tagger to be used in measurements and searches.
+Many other domain shift uncertainties will be handled in \Cref{ch:zjets}.
+Several strategies for estimating or reducing domain shift exist.
+
+\paragraph{Propagating uncertainties.}
+The simplest strategy is to propagate the systematic uncertainty on the input $x$ through the trained model to obtain an uncertainty on $f(x)$.
+This accounts for the effect of the domain shift on the model output, but ignores any effect the shift may have had on the training process itself.
+It also assumes that correct systematic uncertainties on the model inputs are available which is not always the case.
+However in many applications this is easiest and most correct approach, and is used in both \Cref{ch:tagging,ch:zjets}.
+
+\paragraph{Domain adaptation.}
+An alternative is to train the model to be robust to known sources of domain shift.
+This can be done by including data with known domain shifts applied in the training set.
+An additional step that can be taken to reduce the domain shift uncertainty is to explicitly decorrelate the model output against these shifts.
+This is often done in HEP so that systematic variations do not affect the model output.
+This has been studied in the context of jet taggers and other classifiers~\cite{Kasieczka:2020yyl,ATLAS:2025dkv,Ghosh:2021hrh}.
+Decorrelation results in smaller domain shift uncertainties but typically at the cost of performance.
+This may still be a desirable tradeoff, for example jet taggers are typically decorrelated against the jet mass observable to avoid artificial sculpting of mass distributions.
+
+
+\paragraph{Parametrized models.}
+Typically the optimal approach is to incorporate the domain shift directly into the model by conditioning on the nuisance parameter or systematic variation as an additional input~\cite{Louppe:2016ylz,Baldi:2016fzo,Ghosh:2021roe}.
+A model trained this way can in principle learn the correct function across the full range of systematic variations, and the uncertainty on the output can be assessed simply by varying the conditioning parameter.
+This is the optimal strategy when the form of the domain shift is known and can be parametrized.
+It is not always applicable even when this is the case, for example there is no well-established method for parametrizing the iterative unfolding methods discussed in \Cref{ch:unfolding}.

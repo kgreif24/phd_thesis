@@ -1,0 +1,87 @@
+
+\section{Density Ratio Estimation}
+\label{sec:dre}
+
+The generative models described in the previous two sections model $p_\text{data}(x)$ directly.
+This section introduces a complementary approach that sidesteps direct density modeling entirely and instead estimates the \textit{ratio} of two densities.
+Density ratio estimation turns out to be a considerably simpler problem than density estimation, and the methods described here are used extensively in deep learning applications in HEP.
+They are also central to the Omnifold unfolding method discussed in \Cref{ch:unfolding}, which is used for the cross-section measurement presented in \Cref{ch:zjets}.
+
+\subsection{The Likelihood Ratio Trick}
+\label{sec:lrt}
+
+Given two probability densities $p(x)$ and $q(x)$, the likelihood ratio is defined as
+\begin{equation}
+    r(x) = \frac{p(x)}{q(x)}.
+    \label{eqn:likelihood_ratio}
+\end{equation}
+The likelihood ratio trick is a method for computing $r(x)$ that only requires training a neural network classifier with binary cross-entropy (BCE) loss\footnote{Other loss functions such as the MSE and MLC losses are also minimized by the likelihood ratio and so can be used in this way as well.}.
+This is a much simpler problem than density estimation which attempts to model $p(x)$ or $q(x)$ directly.
+
+\subsubsection{Proof: the Optimal BCE Classifier Recovers the Likelihood Ratio}
+
+Consider a classifier $f_\theta(x) \in (0,1)$ trained on a balanced dataset of samples from $p(x)$ (label $y=1$) and $q(x)$ (label $y=0$) using the BCE loss:
+\begin{equation}
+    \mathcal{L}(f) = -\mathbb{E}_{x \sim p}\!\left[\log f(x)\right]
+                    -\mathbb{E}_{x \sim q}\!\left[\log(1 - f(x))\right].
+    \label{eqn:bce_dre}
+\end{equation}
+We seek the function $f^*$ that minimizes this loss over all measurable functions.
+Writing the expectations as integrals gives
+\begin{equation}
+    \mathcal{L}(f) = -\int \!\left[p(x)\log f(x) + q(x)\log(1-f(x))\right] dx.
+    \label{eqn:bce_integral}
+\end{equation}
+To find the minimizer we take the functional derivative of $\mathcal{L}$ with respect to $f$.
+Perturbing $f \to f + \epsilon\,\eta$ for an arbitrary test function $\eta$, the two logarithms in the integrand expand to first order in $\epsilon$ as
+\begin{align}
+    \log\!\left(f(x) + \epsilon\,\eta(x)\right)
+        &= \log f(x) + \frac{\epsilon\,\eta(x)}{f(x)} + \mathcal{O}(\epsilon^2), \label{eqn:log_expand1}\\
+    \log\!\left(1 - f(x) - \epsilon\,\eta(x)\right)
+        &= \log(1-f(x)) - \frac{\epsilon\,\eta(x)}{1-f(x)} + \mathcal{O}(\epsilon^2). \label{eqn:log_expand2}
+\end{align}
+Substituting into $\mathcal{L}(f+\epsilon\,\eta)$ and collecting terms by order in $\epsilon$,
+\begin{align}
+    \mathcal{L}(f + \epsilon\,\eta)
+    &= -\int\!\Bigl[p(x)\Bigl(\log f(x) + \frac{\epsilon\,\eta(x)}{f(x)}\Bigr)
+       \notag\\
+    &\qquad + q(x)\Bigl(\log(1-f(x)) - \frac{\epsilon\,\eta(x)}{1-f(x)}\Bigr)\Bigr]\,dx
+       + \mathcal{O}(\epsilon^2) \notag\\
+    &= \mathcal{L}(f)
+       - \epsilon\int\!\left[\frac{p(x)}{f(x)} - \frac{q(x)}{1-f(x)}\right]\eta(x)\,dx
+       + \mathcal{O}(\epsilon^2).
+    \label{eqn:functional_perturb}
+\end{align}
+The functional derivative is read off as the coefficient of $\eta(x)$ in the first-order term:
+\begin{equation}
+    \frac{\delta \mathcal{L}}{\delta f(x)} = -\frac{p(x)}{f(x)} + \frac{q(x)}{1-f(x)}.
+    \label{eqn:functional_deriv}
+\end{equation}
+Setting $\delta\mathcal{L}/\delta f(x) = 0$ for all $x$ gives the stationary point condition for the functional $\mathcal{L}$:
+\begin{equation}
+    \frac{p(x)}{f^*(x)} = \frac{q(x)}{1-f^*(x)}
+    \;\implies\;
+    f^*(x) = \frac{p(x)}{p(x) + q(x)}.
+    \label{eqn:optimal_classifier}
+\end{equation}
+This is a global minimum since the second functional derivative evaluated at $f^*$ is positive\footnote{In fact the second derivative is positive everywhere, making optimization of the BCE loss a ``convex'' problem. Working out the second functional derivative and showing this is left as an exercise for the reader. Note however that this does not mean that the loss with respect to the parameters of the classifier is convex!}.
+The likelihood ratio is then recovered from the optimal classifier output by a simple algebraic rearrangement:
+\begin{equation}
+    r(x) = \frac{p(x)}{q(x)} = \frac{f^*(x)}{1 - f^*(x)}.
+    \label{eqn:ratio_from_classifier}
+\end{equation}
+Any classifier trained to minimize BCE loss is implicitly learning to estimate $r(x)$, up to this monotonic rescaling.
+Using a network trained with a BCE loss to estimate the likelihood ratio is sometimes called the \textit{likelihood ratio trick}~\cite{Cranmer:2015bka,Andreassen:2019nnm}.
+
+\subsection{Reweighting and Applications in HEP}
+\label{sec:dre_hep}
+
+The practical consequence of \Cref{eqn:ratio_from_classifier} is that a trained classifier can be used to reweight a set of samples drawn from $q(x)$ to match the distribution $p(x)$, or vice versa since the inverse of the likelihood ratio is also a monotonic rescaling of $f^*(x)$.
+Assigning each sample $x_i \sim q$ a weight $w_i = r(x_i) = f^*(x_i) / (1 - f^*(x_i))$ makes the weighted distribution equal to $p(x)$.
+
+Reweighting samples from one probability distribution to samples from another is not a new idea in HEP.
+A standard method is to derive correction factors as ratios of one-dimensional histograms, which is a simple form of density ratio estimation in a single variable.
+Of course this does not generalize to more than a few dimensions given the curse of dimensionality.
+The likelihood ratio trick bypasses the need to bin and so scales to very high dimensions.
+The distributions can even be \textit{variable-dimensional} and the method is still applicable, since neural network architectures like graphs and transformers naturally handle variable-length sets.
+In the context of this thesis, the most relevant application of the likelihood ratio trick is the Omnifold algorithm~\cite{Andreassen:2019cjw}, which is the method used for the cross-section measurement in \Cref{ch:zjets}.
