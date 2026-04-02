@@ -10,29 +10,50 @@ It will close with a discussion of how jet tagging has progressed since the publ
 \section{Jet Tagging}
 \label{sec:tagging-intro}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Why boosted object tagging matters
-%    - At the HL-LHC (sqrt(s)=14 TeV, 3000/fb), heavy SM particles
-%      (top quarks, W/Z/H bosons) are frequently produced with
-%      pT >> m, so decay products merge into a single large-R jet.
-%    - Tagging these jets is essential for:
-%        a) measuring SM processes (ttbar, diboson)
-%        b) BSM searches (stop, KK-gluon, etc.)
-%        c) diHiggs searches (H->bb + H->WW/tau tau)
-%
-% 2. Brief history of jet tagging methods
-%    - Cut-based: simple cuts on mass + N-subjettiness ratios.
-%    - BDT: multivariate, but hand-engineered features.
-%    - Deep learning: end-to-end, learns features from
-%      raw constituents.  Cite Cogan et al. (2015), de Oliveira
-%      et al. (2016) for jet images; deep sets, ParticleNet, ParT.
-%
-% 3. The top quark as a benchmark
-%    - Three-pronged decay (t->Wbqqb) gives distinctive substructure.
-%    - Top tagging is the canonical multi-prong benchmark.
-%    - ATLAS uses a DNN top tagger in many analyses.
+Most searches and measurements at the LHC are concerned with the high-energy scattering of partons.
+In principle, one would like to directly measure the identity and kinematics of the individual quarks and gluons produced in these collisions.
+In practice, the parton shower and hadronization processes make this impossible: the colored partons produced in the hard scatter are never directly observable.
+Instead, the ATLAS and CMS detectors record jets, collimated sprays of hadrons that are reconstructed and used as proxies for the initiating partons.
+Inferring the kinematics of the originating parton from a jet is straightforward in principle: one sums the four-momenta of the jet's constituent hadrons.
+Inferring the \emph{type} of parton that initiated the jet is the problem of jet tagging.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/ch4/jet_types_diagram.pdf}
+    \caption{Schematic illustration of the two broad categories of jets produced in LHC collisions. Boosted jets (left) arise when a massive particle such as a top quark, $W/Z$ boson, or Higgs boson decays hadronically with high transverse momentum, causing its daughter quarks to merge into a single large-radius jet with non-trivial internal substructure. Flavor-tagged jets (right) arise from the production of heavy-flavor quarks, whose long-lived $B$ and $D$ hadron decay products leave a displaced secondary vertex inside the jet.}
+    \label{fig:jet-types}
+\end{figure}
+
+Historically, two distinct jet tagging problems have been studied at the LHC, though modern deep learning methods have largely unified them.
+The first is \textit{boosted jet tagging}.
+When a massive particle such as a top quark, $W$ or $Z$ boson, or Higgs boson is produced with a transverse momentum much larger than its mass ($\pt \gg m$), its hadronic decay products are emitted nearly collinearly.
+The resulting jets from each daughter quark merge into a single large-radius jet with non-trivial substructure: a two-pronged substructure for $W/Z/H \to q\bar{q}$ decays, or a three-pronged substructure for $t \to Wbq\bar{q}$ decays.
+Identifying these boosted jets against the overwhelming background of high-\pt light-quark and gluon jets requires exploiting this substructure.
+Early methods for doing so relied on multivariate discriminants such as BDTs or shallow neural networks trained on a set of hand-engineered substructure observables~\cite{Altheimer:2013yza, Thaler:2008ju}.
+
+The second category is \textit{flavor tagging}.
+When a bottom or charm quark is produced in the hard scatter, the resulting jet contains a $B$ or $D$ hadron.
+These hadrons are long-lived relative to the light hadrons produced in light-quark and gluon jets, and they therefore travel a measurable distance before decaying, leaving a displaced secondary vertex inside the jet.
+Identifying jets that contain $B$ or $D$ hadrons as opposed to jets from light quarks or gluons is called $b$- or $c$-tagging.
+As in the boosted case, early flavor taggers reconstructed the displaced vertex explicitly and used this information as an input to a BDT or neural network~\cite{ATLAS:2016gsw}.
+
+The two problems are illustrated schematically in \Cref{fig:jet-types}.
+Both are fundamentally classification tasks: one must distinguish a signal jet from a background jet using the information available in the detector.
+The primary distinction between them is the nature of the discriminating information.
+Boosted tagging relies on the global spatial structure of energy deposits within a large-radius jet, while flavor tagging relies on precise tracking information near the jet core.
+In both cases, the task is made difficult by the complexity of the QCD background and the large dynamic range of the relevant kinematic variables.
+
+The application of deep learning to both of these problems has been transformative.
+The first papers demonstrating the use of convolutional neural networks for jet classification appeared in 2014--2015, only two or three years after the AlexNet moment~\cite{Cogan:2014oua}.
+The key insight was that a jet could be represented as an image: binning the constituent four-momenta on a grid in the $(\eta, \phi)$ plane and treating the resulting pixelated energy deposits as an image amenable to convolutional processing.
+Rather than relying on any expert-designed features, these networks learned directly from the raw detector information which patterns discriminate signal from background.
+This end-to-end approach consistently outperformed the hand-engineered methods that preceded it, and it set the template for subsequent improvements.
+
+The section that follows describes in detail a particular boosted jet tagging task: identifying jets initiated by top quarks against the background of light-quark and gluon jets.
+Boosted top tagging is the prototypical multi-prong jet tagging problem and was the subject of many early deep learning applications in particle physics.
+It remains the canonical benchmark for new tagging methods.
+The study presented here, carried out in 2022--2023, constitutes the first original research contribution of this thesis.
+The lessons drawn from the binary top-versus-QCD classification problem remain relevant to the multi-class taggers of today, to which I will return in \Cref{sec:tagging-future}.
 
 
 
