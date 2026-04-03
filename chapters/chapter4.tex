@@ -243,6 +243,166 @@ One plausible contributing factor is that the training dataset contains the most
 \section{Systematic Uncertainty Quantification}
 \label{sec:systematic-uq}
 
+The results of \Cref{sec:constituent-top-tagging} establish that constituent-based top taggers substantially outperform expert-feature methods when evaluated on ATLAS full simulation.
+But raw classification performance is only part of what is required to deploy a tagger in a physics analysis.
+Every tagger is trained on simulation and applied to data, and the simulation is never a perfect model of the real detector.
+Any difference between simulated and real detector response that affects the tagger inputs will produce a corresponding shift in the tagger output, biasing the efficiency measurement in data.
+Quantifying and controlling these biases is the second major contribution of Refs.~\cite{ATLAS:2022qby,ATLAS:2024rua}, and the primary original research contribution of this thesis.
+
+\subsection{Scale Factor Calibration}
+
+The standard approach to systematic uncertainty in jet tagging is tagger calibration via scale factors.
+A scale factor is the ratio of the tagger efficiency measured in data to the efficiency predicted by simulation, evaluated at a fixed working point.
+It corrects for the fact that the simulation used to train the tagger does not perfectly reproduce the data, and is applied as a multiplicative weight to simulated events to bring the predicted efficiency into agreement with observation.
+
+Measuring a scale factor requires isolating a pure, known sample of signal jets in data, where the true jet flavor is established by independent means rather than by the tagger itself.
+For boosted top tagging this is done using semi-leptonic $t\bar{t}$ events, in which one top quark decays leptonically (producing a charged lepton and a neutrino alongside the $b$-jet) and can be cleanly identified, while the other top quark decays fully hadronically and produces the boosted jet whose tagging efficiency is to be measured.
+The lepton from the leptonic decay serves as a high-purity tag that removes the need for truth labels.
+The scale factor measurement is then a simulation-based inference problem: one extracts the ratio of tagger efficiencies between data and simulation, typically in bins of jet $p_T$, and propagates all relevant systematic uncertainties through the measurement to produce a scale factor with associated uncertainties.
+
+Scale factors are the gold standard in experimental jet physics.
+Virtually every ATLAS and CMS search or measurement that relies on jet tagging applies scale factor corrections, and the corresponding uncertainties are among the dominant sources of systematic error in many analyses.
+The important point is that scale factors do not eliminate the need for uncertainty quantification; they shift it from the tagger output directly to the scale factor measurement, which must itself be assigned systematic uncertainties and validated.
+
+\subsection{The Bottom-Up Approach}
+
+An alternative to scale factors is to propagate systematic uncertainties directly through the tagger, from variations in the input quantities to variations in the tagger output.
+This is the approach developed in Refs.~\cite{ATLAS:2022qby,ATLAS:2024rua}, referred to here as the bottom-up approach.
+
+The conceptual appeal of the bottom-up method is straightforward.
+Once a set of variations on the tagger inputs has been defined, the uncertainty on any tagger is immediately determined by forward-propagating those variations through the network.
+A new scale factor measurement is not needed each time the tagger architecture changes.
+Furthermore, the bottom-up method does not require a pure sample of signal jets in data.
+For the taggers studied here, such a sample exists via semi-leptonic $t\bar{t}$ events, but for taggers designed to isolate jets from BSM or exotic processes, no analogous calibration sample may be available.
+This limitation is already a practical constraint for anomaly detection searches, where the signal topology is by definition unknown~\cite{ATLAS:2025obc, CMS:2025sch}.
+
+The downside is that the bottom-up approach requires a reliable set of input-level systematic variations.
+For UFO constituents this is non-trivial, because ATLAS does not maintain a set of validated experimental uncertainties for these objects.
+The variations developed in this study are therefore approximate, intended to bound the magnitude of experimental effects on tagger performance rather than to serve as the basis for a precision measurement.
+The theoretical uncertainties, as will be seen, are sufficiently dominant that this approximation is acceptable.
+
+\subsection{UFO Constituent Uncertainties}
+
+The UFO construction is illustrated in \Cref{fig:ufo-diagram}, reproduced from Ref.~\cite{ATLAS:2020gwe} under the Creative Commons Attribution 4.0 International license.
+UFOs are built from particle flow objects (PFOs), which are themselves combined from inner detector tracks and calorimeter clusters.
+A splitting step is applied to calorimeter clusters in dense environments, such as the core of high-multiplicity boosted jets, to improve energy resolution by disentangling overlapping showers.
+The splitting step gives rise to three distinct UFO types, each with different dominant detector contributions and therefore different systematic uncertainties.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/ch4/ufo_diagram.pdf}
+    \caption{Flow diagram illustrating the construction of Unified Flow Objects from inner detector tracks and calorimeter clusters, reproduced from Ref.~\cite{ATLAS:2020gwe} under the Creative Commons Attribution 4.0 International license. The splitting step applied to clusters in dense regions produces three distinct UFO types whose dominant detector contributions differ.}
+    \label{fig:ufo-diagram}
+\end{figure}
+
+Charged UFOs arise from charged PFOs in regions outside dense calorimeter environments, where the inner detector track dominates the energy and directional measurement.
+These constituents are assigned the set of validated inner detector track systematic uncertainties.
+Track uncertainties are well understood in ATLAS from extensive calibration studies, and the bottom-up approach is reliable for this class of constituent.
+Indeed, this same methodology is used without approximation in the unfolding measurement described in \Cref{ch:zjets}.
+
+Neutral UFOs arise from neutral PFOs, which have no associated track.
+Their kinematics are determined primarily by calorimeter clusters.
+A complication arises because the cluster-splitting step means that inner detector tracks can indirectly influence neutral UFOs even though no track is directly associated.
+In this study that indirect effect is neglected, and calorimeter cluster systematic uncertainties are applied to neutral UFOs directly.
+
+Merged UFOs arise from charged PFOs in dense regions that are fed into the cluster-splitting step.
+These objects mix inner detector and calorimeter information in a more complicated way than the other UFO types.
+A simplifying assumption is adopted: the $p_T$ measurement of merged UFOs is treated as calorimeter-dominated and assigned calorimeter cluster uncertainties, while the angular measurement is treated as track-dominated.
+The angular resolution uncertainties on inner detector tracks are small enough to be negligible in practice.
+
+\subsection{Theoretical Uncertainties}
+
+Theoretical uncertainties arise from the approximations inherent in the event generators used to produce the training and evaluation samples.
+The most important are uncertainties in the modeling of parton shower and hadronization processes, which govern the distribution of energy among jet constituents and therefore directly affect the inputs seen by the tagger.
+
+For the signal jets, parton shower and hadronization uncertainties are assessed using two samples of SM $t\bar{t}$ events generated with matrix element calculations from \textsc{Powheg Box v2}~\cite{Frixione:2007vw, PLACEHOLDER:Nason:2004rx, PLACEHOLDER:Alioli:2010xd} at NLO with the \textsc{NNPDF3.0nlo}~\cite{PLACEHOLDER:Ball:2014uwa} PDF set.
+Both samples use the same matrix element generator, with the $h_\text{damp}$ resummation parameter set to 1.5 times the top quark mass~\cite{PLACEHOLDER:ATL-PHYS-PUB-2016-020}, and decays of bottom and charm hadrons modeled by \textsc{EvtGen 1.6.0}~\cite{PLACEHOLDER:Lange:2001uf}.
+The two samples differ in the model used for parton shower and hadronization: one uses \textsc{Pythia 8}~\cite{PLACEHOLDER:pythia8} and the other uses \textsc{Herwig 7}~\cite{PLACEHOLDER:herwig1, PLACEHOLDER:herwig2}.
+The full difference in tagger performance between the two samples is taken as the signal modeling uncertainty.
+Because \textsc{Pythia} and \textsc{Herwig} use different parton shower algorithms and different hadronization models simultaneously, this uncertainty captures both effects in a single variation.
+
+For the background jets, the parton shower and hadronization uncertainties can be assessed independently using four samples of simulated QCD dijet events, all generated with LO matrix elements using the \textsc{NNPDF3.0lo}~\cite{PLACEHOLDER:Ball:2014uwa} PDF set.
+The parton shower uncertainty is assessed by comparing tagger performance between two \textsc{Herwig 7} samples: one using the default angular-ordered parton shower model and one using the alternative dipole parton shower model, both with the default cluster-based hadronization model~\cite{PLACEHOLDER:Winter:2003tt}.
+The hadronization uncertainty is assessed by comparing tagger performance between two \textsc{Sherpa 2.2}~\cite{Sherpa:2019gpd} samples that share the same $p_T$-ordered parton shower but differ in their hadronization model: one uses the default cluster-based hadronization~\cite{PLACEHOLDER:Winter:2003tt} and the other uses the \textsc{Sherpa} interface to the Lund string fragmentation model of \textsc{Pythia 6}~\cite{PLACEHOLDER:Sjostrand:2006za}.
+By varying the parton shower and hadronization models independently across these four samples, two separate background modeling uncertainties are obtained.
+
+Other theoretical uncertainties, such as those from the choice of renormalization and factorization scales in the parton shower, are assessed by applying event-level reweighting rather than by generating alternative samples.
+
+It is worth noting that the theoretical uncertainties are expected to be largest for taggers that exploit IRC unsafe information.
+IRC unsafe observables are not computable in perturbative QCD, and while event generators model them phenomenologically, this modeling is known to be sensitive to the choice of parton shower and hadronization parameters.
+Conversely, IRC safe quantities can in principle be computed perturbatively and are generally better controlled.
+The EFN is by construction insensitive to IRC unsafe information, which motivates the expectation that it will carry smaller theoretical uncertainties than the other taggers.
+
+\subsection{Validation and Results}
+
+Before applying the bottom-up uncertainties to the constituent-based taggers, the method is validated against the well-established scale factor approach.
+A scale factor for the hlDNN tagger has already been measured using semi-leptonic $t\bar{t}$ events~\cite{ATLAS:2018wis}, providing an independent and direct measurement of the data-to-MC efficiency ratio.
+The total bottom-up uncertainty on the hlDNN, which represents an upper bound on the possible performance difference between data and simulation, can be compared against this scale factor measurement to test the method's coverage.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/ch4/sf_comparison.pdf}
+    \caption{Comparison of the hlDNN scale factor measured in data (points with error bars) against the total bottom-up systematic uncertainty band (shaded region), as a function of jet $p_T$, reproduced from Ref.~\cite{ATLAS:2024rua} under the Creative Commons Attribution 4.0 International license. The bottom-up uncertainty covers the measured scale factor in all $p_T$ bins, validating the method. The scale factor is consistently below unity, indicating that tagger efficiency is degraded in data relative to simulation, consistent with known limitations of the calorimeter simulation.}
+    \label{fig:sf-comparison}
+\end{figure}
+
+\Cref{fig:sf-comparison} shows the result.
+The bottom-up uncertainty band covers the measured scale factor in all bins of jet $p_T$, confirming that the method produces a conservative but reasonable bound on the data-to-MC performance difference.
+Several features of this comparison are noteworthy.
+The scale factor is consistently below unity across the full $p_T$ range, indicating that the hlDNN is systematically more efficient in simulation than in data.
+This is the expected direction of the effect, since the tagger is trained on simulation and can overfit to features of the simulation that are not present in data.
+The bottom-up uncertainties are symmetrized and therefore accommodate improvements as well as degradations in performance relative to simulation, but such improvements are neither expected nor observed in practice.
+
+With the method validated, the bottom-up uncertainties are evaluated for all constituent-based taggers.
+\Cref{fig:efn-uncert,fig:particlenet-uncert} show the uncertainty breakdown for the EFN and ParticleNet respectively.
+
+\begin{figure}[tb]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/efn_uncert.pdf}
+        \caption{EFN uncertainty breakdown.}
+        \label{fig:efn-uncert}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/particlenet_uncert.pdf}
+        \caption{ParticleNet uncertainty breakdown.}
+        \label{fig:particlenet-uncert}
+    \end{subfigure}
+    \caption{Systematic uncertainty budgets for the EFN (left) and ParticleNet (right) taggers as a function of jet $p_T$, reproduced from Ref.~\cite{ATLAS:2024rua} under the Creative Commons Attribution 4.0 International license. Individual uncertainty sources are shown as colored bands, with the total uncertainty given by their quadrature sum. The signal modeling uncertainty is the dominant contribution for both taggers, and all uncertainties are smaller for the EFN than for ParticleNet.}
+    \label{fig:uncert-budgets}
+\end{figure}
+
+Two features stand out from these plots.
+First, the dominant source of uncertainty for both taggers is signal modeling: the difference in tagger performance between the \textsc{Pythia 8} and \textsc{Herwig 7} parton shower and hadronization models.
+This is a manifestation of domain shift: the tagger learns features of the particular parton shower and hadronization model used to produce its training sample, and those features do not generalize perfectly to alternative models or, by extension, to data.
+Second, all uncertainties are smaller for the EFN than for ParticleNet.
+The IRC safety constraint prevents the EFN from exploiting the soft and collinear radiation patterns that are most sensitive to parton shower modeling, and this translates directly into a smaller signal modeling uncertainty.
+The experimental uncertainties are sub-leading for both taggers, but they too are larger for ParticleNet, confirming that the constituent-level architecture is generally more sensitive to detector effects than the energy-weighted deep set.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/ch4/uncert_vs_perf.pdf}
+    \caption{Total systematic uncertainty on the inverse background rejection at the 50\% signal efficiency working point plotted against the background rejection itself, reproduced from Ref.~\cite{ATLAS:2024rua} under the Creative Commons Attribution 4.0 International license. Each point corresponds to one of the taggers studied. ParticleNet (upper right) achieves the highest classification performance but carries the largest uncertainty. The EFN (lower left) achieves the smallest uncertainty at the cost of lower performance. The ResNet is an outlier with both poor performance and large uncertainty. The other taggers trace a roughly monotonic performance--robustness frontier.}
+    \label{fig:uncert-vs-perf}
+\end{figure}
+
+Aggregating the results across all taggers and averaging over jet $p_T$ yields \Cref{fig:uncert-vs-perf}, which plots total uncertainty against background rejection for each tagger at the 50\% signal efficiency working point.
+This figure introduces a new axis for comparing taggers beyond raw classification power.
+ParticleNet occupies the upper right corner: the highest background rejection, but also the highest uncertainty.
+The EFN occupies the lower left: the lowest uncertainty, but also among the lowest background rejections of the constituent-based taggers.
+The remaining taggers fall roughly along a monotonic performance-robustness frontier between these two extremes.
+The notable exception is ResNet, which achieves neither good performance nor low uncertainty, a consequence of the calorimeter pixelization artifacts that degrade its classification accuracy while simultaneously making it sensitive to calorimeter systematic variations.
+
+The performance-robustness frontier is a practically useful concept.
+Whether a tagger with high performance and high uncertainty or one with lower performance and lower uncertainty is preferred depends on the analysis.
+A search with limited signal-region statistics may benefit most from a tagger with the highest background rejection regardless of uncertainty, while a measurement in a high-statistics regime may be systematics-limited and prefer a more robust tagger.
+The bottom-up framework makes this tradeoff quantitative and computable for any tagger, without requiring a dedicated scale factor measurement.
+
+To facilitate further development with both tagger performance and robustness in mind, all datasets used to produce the results in this section have been made publicly available~\cite{top_tagging_data}.
+
 \section{The Future of Jet Classification}
 \label{sec:tagging-future}
 
