@@ -94,21 +94,11 @@ The first step was to construct a dataset of labeled jets that can be used to tr
 Both ATLAS and CMS train taggers on simulated events and then apply them on data, because truth labeling schemes are straightforward to define for simulated events.
 Setting truth labels on data is in-principle possible but much more complicated.
 In this study, top quark signal jets are obtained from simulated $Z' \rightarrow t\bar{t}$ events with $m_{Z'} = 2$~TeV, where the $Z'$ is a hypothetical massive resonance used solely as a convenient source of boosted top quarks.
+These events are generated at leading-order (LO) with \textsc{PYTHIA8}~\cite{Sjostrand:2014zea} using the \textsc{NNPDF2.3LO}~\cite{Ball:2012cx} set of parton distribution functions (PDFs) and the A14~\cite{ATL-PHYS-PUB-2014-021} set of tuned parameters.
 The production cross section is reweighted to yield an approximately flat jet $p_T$ distribution, which ensures that the tagger can learn to classify top jets across a wide range of jet \pt values.
 Background jets are obtained from simulated QCD dijet events, which are also reweighted to yield an approximately flat jet $p_T$ distribution.
-
-Jets are clustered from Unified Flow Object (UFO) inputs~\cite{ATLAS:2020gwe} using the anti-$k_t$ algorithm with a radius parameter of $R = 1.0$~\cite{Cacciari:2008gp}.
-The UFO is an ATLAS analysis object specifically optimized for reconstructing large-radius jets with significant substructure.
-It combines inner detector tracking and calorimeter information in a way that exploits the complementary resolution of the two sub-systems.
-The four-momenta of the UFO constituents within each jet are the raw inputs to the constituent-based taggers described below.
-
-A jet selection is then applied to both samples.
-\Cref{tab:cuts} summarizes the requirements.
-The requirements in the left hand column are applied to all jets.
-For the signal sample, additional requirements in the right hand column define the top quark jet label: the jet must be geometrically matched to both a truth jet and to a truth top parton, have a groomed mass consistent with the top quark mass, contain at least one ghost-associated $b$-hadron (ensuring the jet contains the $b$-quark from the top decay), and satisfy a requirement on the truth jet splitting scale $\sqrt{d_{23}}$ that ensures all three top decay products are captured within the jet.
-The $\sqrt{d_{23}}$ requirement has an explicit $p_T$ dependence that accounts for the increasing collimation of the decay products at higher jet $p_T$.
-After selection, the dataset consists of simulated top quark jets (signal) and QCD jets (background), with similar \pt spectra.
-The goal is then to train classifiers that separate the two categories.
+All simulated samples are passed through a \textsc{Geant4}~\cite{GEANT4:2002zbu}-based simulation of the ATLAS detector.
+For more details on the ATLAS detector, see Ref.~\cite{ATLAS:2008xda}.
 
 \input{tables/top_jet_selection.tex}
 
