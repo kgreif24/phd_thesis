@@ -61,6 +61,180 @@ The lessons drawn from the binary top-versus-QCD classification problem remain r
 \section{Constituent Based Top Quark Tagging}
 \label{sec:constituent-top-tagging}
 
+\subsection{The Top Tagging Landscape}
+
+Before describing the ATLAS study, it is useful to place it in context.
+In 2019, a community comparison study~\cite{Kasieczka:2019dbj} trained a wide variety of deep learning based top tagging methods on a single, common dataset and evaluated their performance under identical conditions.
+The study serves as the clearest demonstration of the state of constituent-based top tagging prior to the ATLAS work described here.
+The key result is summarized by the ROC curve reproduced in \Cref{fig:landscape-roc}.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/ch4/landscape_roc.png}
+    \caption{ROC curves for a range of top tagging classifiers evaluated on a common dataset, reproduced from Ref.~\cite{Kasieczka:2019dbj} under the Creative Commons Attribution 4.0 International license. Each curve traces the signal efficiency (true positive rate) against the background rejection (inverse false positive rate) as the classifier threshold is varied. A classifier with no discriminating power would follow the diagonal; greater area under the curve indicates better classification performance. Constituent-based deep learning taggers (upper left cluster) consistently outperform the expert-feature baseline (lower left).}
+    \label{fig:landscape-roc}
+\end{figure}
+
+A ROC (receiver operating characteristic) curve plots signal efficiency on the horizontal axis against background rejection on the vertical axis, as the discriminant threshold of the classifier is swept from its most to least restrictive value.
+A tagger with no discriminating power produces a flat line (all thresholds yield the same background rejection regardless of signal efficiency), while a perfect tagger reaches the upper-left corner of the plane.
+The area under the curve (AUC) summarizes overall classification power in a single number, with a perfect classifier achieving an AUC of 1.
+
+The landscape study yields two important takeaways.
+First, constituent-based deep learning taggers substantially outperform methods that rely on hand-engineered expert features.
+This is the jet tagging analog of the AlexNet moment: rather than asking domain experts to distill the relevant physics into a set of high-level variables, end-to-end networks learn directly from the raw kinematic information of the jet constituents which patterns discriminate top jets from QCD.
+The improvement in background rejection is a factor of several relative to the expert-feature baseline.
+Second, the dataset used in the landscape study was generated with the fast detector simulation Delphes~\cite{deFavereau:2013fsa}, which models the detector response at a coarse level.
+The much more realistic \textsc{Geant4}-based full simulation used by ATLAS and CMS introduces detector effects, such as calorimeter cell geometry and noise, that are absent from Delphes.
+Whether the performance advantage of constituent-based taggers persists under realistic simulation was an open question.
+Furthermore, the landscape study evaluated only raw classification power.
+Deploying taggers in physics analyses requires a careful treatment of systematic uncertainties, which was entirely absent from the landscape comparison.
+
+\subsection{Dataset and Jet Selection}
+
+The primary objective of Refs.~\cite{ATLAS:2022qby, ATLAS:2024rua} was to address both of these gaps: train and evaluate top taggers on ATLAS full simulation, and provide a high-quality public dataset to support future studies.
+
+The first step is to construct a dataset of labeled jets from simulated events.
+Simulation is necessary because truth labels are required for the supervised training of classifiers.
+Top quark signal jets are obtained from simulated $Z' \rightarrow t\bar{t}$ events with $m_{Z'} = 2$~TeV, where the $Z'$ is a hypothetical massive resonance used solely as a convenient source of boosted top quarks.
+The production cross section is reweighted to yield an approximately flat jet $p_T$ distribution, which ensures that the tagger performance is not driven by the particular kinematic configuration of the training sample.
+Background jets are obtained from simulated QCD dijet events.
+
+Jets are clustered from Unified Flow Object (UFO) inputs~\cite{ATLAS:2020gwe}.
+The UFO is an ATLAS analysis object specifically optimized for reconstructing large-radius jets with significant substructure.
+It combines inner detector tracking and calorimeter information in a way that exploits the complementary resolution of the two sub-systems.
+The four-momenta of the UFO constituents within each jet are the inputs to the constituent-based taggers described below.
+
+A jet selection is then applied to both samples.
+\Cref{tab:cuts} summarizes the requirements.
+Basic kinematic requirements are applied to all jets.
+For the signal sample, additional truth-level requirements define the top quark jet label: the jet must be geometrically matched to both a truth jet and to the truth top parton, have a groomed mass consistent with the top quark mass, contain at least one ghost-associated $b$-hadron (ensuring the jet contains the $b$-quark from the top decay), and satisfy a requirement on the truth jet splitting scale $\sqrt{d_{23}}$ that ensures all three top decay products are captured within the jet.
+The $\sqrt{d_{23}}$ requirement has an explicit $p_T$ dependence that accounts for the increasing collimation of the decay products at higher jet $p_T$.
+After selection, the dataset consists of top quark jets (signal) and QCD jets (background), with the goal of training classifiers that separate them.
+
+\input{tables/top_jet_selection.tex}
+
+\subsection{Tagger Architectures}
+
+Five classifiers spanning a range of architectural complexity are trained and evaluated.
+The architectural building blocks have been introduced in \Cref{ch:ml}; only the jet-tagging-specific details are described here.
+
+\textbf{hlDNN.} A multi-layer perceptron trained on 15 hand-engineered substructure variables.
+This serves as the expert-feature baseline for the study.
+
+\textbf{DNN.} A multi-layer perceptron that operates directly on the constituent four-momenta, with no hand-engineered features.
+Because the number of constituents varies from jet to jet, the constituent list is zero-padded to a fixed length before being passed to the network.
+
+\textbf{EFN and PFN.} The Energy Flow Network and Particle Flow Network are deep set architectures~\cite{Komiske:2018cqr}.
+Each constituent is mapped independently through a shared per-constituent network to produce a latent representation; the representations are then aggregated (summed) to produce a jet-level embedding, which is passed to a final classifier network.
+The EFN is constrained to be infrared and collinear (IRC) safe: constituent coordinates are weighted by their $p_T$ fraction before aggregation, so the network output is invariant under the addition of soft particles or the collinear splitting of any constituent.
+This constraint limits the information available to the EFN but, as will be discussed in the following section, confers significant robustness against systematic uncertainties.
+
+\textbf{ResNet50.} A convolutional neural network~\cite{He:2015resnet} applied to jet images.
+A jet image is constructed by projecting the constituent $p_T$ onto a $64 \times 64$ pixel grid in the $(\eta, \phi)$ plane centered on the jet axis, with each pixel value equal to the sum of constituent $p_T$ falling within it.
+Pixel intensities are rescaled as $p_T \to \log(1 + 100\, p_T)$ to enhance sensitivity to the lower-$p_T$ substructure patterns that would otherwise be washed out by the hardest constituents.
+Example jet images are shown in \Cref{fig:jet-images}.
+The three-pronged substructure of the top jet is visible as an over-density of radiation at three locations around the jet center in the ratio image.
+
+\begin{figure}[tb]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/top_jet.pdf}
+        \caption{Average top jet image.}
+        \label{fig:top-jet-image}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/qcd_jet.pdf}
+        \caption{Average QCD jet image.}
+        \label{fig:qcd-jet-image}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/jet_image_ratio.pdf}
+        \caption{Ratio: top / QCD.}
+        \label{fig:jet-image-ratio}
+    \end{subfigure}
+    \caption{Average jet images for top quark jets (left) and QCD jets (center), and their pixel-wise ratio (right). Pixel intensities are shown on a logarithmic scale after the $p_T \to \log(1 + 100\,p_T)$ rescaling. The three-pronged substructure of the top quark decay is visible as the three over-dense regions surrounding the jet center in the ratio image.}
+    \label{fig:jet-images}
+\end{figure}
+
+\textbf{ParticleNet.} A dynamic graph convolutional neural network~\cite{Qu:2019gqs}.
+Each jet constituent is represented as a node, with node features given by the seven input variables described below.
+In the first message-passing layer, edges connect each node to its $k = 18$ nearest neighbors in the $(\eta, \phi)$ plane, incorporating the inductive bias that spatially proximate constituents are physically related.
+In subsequent layers, nearest neighbors are determined in the full feature space rather than the coordinate subspace, so the graph topology changes dynamically after each block.
+ParticleNet has been deployed extensively by CMS for jet tagging in a wide range of measurements and searches, making it one of the most practically important architectures in LHC physics.
+
+\subsection{Input Features and Training}
+
+Each constituent-based tagger operates on a common set of seven input features per constituent: the $\eta$ and $\phi$ coordinates relative to the jet axis, the logarithms of the constituent $p_T$ and energy $E$, the logarithms of the constituent $p_T$ and $E$ normalized to the total jet $p_T$ and $E$ respectively, and the angular distance $\Delta R$ between the constituent and the jet axis.
+The EFN uses only constituent $\eta$, $\phi$, and $p_T$ by architectural constraint, and the ResNet50 uses the jet image rather than per-constituent features.
+
+All taggers are trained using the Adam optimizer to minimize the binary cross-entropy loss.
+Training proceeds until the validation loss fails to improve for 20 consecutive epochs.
+The training, validation, and test sets contain 9 million, 1 million, and 3.8 million jets respectively.
+
+\subsection{Results}
+
+The classification performance of each tagger is summarized in \Cref{tab:performance_numbers} and \Cref{fig:roc}.
+Three metrics are reported: the AUC, the accuracy (ACC), and the inverse background rejection $\varepsilon^{-1}_\text{bkg}$ evaluated at fixed signal efficiencies of 50\% and 80\%.
+The inverse background rejection is the most physically relevant metric for collider analyses: downstream measurements and searches typically operate at a fixed working point (a fixed signal efficiency), and the figure of merit is how many background jets survive the cut, since fewer background events in the signal region directly translates to improved sensitivity.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/ch4/roc.pdf}
+    \caption{ROC curves for the five top quark taggers evaluated on the full simulation test set. The vertical axis shows the inverse background rejection $\varepsilon^{-1}_\text{bkg}$ and the horizontal axis shows the signal efficiency $\varepsilon_\text{sig}$. All constituent-based taggers outperform the hlDNN expert-feature baseline, with ParticleNet achieving the highest background rejection across all working points.}
+    \label{fig:roc}
+\end{figure}
+
+\input{tables/top_metrics.tex}
+
+ParticleNet is the most performant tagger in the study, outperforming the hlDNN baseline by a factor of roughly 2--3 in background rejection depending on the working point.
+This mirrors the result seen in the landscape paper (\Cref{fig:landscape-roc}) and confirms that the performance advantage of constituent-based taggers is not an artifact of fast simulation: it persists under the more challenging conditions of ATLAS full simulation.
+
+The ResNet50 is the worst-performing constituent-based tagger, and notably performs below the hlDNN expert-feature baseline.
+This is a significant reversal from the landscape study, where ResNet was among the top performers.
+The most likely explanation is the pixelization of the jet image, which imposes a fixed spatial grid on top of the non-uniform calorimeter cell geometry of the ATLAS detector.
+The resulting discretization artifacts are severe enough to degrade the network's ability to resolve the substructure patterns that drive its performance.
+Delphes fast simulation does not model these non-uniformities, which likely explains why ResNet performed much better in the landscape comparison.
+
+The EFN underperforms the hlDNN despite having access to the full constituent kinematics.
+This is a direct consequence of the IRC safety constraint: by weighting constituent features by their $p_T$ fraction before aggregation, the EFN is prevented from utilizing the soft radiation patterns that carry significant discriminating information for top versus QCD classification.
+This limitation in raw performance has a counterpart advantage, however, as the EFN's robustness against systematic effects will be discussed in the following section.
+
+Finally, \Cref{fig:br-pt} shows the background rejection as a function of jet $p_T$ at the 50\% and 80\% signal efficiency working points.
+
+\begin{figure}[tb]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/br_50.pdf}
+        \caption{Background rejection at $\varepsilon_\text{sig} = 50\%$.}
+        \label{fig:br-50}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/br_80.pdf}
+        \caption{Background rejection at $\varepsilon_\text{sig} = 80\%$.}
+        \label{fig:br-80}
+    \end{subfigure}
+    \caption{Background rejection as a function of jet $p_T$ at fixed signal efficiency working points of 50\% (left) and 80\% (right). The hlDNN background rejection falls monotonically with increasing $p_T$, consistent with the expectation that the three-pronged substructure of the top decay becomes increasingly difficult to resolve as the jet grows more collimated. Constituent-based taggers show a different behavior, with peak performance in the intermediate $p_T$ range, a trend that is not yet fully understood but may reflect the greater abundance of training statistics at moderate $p_T$.}
+    \label{fig:br-pt}
+\end{figure}
+
+The hlDNN background rejection falls monotonically with increasing jet $p_T$.
+This is physically intuitive: as the top quark becomes more boosted, its three decay products are emitted with smaller angular separations, and the three-pronged substructure becomes increasingly difficult to resolve against the finite angular resolution of the calorimeter.
+In the limit of very large $p_T$, all decay products are contained within a single calorimeter cell and the jet images of top and QCD jets become indistinguishable.
+
+The constituent-based taggers display a qualitatively different behavior.
+Their background rejection peaks in the intermediate $p_T$ range rather than at low $p_T$, and they degrade more slowly at high $p_T$ than the hlDNN.
+The origin of this behavior is not fully understood.
+One plausible contributing factor is that the training dataset contains the most jets in the intermediate $p_T$ range (since the flat $p_T$ reweighting has a finite reach), so the networks are better optimized at the $p_T$ values where training statistics are most abundant.
+Regardless of origin, the result is that constituent-based taggers maintain a larger performance advantage over the hlDNN baseline precisely in the high-$p_T$ regime where boosted object reconstruction is most relevant for new physics searches.
+
 \section{Systematic Uncertainty Quantification}
 \label{sec:systematic-uq}
 
