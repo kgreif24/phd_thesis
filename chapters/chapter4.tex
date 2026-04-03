@@ -3,33 +3,37 @@
 \label{ch:tagging}
 
 Jet classification, commonly referred to as ``jet tagging'', was one of the first applications of deep learning in particle physics and remains arguably the most important.
-The techniques covered in this chapter are used by both ATLAS and CMS and are driving improvements in the search for di-Higgs production.
+The techniques covered in this chapter are used by both ATLAS and CMS and are driving improvements in the search for di-Higgs production, which is the main goal of the current LHC physics program.
 This chapter will introduce jet tagging as a problem, then cover an ATLAS study on top tagging that is the first original research contribution in this thesis.
-It will close with a discussion of how jet tagging has progressed since the publication of this paper and end with some prospects for the high luminosity LHC.
+It will close with a discussion of how jet tagging has progressed since the publication of the ATLAS top tagging paper and end with some prospects for the high luminosity LHC.
 
 \section{Jet Tagging}
 \label{sec:tagging-intro}
 
 Most searches and measurements at the LHC are concerned with the high-energy scattering of partons.
-In principle, one would like to directly measure the identity and kinematics of the individual quarks and gluons produced in these collisions.
-In practice, the parton shower and hadronization processes make this impossible: the colored partons produced in the hard scatter are never directly observable.
-Instead, the ATLAS and CMS detectors record jets, collimated sprays of hadrons that are reconstructed and used as proxies for the initiating partons.
-Inferring the kinematics of the originating parton from a jet is straightforward in principle: one sums the four-momenta of the jet's constituent hadrons.
+Ideally one would directly measure the identity and kinematics of the individual quarks and gluons produced in an LHC collision.
+In practice, the parton shower and hadronization processes make this impossible.
+Detectors can only observe the outcome of the parton shower and hadronization processes, which are collimated sprays of hadrons known as jets.
+See \Cref{ch:qcd} for a full discussion.
+These jets are typically used as proxies for the initiating parton.
+For example the kinematics of the initiating parton can be inferred from the kinematics of the jet, obtained by summing the four-momenta of the jet's constituent hadrons.
 Inferring the \emph{type} of parton that initiated the jet is the problem of jet tagging.
 
-\begin{figure}[ht]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.85\linewidth]{figures/ch4/jet_types_diagram.pdf}
-    \caption{Schematic illustration of the two broad categories of jets produced in LHC collisions. Boosted jets (left) arise when a massive particle such as a top quark, $W/Z$ boson, or Higgs boson decays hadronically with high transverse momentum, causing its daughter quarks to merge into a single large-radius jet with non-trivial internal substructure. Flavor-tagged jets (right) arise from the production of heavy-flavor quarks, whose long-lived $B$ and $D$ hadron decay products leave a displaced secondary vertex inside the jet.}
+    \caption{Schematic illustration of the two broad categories of jets produced in LHC collisions. From the top left working clockwise: light quark and gluon initiated jets are the most abundant jets with no substructure, bottom quark (and to some extent charm quark) initiated jets conain a displaced vertex due to the long-lived B and D hadrons, jets initiated by the hadronic decay of the W and Z bosons contain a two-pronged substructure, jets initiated by the decay of a Higgs boson to two b quarks results in a two-pronged substructure with displaced vertices, and the hadronic decay of a top quark results in a three-pronged substructure with one displaced vertex.}
     \label{fig:jet-types}
 \end{figure}
 
-Historically, two distinct jet tagging problems have been studied at the LHC, though modern deep learning methods have largely unified them.
+Historically, two distinct jet tagging problems have been studied at the LHC.
 The first is \textit{boosted jet tagging}.
-When a massive particle such as a top quark, $W$ or $Z$ boson, or Higgs boson is produced with a transverse momentum much larger than its mass ($\pt \gg m$), its hadronic decay products are emitted nearly collinearly.
-The resulting jets from each daughter quark merge into a single large-radius jet with non-trivial substructure: a two-pronged substructure for $W/Z/H \to q\bar{q}$ decays, or a three-pronged substructure for $t \to Wbq\bar{q}$ decays.
-Identifying these boosted jets against the overwhelming background of high-\pt light-quark and gluon jets requires exploiting this substructure.
+When a massive particle such as a top quark, $W$ or $Z$ boson, or Higgs boson is produced with a transverse momentum much larger than its mass ($p_T \gg m$), its hadronic decay products are emitted nearly collinearly.
+The resulting jets from each daughter quark merge into a single large-radius jet with non-trivial substructure.
+$W/Z/H \to q\bar{q}$ decays produce a two-pronged substructure, and a $t \to Wbq\bar{q}$ decay produces a three-pronged substructure.
+Identifying these boosted jets against the large background of high-\pt light-quark and gluon jets requires exploiting this substructure.
 Early methods for doing so relied on multivariate discriminants such as BDTs or shallow neural networks trained on a set of hand-engineered substructure observables~\cite{Altheimer:2013yza, Thaler:2008ju}.
+An example use case for boosted jet tagging is to search for BSM resonances that decay to boosted SM objects like top quarks of W/Z bosons~\cite{ATLAS:2022enb,CMS:2026ogg}.
 
 The second category is \textit{flavor tagging}.
 When a bottom or charm quark is produced in the hard scatter, the resulting jet contains a $B$ or $D$ hadron.
@@ -37,103 +41,29 @@ These hadrons are long-lived relative to the light hadrons produced in light-qua
 Identifying jets that contain $B$ or $D$ hadrons as opposed to jets from light quarks or gluons is called $b$- or $c$-tagging.
 As in the boosted case, early flavor taggers reconstructed the displaced vertex explicitly and used this information as an input to a BDT or neural network~\cite{ATLAS:2016gsw}.
 
-The two problems are illustrated schematically in \Cref{fig:jet-types}.
-Both are fundamentally classification tasks: one must distinguish a signal jet from a background jet using the information available in the detector.
-The primary distinction between them is the nature of the discriminating information.
-Boosted tagging relies on the global spatial structure of energy deposits within a large-radius jet, while flavor tagging relies on precise tracking information near the jet core.
-In both cases, the task is made difficult by the complexity of the QCD background and the large dynamic range of the relevant kinematic variables.
+The types of jets are illustrated in \Cref{fig:jet-types}.
+Boosted jet tagging aims to identify top, W/Z, and Higgs jets against the background of light-quark and gluon jets, and flavor tagging aims to identify $b$ and $c$ jets\footnote{Note that $c$ jets are not shown in the Figure but are a distinct category of jets from $b$ jets though they're signatures are very similar.}.
+Both are classification tasks, where one must distinguish a signal jet from a background jet using the kinematics of the jet constituents that are measured by the detector.
+The distinction is the nature of the discriminating information.
+Boosted tagging relies on the global spatial structure of constituent particles within a jet, while flavor tagging relies on the longitudinal and transverse impact parameter information of the tracks within a jet that are used to reconstruct secondary vertices.
+These sets of information are not independent, but do factorize somewhat into signals coming from the inner tracking and calorimeter sub-systems of the ATLAS and CMS detectors.
 
-The application of deep learning to both of these problems has been transformative.
-The first papers demonstrating the use of convolutional neural networks for jet classification appeared in 2014--2015, only two or three years after the AlexNet moment~\cite{Cogan:2014oua}.
-The key insight was that a jet could be represented as an image: binning the constituent four-momenta on a grid in the $(\eta, \phi)$ plane and treating the resulting pixelated energy deposits as an image amenable to convolutional processing.
-Rather than relying on any expert-designed features, these networks learned directly from the raw detector information which patterns discriminate signal from background.
-This end-to-end approach consistently outperformed the hand-engineered methods that preceded it, and it set the template for subsequent improvements.
+Both problems have a long history in collider experiments.
+In runs one and two of the LHC, both were solved by combining hand-engineered expert features with a simple multivariant discriminant provided by a BDT or small neural network.
+The story of the top tagging paper presented here is that larger neural networks that operate directly on the jet constituent kinematics rather than on hand-engineered features can achieve much better performance.
+While this is illustrated in a boosted jet tagging task, the same is true for flavor tagging.
 
-The section that follows describes in detail a particular boosted jet tagging task: identifying jets initiated by top quarks against the background of light-quark and gluon jets.
+The paper focuses on boosted top tagging, a particular boosted jet tagging task that classifies top quark initiated jets against the light quark and gluon initiated (sometimes called QCD) background.
 Boosted top tagging is the prototypical multi-prong jet tagging problem and was the subject of many early deep learning applications in particle physics.
-It remains the canonical benchmark for new tagging methods.
 The study presented here, carried out in 2022--2023, constitutes the first original research contribution of this thesis.
-The lessons drawn from the binary top-versus-QCD classification problem remain relevant to the multi-class taggers of today, to which I will return in \Cref{sec:tagging-future}.
+The lessons drawn from the binary top-versus-QCD classification problem remain relevant to large multi-class taggers of today, to which I will return in \Cref{sec:tagging-future}.
 
+\section{Constituent Based Top Quark Tagging}
+\label{sec:constituent-top-tagging}
 
-
-\section{ATLAS Top Tagger: Training and Uncertainty Quantification}
-\label{sec:atlas-toptagger}
-
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Dataset and simulation
-%    - MC samples: ttbar signal, QCD dijets background.
-%    - Generator: Pythia 8 / Herwig 7 for systematic variations.
-%    - Detector simulation: FullSim (Geant4) vs. AFII (fast sim).
-%    - Large-R jet inputs: constituent four-momenta (point cloud),
-%      track parameters, calorimeter cell energies.
-%
-% 2. Network architecture
-%    - Describe the specific architecture used in the paper.
-%    - [FILL IN: e.g., ParticleNet / GNN / transformer-based?]
-%    - Input features, preprocessing (pT-sorting, normalization).
-%    - Loss: binary cross-entropy; training procedure.
-%
-% 3. Working point definition and efficiency
-%    - Fixed signal efficiency WP (e.g., 80% WP).
-%    - Background rejection as the key figure of merit.
-%    - ROC curves; compare to baseline cut-based tagger.
-%
-% 4. Uncertainty quantification methodology
-%    - Systematic uncertainties considered:
-%        a) MC generator choice (Pythia vs. Herwig)
-%        b) Parton shower / hadronization model
-%        c) Underlying event tune
-%        d) Detector simulation (FullSim vs. AFII)
-%        e) Pile-up modeling
-%    - Ensemble approach: N networks trained with different seeds.
-%    - How uncertainties are propagated to the final WP efficiency.
-%    - Key result: [FILL IN — quote main numbers from the paper]
-%
-% 5. Main results and conclusions
-%    - Improvement over baseline tagger.
-%    - Rigorous UQ framework: first ATLAS paper to do X? [FILL IN]
-%    - Impact on downstream physics analyses that use the tagger.
+\section{Systematic Uncertainty Quantification}
+\label{sec:systematic-uq}
 
 \section{The Future of Jet Classification}
 \label{sec:tagging-future}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Latest ATLAS + CMS flavor tagging models
-%    - b-tagging: GN2 (ATLAS), DeepJet (CMS) — transformer-based,
-%      use track + secondary vertex information.
-%    - Performance: light-jet rejection factors of O(1000) at 70% b-eff.
-%    - Multiclass: simultaneous b/c/light/tau tagging.
-%    - Cite recent ATLAS and CMS performance notes.
-%    - [FILL IN: specific numbers from the latest GN2/DeepJet papers]
-%
-% 2. Large pre-trained foundation models
-%    - Analogy to NLP: pre-train on massive unlabeled corpus,
-%      fine-tune on small labeled dataset.
-%    - Jet foundation models: OmniJet-\alpha, OMNIJET, JetCLR,
-%      PELICAN pretrained variants.
-%    - Self-supervised objectives: masked jet modeling,
-%      contrastive learning, next-constituent prediction.
-%    - Key advantage: the vast unlabeled LHC dataset (O(10^9) jets)
-%      can be used for pre-training; labeled (simulated) data
-%      for fine-tuning specific tasks.
-%    - [FILL IN: cite specific foundation model papers and results]
-%
-% 3. diHiggs at the HL-LHC: the case for jet tagging
-%    - HH production is the key measurement to probe the Higgs
-%      self-coupling lambda.  Current limits are O(5-10x SM).
-%    - The dominant decay channel for sensitivity is HH -> bbbb
-%      and HH -> bbtautau.  Both require excellent b-tagging.
-%    - The argument: improved b-taggers (from foundation models)
-%      directly translate to improved diHiggs sensitivity because:
-%        a) Higher b-eff at fixed mistagging rate → more signal events.
-%        b) Better c-jet rejection → cleaner control regions.
-%        c) Better light-jet rejection → reduced QCD multijet background.
-%    - Quantify: [FILL IN — e.g., going from 70% to 77% b-eff
-%      corresponds to ~X% improvement in HH significance per analysis].
-%    - This is arguably the most important single ML contribution
-%      the collaboration can make to the HL-LHC physics program.

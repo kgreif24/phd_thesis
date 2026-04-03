@@ -1,0 +1,16 @@
+\renewcommand{\arraystretch}{1.5}
+\begin{table}[]
+    \centering
+    \begin{tabular}{l|l}
+        \hline
+        \hline
+        Jet Requirements & Top quark jet requirements \\ \hline 
+        Jet  $|\eta| < 2.0$ & $dR(\text{jet, truth jet}) < 0.75$ \\
+        Jet  $p_{\text{T},\text{truth}} > 350$ GeV & $dR(\text{truth jet, top parton}) < 0.75$ \\
+        Number of constituents $\geq 3$ & Ungroomed truth jet mass $> 140$ GeV \\
+        Jet mass $> 40$ GeV & Number ghost associated $b$-hadrons $\geq 1$ \\
+         & Truth jet $\sqrt{d_{23}} > \exp (3.3 - \num{6.98e-4} \times \text{truth jet} \: \pT)$ \\ \hline \hline
+    \end{tabular}
+    \caption{A summary of the requirements applied on all of the jets in the simulation samples to produce the training and testing sets. The additional top quark jet requirements constitute the truth labeling strategy, and are only applied to jets in the sample of simulated top quarks.}
+    \label{tab:cuts}
+\end{table}
