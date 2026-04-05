@@ -413,6 +413,97 @@ This dataset is somewhat unique in that it lets jet tagging methods be developed
 Additionally this dataset consists of roughly 200 million jets all together, which is a large number of jets generated with ATLAS full simulation.
 This has made the data additionally useful for the development of foundation models, for example Ref.~\cite{Bhimji:2025isp}.
 
-\section{The Future of Jet Classification}
+\section{Jet Tagging Prospects for Run 4}
 \label{sec:tagging-future}
+
+The top tagging study described in this chapter was completed in 2022--2023, and the field has moved quickly since then.
+Two broad directions have emerged and are being pursued in parallel heading into Run 4 of the LHC.
+
+\subsection{Symmetry-Constrained Architectures}
+
+The first direction seeks to encode known symmetries of particle physics directly into the network architecture.
+Jet observables are by construction invariant under Lorentz boosts along the beam axis and rotations around it, and there is a natural appeal to building classifiers that respect these symmetries exactly rather than learning to approximate them from data.
+A number of equivariant architectures have been proposed that constrain the network output to be explicitly invariant under such transformations~\cite{Gong:2022lye, Bogatskiy:2022czk, Brehmer:2024yqw}.
+A practical motivation is that enforcing symmetries algebraically can reduce the number of trainable parameters substantially, which in turn can allow for fast inference times.
+For jet tagging at the trigger level, where latency constraints are severe and decisions must be made in microseconds, this is a meaningful advantage~\cite{Petitjean:2025zjf}.
+From a conceptual standpoint, these models represent an architecture-level contribution from the HEP community rather than an import from the broader ML research community, and they remain an active area of development.
+A notable open question is how robustly equivariant taggers behave under the systematic variations discussed in \Cref{sec:systematic-uq}; this has not yet been studied in any depth.
+
+\subsection{Scaling and Foundation Models}
+
+The second direction follows the broader ML and AI community's focus on scaling: training larger models on larger datasets.
+The first relevant work in this direction is Ref.~\cite{Qu:2022mxj}, which introduced the Particle Transformer (ParT), a transformer-based architecture with a few million parameters.
+A key result of that paper was that state-of-the-art performance on the community top tagging dataset from the landscape study~\cite{Kasieczka:2019dbj} could be achieved by pre-training ParT on a larger auxiliary dataset and then fine-tuning on the target task.
+This demonstrated that the scaling and transfer learning ideas powering progress in NLP and computer vision were applicable to jet tagging, and it redirected some of the community's attention away from architectural novelty toward the question of how much unlabeled data could be exploited.
+
+The subsequent period saw a wave of papers developing jet foundation models: networks pre-trained on large datasets using self-supervised objectives such as masked constituent prediction, contrastive learning, or next-constituent prediction, with the intention of fine-tuning them on specific downstream tasks~\cite{Mikuni:2024qsr, Birk:2024knn, Golling:2024abg, Katel:2024ygn, Li:2024htp, Leigh:2024ked, Birk:2025fbs, Hsu:2026sww}.
+The unlabeled data available at the LHC is essentially unlimited, making it an attractive setting for self-supervised pre-training.
+These models are scientifically interesting, but as of writing none has been deployed for jet tagging by ATLAS or CMS on actual collision data.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.78\linewidth]{figures/ch4/br_vs_year.png}
+    \caption{Background rejection on the community top tagging dataset from Ref.~\cite{Kasieczka:2019dbj} as a function of the year of publication for a selection of architectures, reproduced from Ref.~\cite{Bhimji:2025isp} under the Creative Commons Attribution 4.0 International license. Pre-trained models consistently achieve the highest background rejection because they exploit auxiliary training data beyond the benchmark dataset. The equivariant L-GATr model is competitive among non-pre-trained architectures.}
+    \label{fig:br-vs-year}
+\end{figure}
+
+\Cref{fig:br-vs-year} shows the progression of background rejection on the community top tagging benchmark as a function of publication year.
+The pre-trained models occupy the top of the performance ranking, benefiting from access to training data beyond the benchmark itself.
+Among non-pre-trained architectures, equivariant models such as L-GATr are competitive, though the performance gap between equivariant and pre-trained models has been widening as the latter scale up.
+My expectation is that the benefit from the equivariant prior will diminish as models continue to grow and learn the relevant symmetries from data rather than having them imposed algebraically.
+A related question is whether equivariant inductive biases remain useful for tasks other than classification; I will return to this briefly in \Cref{ch:zjets}, where equivariant networks are compared against pre-trained models on a density ratio estimation task.
+
+Overall, both directions continue to be pursued, but the scaling approach --- larger models trained on more data --- is currently more performant on public benchmarks and is being more actively adopted within ATLAS and CMS.
+
+\subsection{Flavor Tagging at Scale}
+
+The most concrete example of scaling within the experimental collaborations is the recent progress in flavor tagging.
+Both ATLAS and CMS have transitioned to transformer-based flavor taggers with parameter counts in the low millions~\cite{ATLAS:2025dkv, Sarkar:2024vjz}.
+
+Flavor tagging is an especially high-stakes application because the dominant Higgs boson decay mode is $H \to b\bar{b}$, making $b$-jet identification central to essentially all measurements and searches involving the Higgs.
+\Cref{fig:ftag-atlas,fig:ftag-cms} show the background rejection of the latest ATLAS and CMS flavor taggers relative to earlier baselines.
+
+\begin{figure}[tb]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/atlas_ftag.pdf}
+        \caption{ATLAS flavor tagger performance evolution.}
+        \label{fig:ftag-atlas}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/ch4/cms_ftag.png}
+        \caption{CMS flavor tagger performance evolution.}
+        \label{fig:ftag-cms}
+    \end{subfigure}
+    \caption{Background rejection of ATLAS (left) and CMS (right) flavor tagging algorithms relative to earlier baselines, reproduced from Refs.~\cite{ATLAS:2025dkv} and~\cite{Sarkar:2024vjz} respectively under the Creative Commons Attribution 4.0 International license. The CMS figure uses a Run 1 algorithm as its reference and therefore shows larger nominal multipliers. Both experiments have achieved roughly an order of magnitude improvement in light-jet rejection by transitioning from BDT-based and early DNN methods to large-scale constituent-based transformer networks. The ATLAS figure additionally shows scale factor measurements in data, illustrating that the performance gains have come with larger data-to-simulation differences, consistent with the results of \Cref{sec:systematic-uq}.}
+    \label{fig:ftag-comparison}
+\end{figure}
+
+The scale of the improvement is striking: transitioning from BDT-based and early DNN methods to large-scale constituent-based transformer networks has yielded roughly an order of magnitude increase in light-jet background rejection at fixed $b$-tagging efficiency.
+Notably, the ATLAS figure also shows scale factor measurements in collision data alongside the simulation-based performance, and the data-to-simulation differences are larger for the transformer-based taggers than for their predecessors.
+This is precisely what the results of \Cref{sec:systematic-uq} would lead one to expect: larger, more expressive networks exploit more of the available information in simulation, including information that is not perfectly modeled, and the performance gap between simulation and data grows accordingly.
+
+The reason this tradeoff is currently accepted without hesitation is the di-Higgs production search.
+Di-Higgs production has a very small cross section and searches for it are strongly limited by statistical power rather than by systematic uncertainties, particularly scale factor uncertainties.
+Maximizing background rejection is therefore the correct strategy at this moment, and the robustness considerations that motivate the bottom-up framework of \Cref{sec:systematic-uq} are secondary in practice.
+
+\subsection{Prospects for the High-Luminosity LHC}
+
+Looking ahead to Run 4, scaling within the experiments is likely to continue.
+ATLAS has recently released information on GN3, a larger model than GN2 trained on more low-level information and a larger dataset~\cite{ATLAS:2026vyw}, and dedicated studies of scaling laws in the context of jet tagging have appeared~\cite{ATLAS:2026xxx, Vigl:2026ppx}.
+The takeaway from these studies is that there remains room to improve tagging performance in simulation by training on many more jets, potentially reaching into the billions or trillions.
+
+Whether performance in data will improve commensurately is a harder question.
+Gains in simulation tend to outpace gains in data as models grow larger, because more expressive networks are increasingly sensitive to the fine details of the simulation that differ from the real detector.
+At some point this gap will limit the practical utility of continued scaling, and the broader self-supervised or data-driven approaches may become relevant again.
+
+The stakes are high.
+The projected sensitivity for observing di-Higgs production at the HL-LHC has improved substantially over the past decade, rising from a projected combined significance of roughly $4\sigma$ in the 2019 CERN Yellow Report~\cite{Cepeda:2019klc} to greater than $7\sigma$ in the most recent ATLAS and CMS combined projections~\cite{ATLAS:2025eii}.
+Improved $b$-tagging has been a material driver of this trajectory.
+In channels that require four $b$-tagged jets, such as $HH \to b\bar{b}b\bar{b}$, the sensitivity scales steeply with per-jet background rejection, and cumulative improvements of an order of magnitude in rejection translate directly to gains in signal-to-background that simpler channels cannot match.
+More concretely, the ATLAS GN2 tagger alone has been shown to improve projected HH sensitivity by up to 30\% in the most $b$-tagging-sensitive channels relative to its DNN-based predecessor.
+Whether the Run 4 program ultimately delivers an observation of di-Higgs production will depend on many factors, but continued progress in flavor tagging is among the more tractable levers available to both collaborations.
 
