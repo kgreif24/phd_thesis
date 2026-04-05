@@ -105,7 +105,7 @@ For more details on the ATLAS detector, see Ref.~\cite{ATLAS:2008xda}.
 \subsection{Tagger Architectures}
 
 Six classifiers are considered in the study.
-The architectural building blocks have been introduced in \Cref{ch:ml}, so only the jet tagging specific details are described here.
+The architectural building blocks have been introduced in \Cref{ch:ml}, so only the jet tagging specific details are described here\footnote{An obvious exclusion from this list is a transformer architecture. These models were just starting to be applied in HEP as this research was being done. Based on all evidence the transformer should slightly out-perform ParticleNet.}.
 
 \textbf{hlDNN.} A multi-layer perceptron trained on 15 hand-engineered substructure variables.
 This serves as the expert-feature baseline for the study.
@@ -277,6 +277,7 @@ Setting uncertainties is only a matter of running forward inference, rather than
 Further the bottom-up method does not require a pure sample of signal jets in data.
 For the taggers studied here, such a sample exists via semi-leptonic $t\bar{t}$ events, but for taggers designed to isolate jets from BSM or exotic processes, no analogous calibration sample may be available.
 This limitation is already a practical constraint for anomaly detection searches, where the signal topology is by definition unknown~\cite{ATLAS:2025obc, CMS:2025sch}.
+See Ref.~\cite{CMS:2025eyd} for an alternative, but similar, approach to uncertainty quantification in anomalous jet tagging.
 
 The downside is that the bottom-up approach requires a reliable set of input-level systematic variations.
 This is particularly difficult for experimental systematic uncertainties, which often are based on auxiliary measurements of the detector response as opposed to simply varying features of the simulation.
