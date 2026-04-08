@@ -12,42 +12,49 @@ This method is applied to experimental data to produce such a high dimensional c
 \section{Introduction to Unfolding}
 \label{sec:unfolding-intro}
 
-The detectors used in particle physics experiments are imperfect instruments.
-They introduce non-trivial distortions into every observable they record, and precise measurements must account for these distortions.
-There is one important exception: when a measurement is performed in sufficiently coarse bins such that the bin widths are much larger than the detector resolution, the detector response matrix (see \Cref{sec:binned-unfolding-methods}) is nearly diagonal and its effect can safely be neglected.
-Outside of this regime, two broad strategies have emerged for treating the detector response.
-
-The first is \textit{forward folding}.
-In this approach, theoretical predictions are expressed as fully exclusive particle-level predictions, specifying for example the four-momenta of all long-lived particles that interact with the detector.
-These predictions are then passed through a simulation of the detector response and compared to the raw experimental data in detector space.
+The detectors used in particle physics experiments are not perfect.
+Every measurement they make has finite resolution and acceptance.
+For example the ATLAS calorimeters are divided into calorimeter cells whose size place a firm lower bound on the angular resolution, and ATLAS as a whole has limited acceptance in the foward region because detectors cannot be placed inside the beampipe.
+These imperfect measurements introduce \textit{detector effects} which must be accounted for in order to compare cross section measurements to theoretical predictions\footnote{Note that it is possible to neglect these effects if the measurement is performed in sufficiently coarse bins and in regions of phase space where acceptance effects are negligible. In this case the response matrix (see \Cref{sec:binned-unfolding-methods}) is completely diagonal and the detector-level and truth-level histograms are identical. These cases are rare because measurements are typically designed to make full use of the detector response, and so use finer binning and more inclusive phase space selection at the expense of introducing significant detector effects.}.
+There are two general approaches to accounting for detector effects.
+The first is \textit{forward folding} in which theoretical predictions, specifically a Monte Carlo (MC) event generator output that specifies the final state four-momenta of all long-lived particles produced in a collision, are passed through a simulation of the detector response and compared to the raw experimental data.
+In this case the data and theoretical predictions are said to exist at \textit{detector level}, since the detector distortions are present in both.
 The second strategy is \textit{unfolding}.
-Rather than folding theory into detector space, statistical methods are used to construct an approximate inversion of the detector response, which is then applied to the data~\cite{Cowan:2002in}.
-The result is a measurement at the particle level that can be compared directly to theoretical predictions without any further reference to the detector simulation.
-Both approaches require access to an accurate detector simulation, which underpins either the forward-folded theory prediction or the response inversion.
+Instead of passing the theoretical preedictions through a detector simulation, statistical methods are used to construct an approximate inversion of the detector response, which is then applied to the data~\cite{Cowan:2002in}.
+This removes detector effects from the measurement so that it can directly compared to theoretical predictions without passing the predictions through the detector simulation.
+In the case that the unfolding adjusts only for detector distortions, the cross section measurement is said to exist at \textit{particle level}, since it makes a claim about the configuration of final state particles before interaction with the detector.
+Some unfolding applications additionally account for the distortions produced by the parton shower and hadronization processes (see \Cref{ch:qcd}).
+In this case the cross section measurement is said to exist at \textit{parton level}, since it makes a claim about the configuration of partons produced in the underlying hard scatter.
+Both of these are unfolding and the methods discussed in this chapter apply to both.
 
-The two strategies carry distinct advantages and disadvantages.
-Forward folding is strictly more precise.
-Because unfolding inverts the detector simulation, the best case is that the detector response is perfectly invertible and no additional uncertainty is introduced; in practice this is rarely true.
-Despite this limitation, unfolding is often worth the added uncertainty.
-Unfolded measurements can be compared directly to any theoretical prediction, including exclusive calculations such as resummed predictions of jet substructure observables, without requiring access to the detector simulation.
-This is a significant practical benefit when the simulation is expensive to run, which is typically the case at ATLAS and CMS, or when it is unavailable for legacy datasets.
-In contrast, forward folding requires the simulation to be re-run for each new theoretical prediction, is difficult to combine across analyses using different detector responses, and is not straightforwardly applicable to non-inclusive theory calculations.
+Forward folding and unfolding are both actively used in cross section measurements an have distinct advantages and disadvantages.
+Forward folding is strictly more precise than unfolding because unfolding methods will always incur additional systematic uncertainties.
+These may be very sub-leading in which case the precision of both approaches is equivalent, but the unfolding approach will never be more accurate than forward folding\footnote{This claim is mostly true, but unfolded measurements can be more precise than forward folding if unfolding removes the need for some systematic uncertainties. This is sometimes the case for theoretical modeling uncertainties, where the difference between two MC generators is understood as an uncertainty for detector level spectra but only an arbitrary choice of prior for unfolded spectra. This is something of a philosophical point regarding modeling uncertainties. In my opinion if an uncertainty is removed by unfolding this is good evidence that the uncertainty was not well-motivated to begin with.}.
+Despite this limitation, unfolding is often worth the added uncertainty for a few reasons which are worth spelling out in detail:
 
-Whether a given analysis uses forward folding or unfolding depends heavily on context.
-Searches for beyond-Standard-Model (BSM) particles almost never unfold.
-Such searches look for coherent shapes in low-statistics regions of phase space, and unfolding would substantially reduce sensitivity; there is also little practical motivation since well-established procedures exist within the experimental collaborations for re-interpreting searches via forward folding.
-Among Standard Model measurements, unfolding is used in roughly one third of published ATLAS and CMS results, as illustrated in \Cref{fig:paper-citations}.
-Extractions of SM parameters such as the top quark or Higgs boson masses typically do not unfold, while differential cross section measurements typically do.
-This picture is complicated by the fact that some unfolded measurements are not described as such explicitly.
-The Simplified Template Cross Section (STXS) framework used in ATLAS and CMS Higgs measurements, for example, is an instance of profile likelihood unfolding (see \Cref{sec:binned-unfolding-methods}), but is rarely labeled as such in publications~\cite{Berger:2019wnu}.
-In summary, unfolding occupies a niche but important role in the LHC physics program, and is essential for data preservation and legacy comparisons to theory.
+\begin{itemize}
+    \item Unfolded measurements can be compared directly to theoretical predictions furnished by MC event generators without the need to pass the simulated events through the detector simulation. This is an enormous practical benefit. The general hope with any cross section measurement is that it will be used to improve our knowledge of particle physics, for example by constraining a free parameter of the Standard Model or tuning a hadronization model used to provide theoretical predictions. All of these downstream tasks are greatly simplified when detector simulation is not needed. For LHC datasets, the detector simulation is mostly proprietary, computationally expensive, and requires substantial expertise to run, making the forward folding approach inconvenient\footnote{Note that ``inconvenient'' can mean anything from hard to do within the personnel and funding constraints of a research group, to computationally infeasible with existing computational resources. Some downstream applications, for example fitting many Wilson coefficients of an effective field theory to measured spectra, require large amounts of simulation that may be impossible to produce at detector level.}. For legacy datasets, such as those produced by experiments at LEP or SLC, the detector simulation is no longer available, making the forward folding approach impossible. Unfolding can then be understood as a way of preserving cross section measurements for future unforeseen use cases, which might be understood only many years after the intial data taking of an experiment is complete.
+    \item Unfolded measurements can be compared to non fully-inclusive theory predictions. In particular they can be compared to resummed calculations of jet substructure observables, which are defined at particle level but are represented as smooth functions rather than lists of final state particle four-momenta. This is an underappreciated motivation for unfolding. It is \textbf{required} to compare data to the rigourously understood theoretical predictions provided by state-of-the-art QCD calculations.
+    \item Finally unfolded measurements are much easier to combine with other measurements, perhaps from different experiments, to exploit additional statistical power. Combining forward folded measurements is possible, but require access to the detector simulation for proper correlation of uncertainties. This becomes especially difficult if results from different experiments are combined. In contrast combining unfolded spectra is trivial. See Ref.~\cite{Heimel:2024drk} for an excellent example.
+\end{itemize}
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.85\linewidth]{figures/ch5/paper_citations.png}
-    \caption{Number of citations of ATLAS and CMS publications, broken down by whether the analysis uses unfolding or forward folding.}
+    \includegraphics[width=0.66\linewidth]{figures/ch5/paper_citations.png}
+    \caption{Histograms of all ATLAS and CMS physics results in the number of citations recieved. The tail of the distribution at very high citation counts is not shown. Histograms are shown for searches, measurements which forward fold, and measurements which unfold. Data scraped from the InspireHEP archive, and sorted based on keywords in abstracts and whether they cite key papers. Note these data are very approximate given unfolding is not always labeled explicitly.}
     \label{fig:paper-citations}
 \end{figure}
+
+Given these motivations may or may not apply depending on the goals of any measurement, the decision to use forward folding or unfolding is highly context specific.
+It's worth mentioning a few contexts from LHC physics before moving on.
+Searches for beyond-Standard-Model (BSM) particles almost never unfold.
+Such searches look for coherent shapes like resonances in low-statistics regions of phase space, and unfolding would substantially reduce sensitivity.
+It is true that a search using unfolded spectra would be vastly easier to re-interpret, but there is little practical motivation for doing this since well-established procedures exist within the experimental collaborations for re-interpreting searches via forward folding.
+Among measurements of Standard Model processes, unfolding is used in roughly one third of published ATLAS and CMS measurements (excluding for example detector performance papers and searches), as illustrated in \Cref{fig:paper-citations}.
+Extractions of parameters such as particle masses of Wilson coefficients typically do not unfold unless one of the goals of the result is to be used in combinations, while differential cross section measurements typically do.
+This picture is complicated by the fact that some unfolded measurements are not described as such explicitly.
+The Simplified Template Cross Section (STXS) framework used in ATLAS and CMS Higgs measurements~\cite{Berger:2019wnu}, for example, is an instance of profile likelihood unfolding (see \Cref{sec:binned-unfolding-methods}), but is rarely labeled as such in publications.
+In summary, unfolding occupies a niche but important role in the LHC physics program, and is essential for data preservation and comparisons to resummed theory calculations.
 
 \section{Binned Unfolding Methods}
 \label{sec:binned-unfolding-methods}
