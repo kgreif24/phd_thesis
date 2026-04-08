@@ -2,49 +2,20 @@
 \chapter{Unfolding}
 \label{ch:unfolding}
 
-% ---------------------------------------------------------------
-% WRITING NOTES:
-%   Target: ~12–15 pages (Week 6: Apr 20–26)
-%   Structure: classical unfolding (IBU) → AI unfolding motivation
-%              → VLD (your pheno work) → Omnifold (what you use
-%              for the measurement in Ch.6)
-%   Goal: the reader should understand WHY each method is an
-%         improvement over the previous, not just WHAT it does.
-% ---------------------------------------------------------------
+This Chapter is a detailed treatment of \textit{unfolding}, a problem in particle physics data analysis that has been a primary focus of my Ph.D. research.
+It will introduce the problem and why it is important in LHC physics, then illustrate conventional solutions that have been in use for many years.
+Then it will turn to AI/ML based unfolding methods, highlighting a few methods that I played a role in developing.
+These methods enable very high dimensional cross section measurements with many downstream physics applications.
+The Chapter closes with an overview of the \Omnifold method.
+This method is applied to experimental data to produce such a high dimensional cross section measurement in \Cref{ch:zjets}.
 
-\section{Unfolding as an Inverse Problem}
+\section{Introduction to Unfolding}
 \label{sec:unfolding-intro}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. The measurement problem
-%    - We measure detector-level (reco) quantities; we want
-%      particle-level (truth) distributions.
-%    - The detector smears, distorts, and has finite acceptance:
-%        x_reco = R(x_truth) + noise
-%    - Unfolding inverts this: infer p(x_truth) from observed
-%      p(x_reco).  This is an ill-posed inverse problem.
-%
-% 2. Binned unfolding and the response matrix
-%    - Discretize x_truth and x_reco into bins.
-%    - Response matrix R_{ij} = P(reco in bin i | truth in bin j).
-%    - Estimated from simulation; direct matrix inversion is
-%      numerically unstable (amplifies statistical fluctuations).
-%    - Regularization is required.
-%
-% 3. Iterative Bayesian Unfolding (IBU / D'Agostini)
-%    - Apply Bayes' theorem iteratively:
-%        P(truth_j | reco_i) updated each iteration.
-%    - Stopping criterion = regularization (early stopping).
-%    - Widely used in HEP (RooUnfold); well understood.
-%    - Limitations:
-%        a) Binned → loses information, requires choice of binning.
-%        b) Curse of dimensionality: multi-D unfolding is very costly.
-%        c) Observable-by-observable: must redo for each quantity.
-%    - These limitations motivate the AI-based approaches below.
+\section{Binned Unfolding Methods}
+\label{sec:binned-unfolding-methods}
 
-\section{AI-Based Unfolding: Unbinned and High-Dimensional}
+\section{Unbinned and High-Dimensional Unfolding}
 \label{sec:ai-unfolding-motivation}
 
 % ---------------------------------------------------------------
