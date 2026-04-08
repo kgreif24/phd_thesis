@@ -12,6 +12,43 @@ This method is applied to experimental data to produce such a high dimensional c
 \section{Introduction to Unfolding}
 \label{sec:unfolding-intro}
 
+The detectors used in particle physics experiments are imperfect instruments.
+They introduce non-trivial distortions into every observable they record, and precise measurements must account for these distortions.
+There is one important exception: when a measurement is performed in sufficiently coarse bins such that the bin widths are much larger than the detector resolution, the detector response matrix (see \Cref{sec:binned-unfolding-methods}) is nearly diagonal and its effect can safely be neglected.
+Outside of this regime, two broad strategies have emerged for treating the detector response.
+
+The first is \textit{forward folding}.
+In this approach, theoretical predictions are expressed as fully exclusive particle-level predictions, specifying for example the four-momenta of all long-lived particles that interact with the detector.
+These predictions are then passed through a simulation of the detector response and compared to the raw experimental data in detector space.
+The second strategy is \textit{unfolding}.
+Rather than folding theory into detector space, statistical methods are used to construct an approximate inversion of the detector response, which is then applied to the data~\cite{Cowan:2002in}.
+The result is a measurement at the particle level that can be compared directly to theoretical predictions without any further reference to the detector simulation.
+Both approaches require access to an accurate detector simulation, which underpins either the forward-folded theory prediction or the response inversion.
+
+The two strategies carry distinct advantages and disadvantages.
+Forward folding is strictly more precise.
+Because unfolding inverts the detector simulation, the best case is that the detector response is perfectly invertible and no additional uncertainty is introduced; in practice this is rarely true.
+Despite this limitation, unfolding is often worth the added uncertainty.
+Unfolded measurements can be compared directly to any theoretical prediction, including exclusive calculations such as resummed predictions of jet substructure observables, without requiring access to the detector simulation.
+This is a significant practical benefit when the simulation is expensive to run, which is typically the case at ATLAS and CMS, or when it is unavailable for legacy datasets.
+In contrast, forward folding requires the simulation to be re-run for each new theoretical prediction, is difficult to combine across analyses using different detector responses, and is not straightforwardly applicable to non-inclusive theory calculations.
+
+Whether a given analysis uses forward folding or unfolding depends heavily on context.
+Searches for beyond-Standard-Model (BSM) particles almost never unfold.
+Such searches look for coherent shapes in low-statistics regions of phase space, and unfolding would substantially reduce sensitivity; there is also little practical motivation since well-established procedures exist within the experimental collaborations for re-interpreting searches via forward folding.
+Among Standard Model measurements, unfolding is used in roughly one third of published ATLAS and CMS results, as illustrated in \Cref{fig:paper-citations}.
+Extractions of SM parameters such as the top quark or Higgs boson masses typically do not unfold, while differential cross section measurements typically do.
+This picture is complicated by the fact that some unfolded measurements are not described as such explicitly.
+The Simplified Template Cross Section (STXS) framework used in ATLAS and CMS Higgs measurements, for example, is an instance of profile likelihood unfolding (see \Cref{sec:binned-unfolding-methods}), but is rarely labeled as such in publications~\cite{Berger:2019wnu}.
+In summary, unfolding occupies a niche but important role in the LHC physics program, and is essential for data preservation and legacy comparisons to theory.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/ch5/paper_citations.png}
+    \caption{Number of citations of ATLAS and CMS publications, broken down by whether the analysis uses unfolding or forward folding.}
+    \label{fig:paper-citations}
+\end{figure}
+
 \section{Binned Unfolding Methods}
 \label{sec:binned-unfolding-methods}
 
