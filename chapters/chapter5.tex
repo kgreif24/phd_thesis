@@ -22,14 +22,28 @@ In this case the data and theoretical predictions are said to exist at \textit{d
 The second strategy is \textit{unfolding}.
 Instead of passing the theoretical preedictions through a detector simulation, statistical methods are used to construct an approximate inversion of the detector response, which is then applied to the data~\cite{Cowan:2002in}.
 This removes detector effects from the measurement so that it can directly compared to theoretical predictions without passing the predictions through the detector simulation.
+This process of removing distortions is called \textit{deconvolution} in other fields, since one can think of detector effects as the convolution of a noise function with the spectrum of interest
 In the case that the unfolding adjusts only for detector distortions, the cross section measurement is said to exist at \textit{particle level}, since it makes a claim about the configuration of final state particles before interaction with the detector.
 Some unfolding applications additionally account for the distortions produced by the parton shower and hadronization processes (see \Cref{ch:qcd}).
 In this case the cross section measurement is said to exist at \textit{parton level}, since it makes a claim about the configuration of partons produced in the underlying hard scatter.
 Both of these are unfolding and the methods discussed in this chapter apply to both.
 
+In practice detector distortions are not the only effects that must be considered when unfolding.
+A complete list is:
+\begin{enumerate}[label={(\arabic*)}]
+    \item Acceptance and efficiency: particles produced may not be measured.
+    \item Detector noise: particles measured may not be from real particles, at least not the desired particles (e.g. fakes) within a fiducial volume (migrating into acceptance).
+    \item Background processes: if one wants to measure the differential cross section of a particular process, then you may want to subtract the contributions from background processes.
+    \item Combinatorics: if there are $n$ particles and you want to measure the properties of a particular order (e.g. leading $p_T$), the detector effects can change the order.
+    \item Detector distortions: the detector response introduces bias and resolution effects.
+\end{enumerate}
+The unfolding in a well-structure measurement will primarily have to deal with (5).
+For the measurement presented in \Cref{ch:zjets}, item (3) is dealt with but is a very sub-leading effect, and items (1,2,4) are irrelevant.
+This is not generally the case for all particle physics measurements, but for the purposes of this thesis those items will be ignored as irrelevant effects.
+
 Forward folding and unfolding are both actively used in cross section measurements an have distinct advantages and disadvantages.
 Forward folding is strictly more precise than unfolding because unfolding methods will always incur additional systematic uncertainties.
-These may be very sub-leading in which case the precision of both approaches is equivalent, but the unfolding approach will never be more accurate than forward folding\footnote{This claim is mostly true, but unfolded measurements can be more precise than forward folding if unfolding removes the need for some systematic uncertainties. This is sometimes the case for theoretical modeling uncertainties, where the difference between two MC generators is understood as an uncertainty for detector level spectra but only an arbitrary choice of prior for unfolded spectra. This is something of a philosophical point regarding modeling uncertainties. In my opinion if an uncertainty is removed by unfolding this is good evidence that the uncertainty was not well-motivated to begin with.}.
+These may be very sub-leading in which case the precision of both approaches is equivalent, but the unfolding approach will never be more accurate than forward folding\footnote{This claim is mostly true, but unfolded measurements can be more precise than forward folding if unfolding removes the need for some systematic uncertainties. This is sometimes the case for theoretical modeling uncertainties, where the difference between two MC generators is understood as an uncertainty for detector level spectra but only an arbitrary choice of prior for unfolded spectra. This ambiguity stems from the fact that modeling uncertainties are not true systematic uncertainties with a nuisance parameter that can be varied. Whether or not they should be included in a given context is often a somewhat philosophical question.}.
 Despite this limitation, unfolding is often worth the added uncertainty for a few reasons which are worth spelling out in detail:
 
 \begin{itemize}
