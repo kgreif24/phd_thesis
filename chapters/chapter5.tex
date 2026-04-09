@@ -126,8 +126,28 @@ The posterior weights are used to redistribute the observed detector-level count
 Because the number of iterations controls how far the estimate departs from the simulation prior, stopping the iteration early acts as the regularization mechanism in IBU.
 Few iterations keep the result close to the prior corresponding to high regularization (high bias, low variance), while many iterations approach the maximum likelihood solution and zero regularization (low bias, high variance).
 
+\subsection{Profile Likelihood Unfolding}
+\label{sec:plu}
+
+A second class of binned unfolding methods is based on profile likelihood fitting.
+Rather than iteratively redistributing detector-level counts, these methods construct an explicit statistical model for the observed data in which the truth-level bin contents are free parameters.
+The response matrix enters as a linear transformation relating the truth-level parameters to the expected detector-level yields, and the measurement is obtained by maximizing the likelihood of the observed data over the truth-level parameters.
+
+The principal advantage of this approach is that systematic uncertainties are incorporated directly into the fit.
+Each source of systematic uncertainty is represented by a nuisance parameter in the likelihood, which is then simultaneously constrained by the data together with the signal parameters.
+This means that the impact of systematic uncertainties on the unfolded result is determined in a statistically coherent way, without the need for the separate uncertainty propagation steps required by IBU.
+The profile likelihood approach is also naturally suited to measurements where background processes must be estimated from data in a control region, since the background normalization can be treated as an additional nuisance parameter.
+
+The main drawback is that regularization is substantially more difficult than in IBU.
+The likelihood surface over many truth-level bin parameters can be poorly constrained when bins are narrow relative to the detector resolution, and there is no established iterative stopping criterion analogous to the one used in IBU.
+In practice, profile likelihood unfolding is most effective when broad bins are used so that the response matrix is nearly diagonal and the fit is well-conditioned.
+This limits the achievable resolution of the measurement compared to methods with more flexible regularization.
+
+Profile likelihood unfolding is becoming increasingly common in LHC analyses.
+A prototypical recent example is the CMS measurement of $tZ$ associated production~\cite{CMS:2024mke}, which uses a profile likelihood fit to extract differential cross sections while simultaneously constraining the dominant systematic uncertainties in situ.
+As noted in \Cref{sec:unfolding-intro}, the STXS framework used across ATLAS and CMS Higgs measurements is another instance of this approach, demonstrating how widely the method has been adopted even when it is not explicitly described as unfolding.
+
 Reviews of binned unfolding methods in the context of high-energy physics can be found in Refs.~\cite{Cowan:2002in, Blobel:2011fih}.
-IBU is the only binned method directly relevant to this thesis so other methods are not discussed in detail.
 All of the above equations can be used to unfold multi-dimensional histograms by unrolling the histograms and constructing a response matrix with a hierarchical structure.
 This approach however is delicate, and though it has been applied to measurements in up to three dimensions~\cite{CMS:2024mlf} it rapidly becomes impractical as the number of dimensions grows.
 This is due to the curse of dimensionality, where the number of bins in a histogram grows exponentially with the number of dimensions making populating the bins of a high dimensional histogram intractable.
