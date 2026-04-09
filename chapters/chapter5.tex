@@ -73,6 +73,62 @@ In summary, unfolding occupies a niche but important role in the LHC physics pro
 \section{Binned Unfolding Methods}
 \label{sec:binned-unfolding-methods}
 
+Most cross section measurements report results as bin counts in histograms.
+In this context, unfolding can be posed as a concrete inference problem: given a detector-level histogram and a sample of simulated events for which both the truth-level and detector-level configurations are known, infer the truth-level histogram.
+The simulated events are used to construct a \textit{response matrix} that encodes how events migrate between bins at truth level and bins at detector level.
+
+More formally, detector effects acting on a binned histogram can be modeled by the system of linear equations
+\begin{align}
+\label{eq:foldingequation}
+\left(\textbf{R}\cdot (\textbf{t}\odot \textbf{c})\right)\odot 1/\textbf{f}+\textbf{b}=\textbf{d}\,,
+\end{align}
+where bold letters denote vectors or matrices, $\cdot$ is the usual matrix product, $\odot$ is the Hadamard (component-wise) product, and division is defined component-wise.\footnote{An equivalent way to write \Cref{eq:foldingequation} is $\left(\sum_{i}R_{ij}\,t_i\,c_i\right)/f_j+b_j=d_j$, where $i$ and $j$ are indices for the truth-level and detector-level bins, respectively.}
+Here $\textbf{t}$ is the particle-level distribution, $\textbf{d}$ is the detector-level distribution, $\textbf{b}$ is the background contribution at detector level, and $\textbf{R}$ is the response matrix.
+The correction factors $\textbf{c}$ account for events whose particle-level configuration passes the particle-level selection but whose detector-level configuration fails the detector-level selection (efficiency and acceptance losses corresponding to item (1) in \Cref{sec:unfolding-intro}).
+The fake factors $\textbf{f}$ account for the inverse: events whose detector-level configuration passes the detector-level selection but whose particle-level configuration does not, corresponding to item (2).
+
+The maximum likelihood solution to \Cref{eq:foldingequation} is
+\begin{align}
+\label{eq:unfolding}
+\textbf{t}_\text{measured} = \textbf{R}^{-1}\left( (\textbf{d}-\textbf{b})\odot \textbf{f}\right)\odot 1/\textbf{c}.
+\end{align}
+
+In practice this direct matrix inversion is often not useful.
+The response matrix $\textbf{R}$ is frequently ill-conditioned, meaning that its smallest singular values are close to zero.
+Matrix inversion then amplifies statistical fluctuations in the detector-level histogram $\textbf{d}$ by a factor proportional to the condition number of $\textbf{R}$, producing a truth-level estimate with very large variance.
+Equivalently, the maximum likelihood solution can be highly unstable: small changes in the observed data lead to large and unphysical oscillations in the inferred spectrum.
+Most binned unfolding methods address this by deliberately injecting a small bias into the solution in order to reduce the variance, a procedure known as \textit{regularization}.
+The residual bias introduced by regularization must then be estimated and propagated as a systematic uncertainty on the final result.
+
+\subsection{Iterative Bayesian Unfolding}
+\label{sec:ibu}
+
+The most widely used binned unfolding method in high-energy physics is \textit{Iterative Bayesian Unfolding} (IBU)~\cite{DAgostini:1994fjx}, also known as Lucy-Richardson deconvolution in other fields~\cite{Lucy:1974yx, Richardson:1972}.
+IBU is an expectation-maximization (EM) algorithm~\cite{Shepp:1982}.
+For clarity, the derivation below assumes $\textbf{b}=\textbf{0}$ and $\textbf{f}=\textbf{c}=\textbf{1}$, so that the folding equation reduces to $\textbf{R}\cdot\textbf{t} = \textbf{d}$.
+
+The IBU estimate at iteration $n$ is
+\begin{align}
+t_i^{(n)}&=\sum_j \Pr(t_i|d_j)\, d_j \label{eq:ibu1}\\
+&=\sum_j \frac{\Pr(d_j|t_i)\,\Pr^{(n)}(t_i)}{\sum_{i'} \Pr(d_j|t_{i'})\,\Pr^{(n)}(t_{i'})}\, d_j \label{eq:ibu2}\\
+&=\sum_j \frac{R_{ji}\,\Pr^{(n)}(t_i)}{\sum_{i'} R_{ji'}\,\Pr^{(n)}(t_{i'})}\, d_j, \label{eq:ibu3}
+\end{align}
+where $\Pr^{(n)}(t_i) \propto t_i^{(n-1)}$ is the prior on the truth-level bin $i$ at iteration $n$, updated at each step using the estimate from the previous iteration.
+The prior for the first iteration is taken from simulation, $\Pr^{(0)}(t_i) \propto t_i^{(0)}$.
+It has been shown that as $n \to \infty$ the IBU estimate converges to the maximum likelihood estimator~\cite{Shepp:1982}.
+
+The connection to the EM algorithm is explicit in the structure of these equations.
+The \textit{expectation step} (E-step) is the computation in \Cref{eq:ibu2}: holding the current prior $\Pr^{(n)}(t_i)$ fixed, one calculates the posterior probability $\Pr(t_i | d_j)$ that a detector-level event in bin $j$ originated from truth-level bin $i$, using Bayes' theorem with the response matrix elements $R_{ji} = \Pr(d_j | t_i)$ as the likelihood.
+The \textit{maximization step} (M-step) is the sum in \Cref{eq:ibu1} and \Cref{eq:ibu3}: the posterior weights are used to redistribute the observed detector-level counts $d_j$ back to truth-level bins, yielding the updated estimate $t_i^{(n)}$, which then serves as the prior for the next iteration.
+Because the number of iterations controls how far the estimate departs from the simulation prior, stopping the iteration early acts as the regularization mechanism in IBU: few iterations keep the result close to the prior (high bias, low variance), while many iterations approach the maximum likelihood solution (low bias, high variance).
+
+Reviews of binned unfolding methods in the context of high-energy physics can be found in Refs.~\cite{Cowan:2002in, Blobel:2011fih}.
+IBU is the only binned method directly relevant to this thesis, so other methods are not discussed in detail.
+Binned unfolding can be extended beyond one-dimensional histograms by unrolling multi-dimensional histograms and response matrices into one-dimensional vectors and matrices.
+This approach has been applied to measurements in up to three dimensions~\cite{CMS:2024mlf}, but it rapidly becomes impractical as the number of dimensions grows.
+The number of bins scales exponentially with the number of observables, making it impossible to populate the response matrix with sufficient simulation.
+This fundamental limitation, known as the curse of dimensionality, is one of the primary motivations for unbinned unfolding methods, which are the subject of the next section.
+
 \section{Unbinned and High-Dimensional Unfolding}
 \label{sec:ai-unfolding-motivation}
 
