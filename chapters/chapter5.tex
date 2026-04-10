@@ -151,36 +151,43 @@ See Ref.~\cite{Collaboration:2944725} for an example of relatively high-dimensio
 \section{Unbinned and High-Dimensional Unfolding}
 \label{sec:ai-unfolding-motivation}
 
-The binned methods of \Cref{sec:binned-unfolding-methods} have been the workhorses of unfolding at the LHC for decades, but they carry structural limitations that motivate a different approach.
-This section describes those limitations, explains how unbinned and high-dimensional unfolding addresses them, and surveys the experimental measurements that have applied these methods to date.
+The binned methods of \Cref{sec:binned-unfolding-methods} have been used in particle physics for decades but have limitations that bottleneck the flexibility of cross section measurements.
+This section motivates adopting unbinned and high-dimensional unfolding techniques and surveys existing experimental applications.
 
 \subsection{Motivation}
 \label{sec:unbinned-motivation}
 
-Two related but distinct limitations of binned unfolding motivate the pursuit of unbinned, high-dimensional methods.
+There are three key challenges of the binned unfolding methods, all of which can be addressed by unbinned and high-dimensional unfolding.
+First, with binned methods the binning must be fixed before the analysis is complete and cannot be revised without introducing bias.
+A binning optimized for one downstream application of the measurement will be suboptimal for another.
+This is particularly relevant if one wishes to compute statistical moments of measured distributions, since binning introduces artifacts that will bias the result.
+Unbinned unfolding avoids all of this by allowing the binning to be adjusted post-hoc or avoided entirely in the case of computing statistical moments.
+This trick will be used extensively in \Cref{ch:zjets}.
+Note that unbinned but low-dimensional unfolding methods have been proposed~\cite{Lindemann:1995ut, Aslan:2003vu, Glazov:2017vni}, as well as methods that target statistical moments directly~\cite{Desai:2024yft}.
 
-The first is the choice of binning itself.
-Binning must be fixed before the analysis is complete and cannot be revised after unblinding without introducing bias.
-A binning optimized for one physics question will be suboptimal for another.
-Beyond convenience, binning introduces artifacts into statistical moments of distributions: the finite bin width smears out structures at scales below the bin size, and the bin boundaries impose an arbitrary discretization on what is fundamentally a continuous measurement.
-Unbinned unfolding avoids all of this by operating at the level of individual events, producing a per-event weight or a generative model of the truth-level distribution that can be projected onto any observable or binning after the fact.
-Unbinned but low-dimensional unfolding methods have been proposed~\cite{Lindemann:1995ut, Aslan:2003vu, Glazov:2017vni}, as well as methods that target statistical moments directly~\cite{Desai:2024yft}.
-
-The second limitation is dimensionality.
+The second challenge is dimensionality.
 Conventional differential cross section measurements report a spectrum in a single observable, or at most two or three in a double or triple differential measurement.
-As discussed in \Cref{sec:binned-unfolding-methods}, extending binned unfolding to more dimensions is impractical beyond three due to the curse of dimensionality: the number of bins grows exponentially with the number of observables, and the amount of simulation needed to populate the response matrix becomes intractable.
-High-dimensional unfolding removes this ceiling.
-By operating on continuous event representations rather than histogram bins, and by relying on machine learning methods that are well-suited to high-dimensional data, these approaches enable simultaneous measurements of many observables in a single analysis.
-This substantially increases the scientific value of a measurement: a single high-dimensional result implicitly encodes many individual one- and two-dimensional projections, can constrain multiple theoretical parameters at once, and is far more useful for downstream applications such as EFT fits or hadronization model tuning.
-High-dimensional unfolding is necessarily unbinned; the two properties are inseparable in practice.
+As discussed in \Cref{sec:binned-unfolding-methods}, extending binned unfolding to more dimensions is impractical beyond three due to the curse of dimensionality.
+High-dimensional unfolding removes this ceiling and allows for measurements of much more highly differential cross sections.
+In practice this requires the unfolding be unbinned, and rely on machine learning methods since they are a natural tool for processing high-dimensional data.
 
-The most ambitious version of this program is to extend the measurement to the full final-state phase space, unfolding the four-momenta of every particle produced in the collision.
-Because the number of particles is stochastic, this defines a cross section measurement on a variable-dimensional space.
-A single such measurement implicitly contains every infrared-and-collinear-safe observable computable from the final state.
-This is qualitatively different from any measurement that targets a fixed set of observables, however large: it is a permanent, maximally information-preserving record of the collision data at particle level.
-Future theoretical predictions developed years after the measurement can be tested against it without any further reference to the detector.
-Achieving this requires machine learning methods powerful enough to process variable-length sets of particle four-momenta, as well as systematic uncertainties defined at the level of individual particle measurements.
-The latter connection links directly to the bottom-up approach to systematic uncertainties in jet tagging discussed in \Cref{sec:constituent-top-tagging}.
+The third challenge is that low-dimensional unfoldings do not take into account all possible auxiliary features that control the detector response.
+This means that there can be ``hidden variables'' that the unfolding must marginalize over, which can limit the accuracy of the unfolding and increase unfolding uncertainties.
+This is a subtle point, but the takeaway is that high-dimensional unfolding has the capacity to be more accurate than lower dimensional unfolding that can't take all available information into account.
+
+A simple application of high-dimensional unfolding is to extend the length of the list of observables of interest to be anywhere from a handful to several tens.
+This would produce a fixed but high dimensional cross section measurement that can be projected to any input observable to produce a measurement.
+Additionally the correlations between observables would be preserved, so projecting to functions of the input observables is also supported.
+Measurements of many observables can then be accomplished with a single analysis.
+However the most ambitious application of high-dimensional unfolding is to extend the measurement to the full phase space, unfolding the kinematics of every particle measured by the detector.
+This approach is maximally information preserving, in that the primary measurements actually made by the detector are corrected for detector effects rather than individual summary observables.
+Note that because the number of particles produced in collisions is variable, this application defines a cross section measurement on a variable-dimensional space.
+Such a measurement implicitly contains every observable computable from the final state, making the downstream application potential immense.
+Future of observables of interest can be quickly measured and furture theoretical calculations can be quickly compared to data, without the need to conduct a new analysis, which can either be time and resource intensive or impossible if the detector simulation is no longer available.
+Realizing this greatly increased flexibility and physics potential requires two major technical advances: machine learning methods powerful enough to unfold variable-length sets of particle four-momenta, and systematic uncertainties defined at the level of individual particle measurements.
+The machine learning methods described below have already been shown to be capable of unfolding in high and variable dimensions.
+The requirement for systematic uncertainties on individual particles is already satisfied for charged particles but difficult for neutral particles, which is why the measurement in \Cref{ch:zjets} uses charged particles only.
+This also links directly to the bottom-up approach to systematic uncertainties in jet tagging discussed in \Cref{sec:constituent-top-tagging}.
 
 \subsection{Experimental Results}
 \label{sec:unbinned-experimental-results}
