@@ -151,6 +151,62 @@ See Ref.~\cite{Collaboration:2944725} for an example of relatively high-dimensio
 \section{Unbinned and High-Dimensional Unfolding}
 \label{sec:ai-unfolding-motivation}
 
+The binned methods of \Cref{sec:binned-unfolding-methods} have been the workhorses of unfolding at the LHC for decades, but they carry structural limitations that motivate a different approach.
+This section describes those limitations, explains how unbinned and high-dimensional unfolding addresses them, and surveys the experimental measurements that have applied these methods to date.
+
+\subsection{Motivation}
+\label{sec:unbinned-motivation}
+
+Two related but distinct limitations of binned unfolding motivate the pursuit of unbinned, high-dimensional methods.
+
+The first is the choice of binning itself.
+Binning must be fixed before the analysis is complete and cannot be revised after unblinding without introducing bias.
+A binning optimized for one physics question will be suboptimal for another.
+Beyond convenience, binning introduces artifacts into statistical moments of distributions: the finite bin width smears out structures at scales below the bin size, and the bin boundaries impose an arbitrary discretization on what is fundamentally a continuous measurement.
+Unbinned unfolding avoids all of this by operating at the level of individual events, producing a per-event weight or a generative model of the truth-level distribution that can be projected onto any observable or binning after the fact.
+Unbinned but low-dimensional unfolding methods have been proposed~\cite{Lindemann:1995ut, Aslan:2003vu, Glazov:2017vni}, as well as methods that target statistical moments directly~\cite{Desai:2024yft}.
+
+The second limitation is dimensionality.
+Conventional differential cross section measurements report a spectrum in a single observable, or at most two or three in a double or triple differential measurement.
+As discussed in \Cref{sec:binned-unfolding-methods}, extending binned unfolding to more dimensions is impractical beyond three due to the curse of dimensionality: the number of bins grows exponentially with the number of observables, and the amount of simulation needed to populate the response matrix becomes intractable.
+High-dimensional unfolding removes this ceiling.
+By operating on continuous event representations rather than histogram bins, and by relying on machine learning methods that are well-suited to high-dimensional data, these approaches enable simultaneous measurements of many observables in a single analysis.
+This substantially increases the scientific value of a measurement: a single high-dimensional result implicitly encodes many individual one- and two-dimensional projections, can constrain multiple theoretical parameters at once, and is far more useful for downstream applications such as EFT fits or hadronization model tuning.
+High-dimensional unfolding is necessarily unbinned; the two properties are inseparable in practice.
+
+The most ambitious version of this program is to extend the measurement to the full final-state phase space, unfolding the four-momenta of every particle produced in the collision.
+Because the number of particles is stochastic, this defines a cross section measurement on a variable-dimensional space.
+A single such measurement implicitly contains every infrared-and-collinear-safe observable computable from the final state.
+This is qualitatively different from any measurement that targets a fixed set of observables, however large: it is a permanent, maximally information-preserving record of the collision data at particle level.
+Future theoretical predictions developed years after the measurement can be tested against it without any further reference to the detector.
+Achieving this requires machine learning methods powerful enough to process variable-length sets of particle four-momenta, as well as systematic uncertainties defined at the level of individual particle measurements.
+The latter connection links directly to the bottom-up approach to systematic uncertainties in jet tagging discussed in \Cref{sec:constituent-top-tagging}.
+
+\subsection{Experimental Results}
+\label{sec:unbinned-experimental-results}
+
+Despite the technical demands, a growing number of experimental measurements have now been performed using unbinned and high-dimensional unfolding methods.
+\Cref{tab:unbinned-unfolding-measurements} summarizes these results.
+All of them use the \Omnifold algorithm, which is described in detail in \Cref{sec:omnifold}.
+
+\input{tables/unbinned_unfolding_measurements.tex}
+
+The measurements span a range of experiments and final states.
+Three H1 measurements of high-$Q^2$ deep inelastic scattering events~\cite{H1:2021wkz, H1:2023fzk, H1:2024mox} represent the most developed program of unbinned unfolding at a single experiment, building from an initial 8-dimensional result to a 10-dimensional measurement.
+Two STAR jet measurements~\cite{Song:2023sxb, Pani:2024mgy} demonstrate the applicability of these methods in heavy-ion collisions.
+The LHCb result~\cite{LHCb:2022rky} and both ATLAS measurements~\cite{ATLAS:2024xxl, ATLAS:2025qtv} show that unbinned unfolding is beginning to take hold at the LHC.
+The ATLAS $Z$+jets measurement~\cite{ATLAS:2024xxl} is the highest-dimensional published LHC result at 24 dimensions and is discussed extensively in \Cref{ch:zjets}.
+A recent T2K neutrino scattering measurement~\cite{Huang:2025ziq} illustrates that the approach is not limited to collider experiments.
+The ALEPH thrust measurement~\cite{Electron-PositronAlliance:2025nbl} is notable as a reanalysis of archival $e^+e^-$ data, demonstrating how unbinned unfolding enables new physics from legacy datasets.
+
+The current record for the highest-dimensional cross section measurement is held by a preliminary H1 result~\cite{H1:prelim}, which targets the full final-state phase space of high-$Q^2$ DIS events with a variable-dimensional unfolding reaching a few hundred dimensions.
+This is the first measurement of its kind and a proof of concept for the full phase-space program described above.
+The remainder of the measurements in \Cref{tab:unbinned-unfolding-measurements} target fixed sets of observables ranging from 4 to 24 dimensions.
+
+The field is still nascent.
+Only a handful of LHC measurements appear in this table, and many of the results listed are recent publications from 2024 and 2025.
+Given the clear scientific motivation and the rapid maturation of the underlying methods, it is reasonable to expect this landscape to change substantially in the near future.
+
 \section{Review of Existing Methods}
 \label{sec:unfolding-methods}
 
