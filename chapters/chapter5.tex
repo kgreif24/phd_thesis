@@ -96,7 +96,7 @@ The (maximum likelihood) solution to \Cref{eq:foldingequation} is
 In practice this direct matrix inversion is often not useful.
 The response matrix $\textbf{R}$ is frequently ill-conditioned, meaning that its smallest singular values are close to zero.
 Matrix inversion then amplifies statistical fluctuations in the detector-level histogram $\textbf{d}$ by a factor proportional to the condition number of $\textbf{R}$, producing a truth-level estimate with very large variance.
-Put another way the maximum likelihood solution can be highly unstable.
+Put another way the naive algebraic solution to the unfolding problem can be highly numerically unstable.
 Small changes in the detector level histogram (e.g. from statistical fluctuations) lead to large and unphysical oscillations in the unfolded histogram.
 Most binned unfolding methods address this by deliberately injecting a small bias into the solution in order to reduce the variance, a procedure known as \textit{regularization} with conceptual ties to the bias-variance tradeoff discussed in \Cref{sec:ml-overview}.
 In HEP applications this bias is typically estimated and propagated as a systematic uncertainty on the final result.
@@ -105,13 +105,42 @@ A common feature of all methods is that they do not scale beyond unfolding a few
 This is due to the curse of dimensionality, where the number of bins in a histogram grows exponentially with the number of dimensions making populating the bins of a high dimensional histogram intractable.
 The inability of binned unfolding methods to scale to high dimensions is one motivation for unbinned unfolding, which will be discussed in the next Section.
 
+\subsection{Profile Likelihood Unfolding}
+\label{sec:plu}
+
+Profile likelihood unfolding and its variants replace the naive matrix inversion solution with a likelihood model built around Poisson bin counts.
+\begin{equation}
+    \mathcal{L}(\textbf{t} | \textbf{d}) = \prod_{j=1}^{N_d} \frac{e^{-\lambda_j}\lambda_j^{d_j}}{d_j!}
+    \label{eq:unfolding_poisson_likelihood}
+\end{equation}
+where $\lambda_j = \sum_{i=1}^{N_t} R_{ji} t_i$ is the expected detector-level yield for bin $j$, and $N_d$ and $N_t$ are the number of detector-level and truth-level bins, respectively.
+This replaces the linear system in \Cref{eq:unfolding} with a non-linear system that can be solved numerically.
+More specifically if the bin counts are sufficiently large that the errors are approximately Gaussian then the log-likelihood becomes a $\chi^2$.
+Note that although there is no explicit inversion of the response matrix, if the response matrix is ill-conditioned then there are directions in $\textbf{t}$ where the likelihood is essentially flat at the same numerical issues can result.
+This is why additional regularization of the likelihood is often required.
+See for example Ref.~\cite{Tikhonov:1963}.
+
+The principal advantage of this approach is that systematic uncertainties can be incorporated directly into the unfolding.
+Each source of systematic uncertainty is represented by a nuisance parameter in the likelihood, which is then simultaneously constrained by the data together with the bin counts of the truth-level histogram.
+This avoids the need to propagate systematic uncertainties by re-running the unfolding as is done in measurements performed with the IBU method in the next section.
+The normalization of irreducible backgrounds can also be treated as a nuisance parameter and included in the unfolding.
+The main drawback is that the regularization, though principled, can be delicate to tune in practice.
+A common fix to these issues is to simply use coarser bins, so the response matrix is better conditioned but the measurement loses resolution.
+
+Profile likelihood unfolding is becoming increasingly common in LHC analyses.
+See for example Ref.~\cite{CMS:2024mke} or any Higgs boson measurements within the STXS framework, which is a prominent example of profile likelihood unfolding as noted in \Cref{sec:unfolding-intro}.
+See Ref.~\cite{Collaboration:2944725} for an example of relatively high-dimensional profile likelihood unfolding with an explicit regularization term added to the likelihood.
+
 \subsection{Iterative Bayesian Unfolding}
 \label{sec:ibu}
 
-The most widely used binned unfolding method in HEP is \textit{Iterative Bayesian Unfolding} (IBU)~\cite{DAgostini:1994fjx}, also known as Lucy-Richardson deconvolution in other fields~\cite{Lucy:1974yx, Richardson:1972}.
-IBU is an iterative expectation-maximization (EM) algorithm.
+Probably the most widely used binned unfolding method in HEP is \textit{Iterative Bayesian Unfolding} (IBU)~\cite{DAgostini:1994fjx}, also known as Lucy-Richardson deconvolution in other fields~\cite{Lucy:1974yx, Richardson:1972}.
+IBU is an expectation-maximization (EM) algorithm, where a likelihood over the bin counts in both the dector-level and truth-level histograms is approximated with an expectation value (expectation step) and then maximized (maximization step).
+Note the expectation step is required because we don't know the truth-level bin counts by construction.
+Instead we have a prior furnished by MC simulation that is iteratively updated, which is why the method is referred to as Bayesian even though it is attempting to maximize a likelihood.
 For clarity, the equations below assume $\textbf{b}=\textbf{0}$ and $\textbf{f}=\textbf{c}=\textbf{1}$, so that the folding equation reduces to $\textbf{R}\cdot\textbf{t} = \textbf{d}$.
 
+Here the solution to one iteration of the expectation-maximization process will just be quoted without derivation.
 The IBU estimate at iteration $n$ is
 \begin{align}
 t_i^{(n)}&=\sum_j \Pr(t_i|d_j)\, d_j \label{eq:ibu1}\\
@@ -124,29 +153,15 @@ It has been shown that as $n \to \infty$ the IBU estimate converges to the maxim
 
 The EM algorithm structure can be read off from these equations.
 First, in \Cref{eq:ibu2} the current prior $\Pr^{(n)}(t_i)$ is held fixed and one calculates the posterior probability $\Pr(t_i | d_j)$ that a detector-level event in bin $j$ originated from truth-level bin $i$, using Bayes' theorem with the response matrix elements $R_{ji} = \Pr(d_j | t_i)$ as the likelihood.
-This is the expectation step.
-The maximization step corresponds to the sum in \Cref{eq:ibu1} and \Cref{eq:ibu3}.
+This is the expectation step, since the method is calculating the expectation value of latent observables (how the events in bin $j$ of the detector-level histogram split across the truth-level bin $i$) given the current parameters $t_i^{(0)}$ and observations $d_j$.
+The maximization step corresponds to the sum over $j$ and multiplication of the posterior probability by the detector-level bin counts $d_j$.
 The posterior weights are used to redistribute the observed detector-level counts $d_j$ back to truth-level bins, yielding the updated estimate $t_i^{(n)}$, which then serves as the prior for the next iteration.
 Because the number of iterations controls how far the estimate departs from the simulation prior, stopping the iteration early acts as the regularization mechanism in IBU.
 Few iterations keep the result close to the prior corresponding to high regularization (high bias, low variance), while many iterations approach the maximum likelihood solution and zero regularization (low bias, high variance).
 
-\subsection{Profile Likelihood Unfolding}
-\label{sec:plu}
-
-In profile likelihood unfolding the bin counts of the truth-lvel histogram are the parameters of interest in a binned likelihood fit to the detector-level histogram.
-The response matrix enters as a linear transformation relating the truth-level parameters to the expected detector-level yields, and the measurement is obtained by maximizing the likelihood of the observed data over the truth-level parameters.
-
-The principal advantage of this approach is that systematic uncertainties are incorporated directly into the unfolding.
-Each source of systematic uncertainty is represented by a nuisance parameter in the likelihood, which is then simultaneously constrained by the data together with the bin counts of the truth-level histogram.
-This avoids the need to propagate systematic uncertainties by re-running the unfolding as is done in measurements performed with IBU.
-The profile likelihood approach is also naturally suited to measurements where background processes must be estimated from data in a control region, since the background normalization can be treated as an additional nuisance parameter.
-The main drawback is that profile likelihood unfolding typically has no explicit regularization.
-This makes the maximization of the likelihood numerically unstable for response matrices with large off diagonal entries.
-In practice this means using profile likelihood unfolding typically requires bin widths that are much wider than the detector resolution.
-
-Profile likelihood unfolding is becoming increasingly common in LHC analyses.
-See for example Ref.~\cite{CMS:2024mke} or any Higgs boson measurements within the STXS framework, which is a prominent example of profile likelihood unfolding as noted in \Cref{sec:unfolding-intro}.
-See Ref.~\cite{Collaboration:2944725} for an example of relatively high-dimensional profile likelihood unfolding with an explicit regularization term added to the likelihood.
+IBU is commonly used in HEP because it is flexible and easily interpretable.
+Best practices for choosing when to stop the iterations have been documented and implemented in HEP specific software packages~\cite{Brenner:2019lmf}.
+IBU is often the fastest and easiest way to get from detector-level to truth-level spectra.
 
 \section{Unbinned and High-Dimensional Unfolding}
 \label{sec:ai-unfolding-motivation}
@@ -192,25 +207,16 @@ This also links directly to the bottom-up approach to systematic uncertainties i
 \subsection{Experimental Results}
 \label{sec:unbinned-experimental-results}
 
-Despite the technical demands, a growing number of experimental measurements have now been performed using unbinned and high-dimensional unfolding methods.
-\Cref{tab:unbinned-unfolding-measurements} summarizes these results.
-All of them use the \Omnifold algorithm, which is described in detail in \Cref{sec:omnifold}.
-
 \input{tables/unbinned_unfolding_measurements.tex}
 
-The measurements span a range of experiments and final states.
-Three H1 measurements of high-$Q^2$ deep inelastic scattering events~\cite{H1:2021wkz, H1:2023fzk, H1:2024mox} represent the most developed program of unbinned unfolding at a single experiment, building from an initial 8-dimensional result to a 10-dimensional measurement.
-Two STAR jet measurements~\cite{Song:2023sxb, Pani:2024mgy} demonstrate the applicability of these methods in heavy-ion collisions.
-The LHCb result~\cite{LHCb:2022rky} and both ATLAS measurements~\cite{ATLAS:2024xxl, ATLAS:2025qtv} show that unbinned unfolding is beginning to take hold at the LHC.
-The ATLAS $Z$+jets measurement~\cite{ATLAS:2024xxl} is the highest-dimensional published LHC result at 24 dimensions and is discussed extensively in \Cref{ch:zjets}.
-A recent T2K neutrino scattering measurement~\cite{Huang:2025ziq} illustrates that the approach is not limited to collider experiments.
+A growing number of experimental measurements have now been performed using unbinned and high-dimensional unfolding methods.
+\Cref{tab:unbinned-unfolding-measurements} summarizes these results.
+All of them use the \Omnifold algorithm, which is described in detail in \Cref{sec:omnifold}.
+The measurements span a range of collision systems, inlcuding $pp$, $ep$, $e^+e^-$, and neutrino scattering, illustrating that these methods are general purpose and not only for use in LHC experiments.
 The ALEPH thrust measurement~\cite{Electron-PositronAlliance:2025nbl} is notable as a reanalysis of archival $e^+e^-$ data, demonstrating how unbinned unfolding enables new physics from legacy datasets.
-
 The current record for the highest-dimensional cross section measurement is held by a preliminary H1 result~\cite{H1:prelim}, which targets the full final-state phase space of high-$Q^2$ DIS events with a variable-dimensional unfolding reaching a few hundred dimensions.
 This is the first measurement of its kind and a proof of concept for the full phase-space program described above.
 The remainder of the measurements in \Cref{tab:unbinned-unfolding-measurements} target fixed sets of observables ranging from 4 to 24 dimensions.
-
-The field is still nascent.
 Only a handful of LHC measurements appear in this table, and many of the results listed are recent publications from 2024 and 2025.
 Given the clear scientific motivation and the rapid maturation of the underlying methods, it is reasonable to expect this landscape to change substantially in the near future.
 
