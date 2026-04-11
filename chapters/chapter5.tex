@@ -108,14 +108,20 @@ The inability of binned unfolding methods to scale to high dimensions is one mot
 \subsection{Profile Likelihood Unfolding}
 \label{sec:plu}
 
-Profile likelihood unfolding and its variants replace the naive matrix inversion solution with a likelihood model built around Poisson bin counts.
+Profile likelihood unfolding and its variants replace the naive matrix inversion solution with a likelihood model.
+First write the expected detector-level bin counts as a function of the truth-level bin counts,
 \begin{equation}
-    \mathcal{L}(\textbf{t} | \textbf{d}) = \prod_{j=1}^{N_d} \frac{e^{-\lambda_j}\lambda_j^{d_j}}{d_j!}
+    \lambda_j = \sum_i^{N_t} R_{ij} t_i ,
+    \label{eq:unfolding_expected_yield}
+\end{equation}
+with $R_{ij}$ the response matrix element for detector-level bin $j$ given truth-level bin $i$ and $N_t$ the number of truth-level bins.
+Then assuming Poisson distributed bin counts, the log-likelihood is
+\begin{equation}
+    \mathcal{L}(\textbf{t} | \textbf{d}) = \log \prod_{j=1}^{N_d} \frac{e^{-\lambda_j}\lambda_j^{d_j}}{d_j!} = \sum_{j=1}^{N_d} \left( d_j \log \lambda_j - \lambda_j - \log d_j! \right) .
     \label{eq:unfolding_poisson_likelihood}
 \end{equation}
-where $\lambda_j = \sum_{i=1}^{N_t} R_{ji} t_i$ is the expected detector-level yield for bin $j$, and $N_d$ and $N_t$ are the number of detector-level and truth-level bins, respectively.
+where $N_d$ is the number of detector-level bins.
 This replaces the linear system in \Cref{eq:unfolding} with a non-linear system that can be solved numerically.
-More specifically if the bin counts are sufficiently large that the errors are approximately Gaussian then the log-likelihood becomes a $\chi^2$.
 Note that although there is no explicit inversion of the response matrix, if the response matrix is ill-conditioned then there are directions in $\textbf{t}$ where the likelihood is essentially flat at the same numerical issues can result.
 This is why additional regularization of the likelihood is often required.
 See for example Ref.~\cite{Tikhonov:1963}.
