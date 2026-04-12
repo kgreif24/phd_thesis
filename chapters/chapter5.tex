@@ -229,6 +229,86 @@ Given the clear scientific motivation and the rapid maturation of the underlying
 \section{Review of Existing Methods}
 \label{sec:unfolding-methods}
 
+The previous section argued for the value of unbinned, high-dimensional unfolding and surveyed the experimental results that have used it.
+This section reviews the machine learning methods that make it possible.
+Before doing so it is useful to recast the unfolding problem in continuous notation, which exposes the underlying integral equation that all methods must solve and provides a unified framework for comparing them.
+
+\subsection{The Unfolding Integral Equation}
+\label{sec:unfolding-integral-equation}
+
+In the continuous setting, the folding equation of \Cref{eq:foldingequation} becomes
+\begin{align}
+\label{eq:folding-continuous}
+p_{\mathrm{data}}(x) = \int p(x \mid z)\, p_{\mathrm{unfold}}(z)\, dz,
+\end{align}
+where $x$ denotes the detector-level event representation, $z$ the truth-level event representation, $p(x \mid z)$ the detector response (the conditional probability of observing $x$ at detector level given the truth-level configuration $z$), and $p_{\mathrm{data}}(x)$ the observed data distribution.
+The goal of unfolding is to find the truth-level distribution $p_{\mathrm{unfold}}(z)$ such that smearing it through the detector response reproduces the data.
+This is a Fredholm integral equation of the first kind, and it is generically ill-posed: the kernel $p(x \mid z)$ provided by the detector simulation is in practice only a finite sample of simulated events, and the solution $p_{\mathrm{unfold}}$ is not unique without additional constraints.
+
+The EM iteration of IBU solves this equation in the discrete (binned) case.
+The continuous analog of \Cref{eq:ibu2,eq:ibu3} is
+\begin{align}
+\label{eq:ibu-continuous-estep}
+p^{(n)}(z \mid x) = \frac{p(x \mid z)\, p^{(n)}(z)}{\int p(x \mid z')\, p^{(n)}(z')\, dz'}, \quad \text{(E-step)}
+\end{align}
+\begin{align}
+\label{eq:ibu-continuous-mstep}
+p^{(n+1)}(z) = \int p^{(n)}(z \mid x)\, p_{\mathrm{data}}(x)\, dx. \quad \text{(M-step)}
+\end{align}
+The E-step computes the posterior $p^{(n)}(z \mid x)$ — the probability that a detector-level event $x$ originated from truth-level configuration $z$ — using the current prior $p^{(n)}(z)$ and the detector response $p(x \mid z)$ via Bayes' theorem.
+The M-step updates the truth-level distribution by marginalizing over $x$ under the observed data, weighted by the posterior just computed.
+As in the binned case, the prior is initialized from simulation and updated at each iteration, and early stopping provides regularization.
+
+All of the ML-based unfolding methods discussed in this section are performing some version of this EM procedure or are directly solving \Cref{eq:folding-continuous}.
+The key differences between methods reduce to two choices: (1) how the E-step posterior $p(z \mid x)$ is estimated, and (2) what form the truth-level distribution $p(z)$ takes.
+
+\subsection{Direct Methods}
+\label{sec:direct-unfolding-methods}
+
+One class of methods attempts to solve \Cref{eq:folding-continuous} directly, rather than through EM iteration.
+The strategy is to learn a parametric model for the unfolded distribution $q_\phi(z)$ and optimize $\phi$ so that the folded model matches the data.
+This requires a differentiable surrogate for the detector response $p(x \mid z)$, since the true detector simulation is a non-differentiable black box.
+
+\textit{Generative surrogate methods} address this by training a generative model $q_\theta(x \mid z)$ as a differentiable approximation to the detector response.
+With this surrogate in hand, a second generative model $q_\phi(z)$ for the truth-level distribution is trained to maximize the likelihood of the data under the folded model $\int q_\theta(x \mid z)\, q_\phi(z)\, dz$.
+The models $q_\theta$ and $q_\phi$ can be optimized independently in sequence or jointly end-to-end~\cite{Vandegar:2020yvw, Butter:2025via}.
+These methods are conceptually the unbinned generalization of profile likelihood unfolding: rather than fitting truth-level histogram bin counts, one is optimizing the parameters of a generative model for the truth-level distribution.
+They are attractive for their direct formulation and amenability to incorporating systematic uncertainties as nuisance parameters in the likelihood, but optimizing high-dimensional generative models jointly with a surrogate detector can be technically demanding.
+
+An alternative direct approach replaces generative models with likelihood ratio estimation.
+Dividing both sides of \Cref{eq:folding-continuous} by a reference density provided by MC simulation $p_{\mathrm{sim}}(x)$ yields a ratio equation that can be targeted with classifiers via the likelihood ratio trick discussed in \Cref{ch:ml}.
+A novel loss function enforces that the estimated ratios satisfy the integral equation, providing a purely classifier-based route to solving the unfolding problem without EM iteration~\cite{Ore:2026qgp}.
+
+\subsection{Generative Unfolding Methods}
+\label{sec:generative-unfolding-methods}
+
+The larger class of ML unfolding methods performs EM, as in IBU, but replaces the binned response matrix with a learned generative model of the posterior $p(z \mid x)$ in the E-step.
+The connection to \Cref{eq:ibu-continuous-estep} is direct: rather than computing the posterior analytically from a matrix of bin migration probabilities, these methods train a conditional generative model $q_\psi(z \mid x)$ to approximate it.
+Once the posterior is learned, the M-step update of \Cref{eq:ibu-continuous-mstep} follows exactly as in IBU, accumulating the posterior samples or weights over the observed data to produce the updated truth-level estimate.
+
+A range of generative architectures have been studied for the E-step.
+Early work used conditional variational autoencoders and generative adversarial networks~\cite{Datta:2018mwd, Howard:2021pos, Bellagente:2019uyp, Bellagente:2020piv}.
+More recent work has moved to normalizing flows~\cite{Diefenbacher:2023wec, Butter:2024vbx} and diffusion and flow matching models~\cite{Butter:2025mek}, which offer improved expressiveness and training stability.
+The choice of generative model for the posterior is the primary axis of variation across these methods; the underlying EM structure — initialize from simulation, compute a posterior, update the prior, repeat — is common to all of them.
+The specific approaches using diffusion and flow matching are discussed in detail in \Cref{sec:diffusion-unfolding}.
+
+For the M-step, two implementations have been proposed.
+The first uses the posterior samples directly to reweight or augment a MC simulation sample, effectively treating the generative model as a sample from the posterior and using those samples to update the prior~\cite{Backes:2022sph}.
+The second trains a generative model for the updated truth-level distribution $p^{(n+1)}(z)$ using the samples drawn from the posterior, allowing the full truth-level distribution to be represented generatively throughout the iteration~\cite{Butter:2025mek}.
+
+One variant of the generative EM approach forgoes the iterative update entirely and instead treats the unfolding as a fully Bayesian inference problem with a fixed prior.
+In this case the M-step is not performed; the posterior $q_\psi(z \mid x)$ is learned once under the simulation prior and the result is reported as the unfolded distribution~\cite{Acosta:2025shf}.
+This is equivalent to a single E-step and produces an unbiased estimate only if the simulation prior is a good description of the data, but avoids the instability that can arise in iterated generative models.
+
+\subsection{Classifier-Based EM: OmniFold}
+\label{sec:omnifold-preview}
+
+The remaining class of methods performs EM but replaces the generative model for the posterior with likelihood ratio estimation via classifiers.
+This is the approach taken by \Omnifold~\cite{Andreassen:2019cjw} and its variants~\cite{Chan:2023tbf, Zhu:2024drd}.
+Rather than learning $p(z \mid x)$ directly, \Omnifold estimates the ratio $p_{\mathrm{data}}(x) / p_{\mathrm{sim}}(x)$ at detector level and uses it to reweight the simulation prior at truth level, implicitly performing the E- and M-steps of the EM iteration through a pair of classifier training runs per iteration.
+The connection between this reweighting procedure and the EM equations above is made precise in \Cref{sec:omnifold}.
+Given its central role in the experimental measurements reviewed in \Cref{sec:unbinned-experimental-results} and in the $Z$+jets measurement of \Cref{ch:zjets}, a full discussion of \Omnifold is reserved for that dedicated section.
+
 \section{Unfolding with Diffusion and Flow Matching}
 \label{sec:diffusion-unfolding}
 
