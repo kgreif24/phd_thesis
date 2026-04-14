@@ -1117,7 +1117,7 @@ For the top jets, the jet mass is reproduced to within 10\%, which is state-of-t
 \section{Omnifold}
 \label{sec:omnifold}
 
-\Omnifold~\cite{Andreassen:2019cjw} is the unbinned, classifier-based implementation of the EM algorithm for unfolding introduced in \Cref{sec:unfolding-integral-equation}.
+\Omnifold~\cite{Andreassen:2019cjw} is a classifier-based implementation of the EM algorithm.
 It can also be understood as the limit of IBU as the bin width goes to zero.
 Rather than modeling the posterior $p(z \mid x)$ directly with a generative model as in the generative unfolding methods of \Cref{sec:generative-unfolding-methods}, \Omnifold models two likelihood ratios per EM iteration using machine-learned classifiers.
 These furnish per-event reweighting functions $w_n(m)$ defined on the detector-level phase space and $\nu_n(t)$ defined on the truth-level phase space, where $n$ is the EM iteration index.
@@ -1135,16 +1135,16 @@ where $p_{\mathrm{gen}}(t)$ is the truth-level distribution of the MC generator 
 The denominator is the detector-level distribution of the MC simulation reweighted by $\nu^{\mathrm{of}}_{n-1}$.
 In practice this ratio is estimated by training a classifier to distinguish observed data from the reweighted detector-level MC sample.
 The forward mapping between truth-level and detector-level events provided by the simulation $p(m \mid t)$ makes it possible to draw samples from the denominator without evaluating the integral explicitly, since each simulated event already carries a paired truth-level and detector-level configuration.
-Comparing \Cref{eq:omnifold-estep} with the IBU E-step in \Cref{eq:ibu2}, the ratio $w_n(m)$ plays the same role as $\Pr(d_j \mid t_i)$ in the binned case, with the sum over bins replaced by an integral over the continuous detector-level space.
+Comparing \Cref{eq:omnifold-estep} with the IBU E-step in \Cref{eq:ibu2}, the ratio $w_n(m)$ plays the same role as $d_j$ divided by the denominator with the sum over bins replaced by an integral over the continuous detector-level space.
 
-The M-step computes the corresponding truth-level ratio
+The M-step computes the likelihood ratio at truth-level
 \begin{align}
 \label{eq:omnifold-mstep}
-\nu_n(t) = \frac{\displaystyle\int w_n(m)\, p(m \mid t)\, dm}{\nu^{\mathrm{of}}_{n-1}(t)\, p_{\mathrm{gen}}(t)},
+\nu_n(t) = \frac{\displaystyle\int w_n(m)\, p(m \mid t)\, dm}{\nu^{\mathrm{of}}_{n-1}(t)\, p_{\mathrm{gen}}(t)}.
 \end{align}
-which is the expected value of the detector-level reweighting function $w_n(m)$ under $p(m \mid t)$, normalized by the current prior.
-This expectation again requires the truth-to-detector mapping supplied by the simulation.
-The numerator is the continuous analog of the sum over $j$ in the IBU M-step of \Cref{eq:ibu3}, confirming that \Omnifold is the zero-bin-width limit of IBU.
+The numerator is the expected value of the detector-level reweighting function $w_n(m)$ under $p(m \mid t)$, normalized by the current prior.
+Again draws from this distribution can be obtained without estimating the integral by using the mapping between truth-level and detector-level events provided by the simulation.
+The numerator is the continuous analog of the sum over $j$ in \Cref{eq:ibu1}, showing that \Omnifold is the zero-bin-width limit of IBU.
 In practice $\nu_n(t)$ is estimated by training a second classifier to distinguish reweighted truth-level MC events (carrying the push-forward of $w_n$) from the current prior truth-level MC events.
 
 The prior is then updated via
@@ -1153,7 +1153,8 @@ The prior is then updated via
 \nu^{\mathrm{of}}_n(t) = \nu_n(t)\, \nu^{\mathrm{of}}_{n-1}(t),
 \end{align}
 and the full \Omnifold weight after $N$ iterations is the accumulated product $\nu^{\mathrm{of}}_N(t)$.
-This procedure has been shown to converge to the maximum likelihood solution of the folding equation~\cite{Andreassen:2019cjw}; convergence can also be understood as the zero-bin-width limit of the analogous result for IBU~\cite{Shepp:1982}.
+This procedure has been shown to converge to the maximum likelihood solution of the folding equation in the Appendix of Ref.~\cite{Andreassen:2019cjw}. 
+Alternatively, this can also be understood as the zero-bin-width limit of the analogous arguments for IBU~\cite{Shepp:1982}.
 
 \subsection{Practical Procedure}
 \label{sec:omnifold-procedure}
@@ -1163,7 +1164,8 @@ This procedure has been shown to converge to the maximum likelihood solution of 
     \includegraphics[width=0.85\linewidth]{figures/ch5/omnifold_schematic.pdf}
     \caption{Schematic illustration of the \Omnifold procedure, reproduced from Ref.~\cite{ATLAS:2024xxl} under a CC~BY~4.0 license.
     Two classifiers are trained per EM iteration.
-    Step~1 trains at detector level to reweight MC simulation to data; Step~2 trains at truth level to push those weights back to the truth-level simulation.
+    Step~1 trains at detector level to reweight MC simulation to data.
+    Step~2 trains at truth level to push those weights back to the truth-level simulation.
     The updated weights serve as the prior for the next iteration.
     In the $Z$+jets measurement of \Cref{ch:zjets}, seven iterations are run.}
     \label{fig:omnifold-schematic}
@@ -1177,39 +1179,40 @@ If this is not the first iteration, the MC sample carries weights from the previ
 The classifier furnishes the reweighting function $w_n(m)$ that adjusts the detector-level MC distribution to match the data.
 
 \textbf{Pull to truth level.}
-The detector-level weights $w_n(m)$ are propagated to the truth-level simulation by assigning each truth-level MC event the weight of its paired detector-level counterpart.
+The detector-level weights $w_n(m)$ are propagated to the truth-level simulation by assigning each truth-level MC event the weight of its paired detector-level counterpart\footnote{Events that pass the truth-level event selection but fail the detector-level selection can be assigned the weight of the prior, which is provided by the event generator.}.
 
 \textbf{Step 2.}
 A second classifier is trained to separate the reweighted truth-level MC (signal) from the raw, or previously weighted, truth-level MC (background).
-The events forming signal and background are identical; only their weights differ.
+When training this classifier the events forming signal and background are identical and differ only by their weights.
 The classifier output furnishes $\nu_n(t)$, which is multiplied by all weights from previous iterations to obtain the updated \Omnifold weight $\nu^{\mathrm{of}}_n(t)$ via \Cref{eq:omnifold-prior-update}.
 
 If the desired number of iterations has been reached, the procedure terminates.
 The unfolded result is the truth-level MC simulation together with the final weights $\nu^{\mathrm{of}}_N(t)$.
-If more iterations are required, the updated weights are pushed back to the detector-level simulation and Steps 1 and 2 repeat.
+If more iterations are required, the updated weights are pushed back to the detector-level simulation and Steps 1 and 2 repeat\footnote{Events that pass the detector-level event selection but fail the detector-level selection can be assigned the weight of the prior at this step as well}.
 
 \subsection{Properties}
 \label{sec:omnifold-properties}
 
-Several features of \Omnifold are worth noting.
+Several features of \Omnifold are worth noting:
+\begin{itemize}
+  \item \textbf{Physical consistency.}
+    The output is a reweighted MC simulation, not a set of generated samples.
+    All events therefore satisfy energy and momentum conservation by construction, since they are the output of an MC generator.
+    This is not guaranteed by generative model based approaches, where the generated samples may not lie exactly on the physical manifold.
 
-The output of the unfolding is a reweighted MC simulation, not a set of generated samples.
-All events therefore satisfy energy and momentum conservation by construction, since they are the output of an MC generator.
-This is not guaranteed by generative model based approaches, where the generated samples may not lie exactly on the physical manifold.
+  \item \textbf{Variable-dimensional distributions.}
+    Both Step~1 and Step~2 classifiers operate on event representations at detector and truth level respectively.
+    When the unfolding targets the full final-state phase space, these representations are variable-length particle lists, and a set-processing neural network (see \Cref{ch:ml}) can be used.
+    Crucially, training a set-processing classifier is substantially easier than training a set-conditional set-generative model, which is the alternative in the generative EM approach.
 
-The method handles variable-dimensional distributions naturally.
-Both Step~1 and Step~2 classifiers operate on event representations at detector and truth level respectively.
-When the unfolding targets the full final-state phase space, these representations are variable-length particle lists, and a set-processing neural network (see \Cref{ch:ml}) can be used.
-Crucially, training a set-processing classifier is substantially easier than training a set-processing generative model, which is the alternative in the generative EM approach.
+  \item \textbf{Flexibility in classifier choice.}
+    In low- to moderate-dimensional fixed-observable tasks, neural networks are not required.
+    Gradient-boosted decision trees are fast to train and achieve comparable performance to neural networks in these cases.
 
-In low- to moderate-dimensional fixed-observable tasks, neural networks are not required.
-Gradient-boosted decision trees are fast to train and achieve comparable performance to neural networks in these cases.
-
-Finally, a note on terminology.
-The case where a single observable is unfolded in an unbinned fashion is called \textit{Unifold}; unfolding a fixed set of several observables is called \textit{Multifold}; and unfolding the full final-state phase space is \textit{Omnifold} in the strict sense (though the name \Omnifold is also used to refer to the algorithm as a whole).
-All existing experimental measurements in \Cref{tab:unbinned-unfolding-measurements}, with the exception of the H1 preliminary result~\cite{H1:prelim}, use Multifold.
+  \item \textbf{Terminology.}
+    The case where a single observable is unfolded in an unbinned fashion is called \textit{Unifold}, unfolding a fixed set of several observables is called \textit{Multifold}, and unfolding the full final-state phase space is \textit{Omnifold} in the strict sense (though the name \Omnifold is also used as an umbrella term to refer to the algorithm as a whole).
+    All existing experimental measurements in \Cref{tab:unbinned-unfolding-measurements}, with the exception of the H1 preliminary result~\cite{H1:prelim}, use Multifold.
+\end{itemize}
 
 \Omnifold is central to this thesis because it has been deployed on experimental ATLAS data to perform a high-dimensional $Z$+jets cross section measurement.
 This measurement is the subject of \Cref{ch:zjets}.
-
-
