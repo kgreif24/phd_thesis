@@ -1,0 +1,126 @@
+% \documentclass[tikz]{standalone}
+% \input{settings.tex}
+
+% \usepackage{amsmath}
+\usetikzlibrary{arrows, shapes.geometric, arrows.meta, shapes, decorations.pathreplacing, fit, patterns, patterns.meta,positioning,calc}
+% \usepackage{tikz} 			% create PostScript and PDF graphics
+
+\definecolor{Rcolor}{HTML}{E99595}
+\definecolor{Gcolor}{HTML}{C5E0B4}
+\definecolor{Gcolor_light}{HTML}{F1F8ED}
+\definecolor{Gcolor_dark}{HTML}{9CB391}
+\definecolor{Bcolor}{HTML}{9DC3E6}
+\definecolor{Ycolor}{HTML}{FFE699}
+\definecolor{Ycolor_light}{HTML}{FFF7DE}
+\definecolor{Ocolor}{HTML}{E67410}
+%\newcommand{\tikznode}[2]{%
+%\ifmmode%
+%\tikz[remember picture,baseline=(#1.base),inner sep=0pt] \node (#1) {$#2$};%
+%\else
+%\tikz[remember picture,baseline=(#1.base),inner sep=0pt] \node (#1) {#2};%
+%\fi}
+
+\tikzstyle{expr} = [rectangle, rounded corners=0.3ex, minimum width=1.5cm, minimum height=1cm, text centered, align=center, inner sep=0, fill=Ycolor, font=\large, draw]
+\tikzstyle{small_cinn} = [double arrow, double arrow head extend=0cm, double arrow tip angle=130, inner sep=0, align=center, minimum width=1.5cm, minimum height=1.7cm, fill=Rcolor, draw]
+\tikzstyle{small_cinn_black} = [small_cinn, minimum height=1.8cm, fill=black]
+\tikzstyle{transformer} = [rectangle, rounded corners, minimum width=6cm, minimum height=2.4cm, font=\large, fill=Gcolor_light, draw]
+\tikzstyle{attention} = [rectangle, rounded corners=0.3ex, minimum width=5.5cm, minimum height=1.2cm, align=center, fill=Gcolor, draw, font=\large]
+\tikzstyle{transformer_huge} = [rectangle, rounded corners, minimum width=1cm, minimum height=1cm, fill=Gcolor]
+\tikzstyle{input} = [rectangle, rounded corners, minimum width=1cm, minimum height=1cm, draw=black]
+\tikzstyle{particle_component} = [rectangle, minimum width = 0.25cm, minimum height=0.25cm, font = \large, fill=Ycolor, rounded corners=0.3ex]
+\tikzstyle{attention_huge} = [rectangle, rounded corners=0.3ex, minimum width=8cm, minimum height=1.2cm, align=center, fill=Gcolor, draw, font=\large]
+\tikzstyle{txt_huge} = [align=center, font=\Huge, scale=2]
+\tikzstyle{txt} = [align=center, minimum height=1cm]
+\tikzstyle{arrow} = [thick,-{Latex[scale=1.0]}, line width=0.2mm, color=black]
+\tikzstyle{line} = [thick, line width=0.2mm, color=black]
+
+\begin{tikzpicture}
+[node distance=0.3cm, scale=0.8, every node/.style={transform shape}]
+\node (particle_1_1) [particle_component]{};
+\node (particle_1_2) [particle_component, below of = particle_1_1]{};
+\node (particle_1_3) [particle_component, below of = particle_1_2]{};
+\node (particle_2_1) [particle_component, right of = particle_1_1, xshift=0.25cm]{};
+\node (particle_2_2) [particle_component, below of = particle_2_1]{};
+\node (particle_2_3) [particle_component, below of = particle_2_2]{};
+\node (and) [txt, right of = particle_2_2, xshift = 0.55cm]{...};
+\node (particle_N_2) [particle_component, right of = and, xshift = 0.55cm]{};
+\node (particle_N_1) [particle_component, above of = particle_N_2]{};
+\node (particle_N_3) [particle_component, below of = particle_N_2]{};
+\draw[{Latex[width=0.75mm]}-{Latex[width=0.75mm]}] ([yshift=0.4cm]particle_1_1.west) -- ([yshift=0.4cm]particle_N_1.east);
+\draw [decorate,decoration={brace, mirror}]
+  ([yshift=-0.2cm, xshift=-0.2cm]particle_1_3.south) -- ([yshift=-0.2cm, xshift=0.2cm]particle_N_3.south){};
+\node (N_reco) [txt, above of = and, yshift=0.7cm, xshift=-0.25cm]{$\Ndet$};
+\node (xreco)[txt, below of = N_reco, yshift=-1.8cm]{$\xr \sim p(\xr)$};
+
+\node (Multi_b)[small_cinn_black, below of = and, xshift=-0.2cm, yshift=-2.5cm]{};
+\node (Multi)[small_cinn, above of=Multi_b, yshift=-0.3cm, fill=Bcolor]{Mult.};
+\node (xmult) [txt, right of=Multi, xshift=3.0cm]{$\Npart \sim p_\theta (\Npart|\xr)$};
+
+\node (CFM_b_jet) [small_cinn_black, right of = xmult, xshift=1.9cm, yshift=-1.6cm]{};
+\node (CFM_jet) at (CFM_b_jet) [small_cinn, fill=Gcolor]{Jet};
+
+\node (base_jet_1) [particle_component,left of = CFM_jet, xshift=-1.8cm, fill=Ocolor]{};
+\node (base_jet_2) [particle_component,left of = base_jet_1, fill=Ocolor]{};
+\node (base_jet_3) [particle_component,left of = base_jet_2, fill=Ocolor]{};
+\node (base_jet_4) [particle_component,left of = base_jet_3, fill=Ocolor]{};
+\node (xbasejet)[txt, below of=base_jet_1, yshift=-0.3cm, xshift=-0.3cm]{$z \sim p_{\text{latent}}(z)$};
+
+\node (final_jet_1) [particle_component,right of = CFM_jet, xshift=2.0cm, fill=Ocolor]{};
+\node (final_jet_2) [particle_component,right of = final_jet_1, fill=Ocolor]{};
+\node (final_jet_3) [particle_component,right of = final_jet_2, fill=Ocolor]{};
+\node (final_jet_4) [particle_component,right of = final_jet_3, fill=Ocolor]{};
+\node (xjet)[txt, below of = final_jet_1, xshift=1.1cm, yshift=-0.3cm]{$\Jpart \sim p_\phi(\Jpart|\xr, \Npart)$};
+
+\node (CFM_b) [small_cinn_black, right of = CFM_jet, xshift=5.8cm, yshift=-2.5cm]{};
+\node (CFM) at (CFM_b) [small_cinn]{Const.};
+
+\node (base_node) [txt, left of=CFM, xshift=-9.05cm]{...};
+\node (base_2_2) [particle_component,left of = base_node, xshift=-0.55cm, fill=Ycolor]{};
+\node (base_2_1) [particle_component,above of = base_2_2, fill=Ycolor]{};
+\node (base_2_3) [particle_component,below of = base_2_2, fill=Ycolor]{};
+\node (base_1_2) [particle_component,left of = base_2_2, xshift=-0.25cm, fill=Ycolor]{};
+\node (base_1_1) [particle_component, above of = base_1_2 , fill=Ycolor]{};
+\node (base_1_3) [particle_component, below of = base_1_2, fill=Ycolor]{};
+\node (base_N_2) [particle_component,right of = base_node,xshift = 0.55cm, fill=Ycolor]{};
+\node (base_N_1) [particle_component,above of = base_N_2, fill=Ycolor]{};
+\node (base_N_3) [particle_component,below of = base_N_2, fill=Ycolor]{};
+\node (pgauss) [txt, below of = base_node, yshift=-0.8cm, xshift=-0.3cm]{$z\sim p_\text{latent}(z)$};
+\node (N_reco) [txt, above of = base_node, yshift=0.7cm, xshift=-0.25cm]{$\Npart$};
+\draw [decorate,decoration={brace, mirror}]
+  ([yshift=-0.2cm, xshift=-0.2cm]base_1_3.south) -- ([yshift=-0.2cm, xshift=0.2cm]base_N_3.south){};
+\draw[{Latex[width=0.75mm]}-{Latex[width=0.75mm]}] ([yshift=0.4cm]base_1_1.west) -- ([yshift=0.4cm]base_N_1.east);
+
+\node (final_node) [txt, right of=CFM, xshift=3cm]{...};
+\node (final_2_2) [particle_component,left of = final_node, xshift=-0.55cm, fill=Ycolor]{};
+\node (final_2_1) [particle_component,above of = final_2_2, fill=Ycolor]{};
+\node (final_2_3) [particle_component,below of = final_2_2, fill=Ycolor]{};
+\node (final_1_2) [particle_component,left of = final_2_2, xshift=-0.25cm, fill=Ycolor]{};
+\node (final_1_1) [particle_component, above of = final_1_2 , fill=Ycolor]{};
+\node (final_1_3) [particle_component, below of = final_1_2, fill=Ycolor]{};
+\node (final_N_2) [particle_component,right of = final_node,xshift = 0.55cm, fill=Ycolor]{};
+\node (final_N_1) [particle_component,above of = final_N_2, fill=Ycolor]{};
+\node (final_N_3) [particle_component,below of = final_N_2, fill=Ycolor]{};
+\node (ppart) [txt, below of = final_node, yshift=-0.8cm, xshift=0.4cm]{$\xp \sim p_\psi(\xp|\xr, \Npart, \Jpart)$};
+\node (N_reco2) [txt, above of = final_node, yshift=0.7cm, xshift=-0.25cm]{$\Npart$};
+\draw [decorate,decoration={brace, mirror}]
+  ([yshift=-0.2cm, xshift=-0.2cm]final_1_3.south) -- ([yshift=-0.2cm, xshift=0.2cm]final_N_3.south){};
+\draw[{Latex[width=0.75mm]}-{Latex[width=0.75mm]}] ([yshift=0.4cm]final_1_1.west) -- ([yshift=0.4cm]final_N_1.east);
+
+
+\draw [arrow, color=black] ([yshift=0.1cm,xshift=0.05cm]xreco.south) -- ([yshift=0.1cm]Multi.north);
+\draw [arrow, color=black] ([xshift=0.2cm]Multi.east) -- (xmult.west);
+
+\draw [arrow, color=black] (xreco.east) -- ([xshift=0.1cm]CFM_jet |- xreco.east) -- ([yshift=0.1cm, xshift=0.1cm]CFM_jet.north);
+\draw [arrow, color=black] (xmult.east) -- ([xshift=-0.1cm]CFM_jet |- xmult.east) -- ([yshift=0.1cm, xshift=-0.1cm]CFM_jet.north);
+\draw [arrow, color=black] ([xshift=0.4cm]base_jet_1.east) -- ([xshift=-0.2cm]CFM_jet.west);
+\draw [arrow, color=black] ([xshift=0.2cm]CFM_jet.east) -- ([xshift=-0.4cm]final_jet_1.west);
+
+\draw [arrow, color=black] (xreco.east) -- ([xshift=0.2cm]CFM |- xreco.east) -- ([yshift=0.1cm, xshift=0.2cm]CFM.north);
+\draw [arrow, color=black] (xmult.east) -- (CFM |- xmult.east) -- ([yshift=0.1cm]CFM.north);
+\draw [arrow, color=black] (xjet.east) -- ([xshift=-0.2cm]CFM |- xjet.east) -- ([xshift=-0.2cm,yshift=0.1cm]CFM.north);
+
+\draw [arrow, color=black] ([xshift=1.0cm]base_node.east) -- ([xshift=-0.2cm]CFM.west);
+\draw [arrow, color=black] ([xshift=0.2cm]CFM.east) -- ([xshift=-1.4cm]final_node.west);
+\draw [arrow, color=black] ([xshift=-1.5cm]xmult.south) -- ([xshift=-0.2cm]N_reco.north);
+
+\end{tikzpicture}

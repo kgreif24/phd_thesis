@@ -38,7 +38,7 @@ In the standard denoising diffusion probabilistic model (DDPM) objective, the ge
 \end{equation}
 which is parameterized by a neural network $\mu_\theta$ and a diagonal variance matrix which evolves with time $\sigma_t^2 I$.
 Starting from $p(x_T) = \mathcal{N}(0, I)$, iteratively applying \Cref{eqn:reverse_step} for $t = T, T-1, \ldots, 1$ produces a sample from the learned data distribution.
-The model is trained by maximizing a lower bound on $\log p_\theta(x_0)$, as was the case for VAEs.
+The model is trained by maximizing a lower bound on $\log p_\theta(x_0)$, as was the case for VAEs~\cite{kingma2021variational}.
 The training objective has the same ELBO structure derived in \Cref{sec:vae}, but applied to a hierarchical latent variable model with $T$ latent variables $x_1, \ldots, x_T$:
 \begin{align}
     \log p_\theta(x_0)

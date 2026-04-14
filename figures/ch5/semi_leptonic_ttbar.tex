@@ -1,0 +1,69 @@
+\begin{tikzpicture}[
+        thick,
+        % \ifarxiv 
+        % scale=0.85,
+        % \else
+        scale=0.80,
+        % \fi
+        % Set the overall layout of the tree
+        level/.style={level distance=1.2cm},
+        level 2/.style={sibling distance=1.6cm},
+        level 3/.style={sibling distance=1.2cm}
+    ]
+    \coordinate
+        child[grow=left]{
+            child {
+                node {$g$}
+                % The 'edge from parent' is actually not needed because it is
+                % implicitly added.
+                edge from parent [gluon]
+            }
+            child {
+                node {$g$}
+                edge from parent [gluon]
+            }
+            edge from parent [gluon] node [above=3pt] {$g$}
+        }
+        % I have to insert a dummy child to get the tree to grow
+        % correctly to the right.
+        child[grow=right, level distance=0pt] {
+        child  {
+            child {
+                child {
+                    node {$\bar{d}$}
+                    edge from parent [electron]
+                }
+                child {
+                    node {$u$}
+                    edge from parent [electron]
+                }
+                edge from parent [photon] node [below=3pt] {$W$}
+            }
+            child {
+                node {$b$}
+                edge from parent [electron]
+            }
+            edge from parent [electron]
+            node [below] {$t$}
+        }
+        child {
+            child {
+                node {$\bar{b}$}
+                edge from parent [electron]
+            }
+            child {
+                child {
+                    node {$\bar{v}$}
+                    edge from parent [electron]
+                }
+                child {
+                    node {$e^{-}$}
+                    edge from parent [electron]
+                }
+                edge from parent [photon] node [above=3pt] {$W$}
+            }
+            edge from parent [electron]
+            node [above] {$\bar{t}$}
+        }
+    };
+\end{tikzpicture}
