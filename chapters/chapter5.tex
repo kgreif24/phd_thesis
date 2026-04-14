@@ -1117,4 +1117,79 @@ For the top jets, the jet mass is reproduced to within 10\%, which is state-of-t
 \section{Omnifold}
 \label{sec:omnifold}
 
+\Omnifold~\cite{Andreassen:2019cjw} is a method for unbinned, high-dimensional unfolding that performs the expectation-maximization procedure of \Cref{sec:unfolding-integral-equation} using classifiers rather than a generative model for the posterior.
+It was the first method to demonstrate that unbinned unfolding is tractable in high dimensions, and it underpins all of the experimental measurements listed in \Cref{tab:unbinned-unfolding-measurements}.
+This section describes the algorithm in detail, establishes its connection to IBU, and discusses the implementation choices relevant to the $Z$+jets measurement of \Cref{ch:zjets}.
+
+\subsection{Algorithm}
+\label{sec:omnifold-algorithm}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/ch5/omnifold_schematic.pdf}
+    \caption{Schematic illustration of the two-step \Omnifold procedure. Step 1 trains a classifier at detector level to reweight MC simulation to data. Step 2 pushes those weights back to truth level by training a second classifier. The two steps together constitute one EM iteration; the procedure is repeated until convergence.}
+    \label{fig:omnifold-schematic}
+\end{figure}
+
+Like IBU, \Omnifold iterates between an expectation step and a maximization step.
+The key insight is that both steps can be implemented using the likelihood ratio trick discussed in \Cref{ch:ml}: a classifier trained to distinguish two datasets learns a function proportional to their density ratio, which is exactly the reweighting needed for each step.
+
+\textbf{Step 1 (detector level).}
+A classifier $f_1$ is trained to distinguish observed data events from simulated MC events at detector level.
+The optimal classifier output is a monotonic function of the likelihood ratio $p_{\mathrm{data}}(x) / p_{\mathrm{sim}}(x)$, so the per-event weights
+\begin{align}
+w_1(x) = \frac{f_1(x)}{1 - f_1(x)}
+\end{align}
+reweight the MC detector-level distribution to match the data.
+
+\textbf{Step 2 (truth level).}
+A second classifier $f_2$ is trained at truth level to distinguish MC truth events reweighted by the push-forward of $w_1$ from unweighted MC truth events.
+The push-forward reweighting assigns each truth-level MC event the detector-level weight $w_1(x)$ of its paired detector-level counterpart, effectively asking: given the data-to-MC ratio observed at detector level, what is the corresponding ratio at truth level?
+The per-event truth-level weights
+\begin{align}
+w_2(z) = \frac{f_2(z)}{1 - f_2(z)}
+\end{align}
+then encode the update to the truth-level distribution.
+These weights are used as the new prior for the next iteration.
+
+The two-step procedure is illustrated in \Cref{fig:omnifold-schematic}.
+Iterating it corresponds exactly to running the EM algorithm of \Cref{eq:ibu-continuous-estep,eq:ibu-continuous-mstep} with classifiers performing the density ratio estimation in the E-step.
+Step 1 estimates the ratio $p_{\mathrm{data}}(x) / p_{\mathrm{sim}}(x)$; Step 2 marginalizes this ratio over the detector response to obtain the corresponding ratio $p_{\mathrm{unfold}}(z) / p_{\mathrm{sim}}(z)$ at truth level.
+The product of the weights $w_2$ accumulated across iterations gives the final per-event unfolding weights, which represent the unfolded distribution as a reweighted MC simulation sample.
+Because the weights are defined on individual events rather than histogram bins, \Omnifold is unbinned and high-dimensional by construction: the classifiers operate on the full event representation and no binning is imposed at any stage.
+
+The connection to IBU is direct.
+IBU performs the same EM iteration, but approximates the E-step posterior $p(z \mid x)$ from the binned response matrix rather than learning it from a classifier.
+In the limit where the bins are infinitesimally fine and the classifiers are optimal, \Omnifold and IBU are equivalent.
+In practice \Omnifold is more powerful because the classifiers can exploit the full high-dimensional structure of the events, whereas IBU is limited to the coarse information encoded in the response matrix bins.
+
+\subsection{Convergence and Regularization}
+\label{sec:omnifold-convergence}
+
+It has been shown that \Omnifold converges to the maximum likelihood estimator as the number of iterations grows and the classifiers approach their optimal solutions~\cite{Andreassen:2019cjw}.
+In practice, a small number of iterations (typically three to five) is sufficient for the weights to stabilize.
+As in IBU, early stopping provides implicit regularization: few iterations keep the unfolded distribution close to the simulation prior (high bias, low variance), while many iterations approach the maximum likelihood solution.
+The regularization is therefore controlled by the number of iterations and, more subtly, by the expressiveness and training procedure of the classifiers.
+Underfit classifiers in Step 2 produce smoother weight functions, which act as additional regularization.
+
+\subsection{Uncertainty Estimation}
+\label{sec:omnifold-uncertainties}
+
+Statistical uncertainties on the unfolded result are estimated by bootstrap resampling of the data: the full \Omnifold procedure is repeated on many bootstrap replicas of the dataset, and the spread of the resulting weight distributions encodes the statistical uncertainty.
+Systematic uncertainties are propagated by replacing the nominal MC simulation with systematically varied samples and re-running the unfolding.
+Each systematic variation produces a separate set of unfolding weights; the envelope of the variations defines the systematic uncertainty band.
+This approach is closely analogous to the treatment of systematic uncertainties in IBU and does not require any modification to the core algorithm.
+
+\subsection{Variants}
+\label{sec:omnifold-variants}
+
+Several extensions of the original \Omnifold algorithm have been proposed.
+\textit{Unbinned profiled unfolding}~\cite{Chan:2023tbf} generalizes \Omnifold to simultaneously constrain nuisance parameters associated with systematic uncertainties during the unfolding, analogous to how profile likelihood unfolding handles systematics.
+Rather than running separate unfolding procedures for each systematic variation, the nuisance parameters are profiled directly within the \Omnifold iterations.
+\textit{Multidimensional deconvolution with profiling}~\cite{Zhu:2024drd} further extends this framework to handle more complex uncertainty structures.
+These variants retain the core two-step EM structure of \Omnifold and are applicable whenever a more statistically rigorous treatment of systematic uncertainties is required.
+
+The \Omnifold method is applied to ATLAS data in \Cref{ch:zjets} to produce a 24-dimensional particle-level cross section measurement of $Z$+jets production.
+The specific implementation choices for that measurement, including the classifier architecture, feature sets, number of iterations, and uncertainty treatment, are described there.
+
 
