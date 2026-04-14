@@ -951,6 +951,170 @@ The results on the EFT test sample further indicate that the method is not stron
 \subsection{Unfolding Jet Substructure with Flow Matching}
 \label{sec:cfm-jets}
 
+Both the VLD~\cite{Shmakov:2023kjj} and VL-VLD~\cite{Shmakov:2024gkd} models demonstrated that generative methods can perform accurate unfolding in up to several tens of dimensions.
+However the VL-VLD model was inaccurate when unfolding derived observables rather than those directly included in the loss.
+Ref.~\cite{Petitjean:2025tgk} sought to address this shortcoming for a very particular unfolding task: unfolding jet substructure.
+In this context the inputs to the unfolding are the four-vectors of several tens of individual particles, involving $\mathcal{O}(100)$ dimensions.
+This is approaching a true full-phase space unfolding in which the four-momenta of every particle in the events are unfolded.
+Accurate unfolding of the entire jet substructure is achieved with a three-stage conditional flow matching (CFM) framework that sequentially predicts the constituent multiplicity, the jet kinematics, and the full constituent kinematics.
+Both standard permutation-equivariant transformers and the Lorentz-equivariant L-GATr architecture~\cite{Brehmer:2024yqw} are evaluated as the underlying velocity network.
+
+\subsubsection{Three-Stage Unfolding Framework}
+
+Unfolding the full substructure of a jet requires predicting the kinematics of every constituent at particle level, conditioned on those quantities at detector level.
+As in \Cref{sec:vl-vld}, this is a set-to-set generation problem in which the target and conditioning sets can have different cardinalities.
+Ref.~\cite{Petitjean:2025tgk} addresses it with an autoregressive factorization of the joint particle-level distribution:
+\begin{align}
+  p_{\theta,\phi,\psi}(x_\text{part}, J_\text{part}, N_\text{part} \,|\, x_\text{reco}) &=
+  p_\theta(N_\text{part} \,|\, x_\text{reco}) \nonumber \\
+  &\times p_\phi(J_\text{part} \,|\, x_\text{reco}, N_\text{part}) \nonumber \\
+  &\times p_\psi(x_\text{part} \,|\, x_\text{reco}, N_\text{part}, J_\text{part}),
+  \label{eq:cfm_factorization}
+\end{align}
+where $N_\text{part}$ is the particle-level constituent multiplicity and $J_\text{part}$ the particle-level jet kinematics.
+The corresponding log-likelihood loss decomposes into three independent terms, one for each factor, allowing the three networks to be trained separately.
+The three stages, illustrated in \cref{fig:cfm_model}, are:
+\begin{enumerate}
+  \item \textbf{Multiplicity unfolding}: A transformer encoder processes the detector-level constituents and predicts $N_\text{part}$ as a mixture of five Gaussians with learned means, widths, and weights conditioned on $x_\text{reco}$.
+  Predictions are obtained by sampling from this mixture and rounding to the nearest integer.
+  This is essentially the same as the multiplicity predictor in Ref.~\cite{Shmakov:2024gkd}, but with a Gaussian mixture as opposed to a Gamma distribution.
+  \item \textbf{Jet unfolding}: A CFM network with a transformer encoder-decoder predicts the particle-level jet four-momentum $J_\text{part} = (\log p_{T,J},\, \phi_J,\, \eta_J,\, \log m_J^2)$, conditioned on the detector-level jet kinematics and $N_\text{part}$.
+  $J_\text{part}$ is not the final output of the unfolding.
+  It is only used to define a physically motivated relative coordinate system for the constituent kinematics.
+  \item \textbf{Constituent unfolding}: A second, larger CFM network generates the full set of particle-level constituents, expressed in the relative frame
+  \begin{equation}
+    (\delta_{\log p_T},\, \delta_\phi,\, \delta_\eta) = (\log p_T - \log p_{T,J},\, \phi - \phi_J,\, \eta - \eta_J),
+    \label{eq:cfm_relative}
+  \end{equation}
+  conditioned on $x_\text{reco}$, $N_\text{part}$, and $J_\text{part}$.
+  Expressing the constituent kinematics relative to the (unfolded) jet axis concentrates the distributions sharply around zero and is found to substantially improve the accuracy of the unfolding.
+  The predicted constituent kinematics are the final output of the procedure.
+\end{enumerate}
+
+\begin{figure}[tb]
+  \centering
+  \begingroup
+  \def\xp{x_\text{part}}%
+  \def\xr{x_\text{reco}}%
+  \def\Npart{N_\text{part}}%
+  \def\Ndet{N_\text{reco}}%
+  \def\Jpart{J_\text{part}}%
+  \def\Jdet{J_\text{reco}}%
+  \scalebox{0.82}{\input{figures/ch5/cfm_jets/model.tex}}
+  \endgroup
+  \caption{Three-stage generative substructure unfolding framework of Ref.~\cite{Petitjean:2025tgk}.
+  Given a detector-level event $x_\text{reco}$, the multiplicity network (Mult.) first predicts the particle-level constituent count $N_\text{part}$.
+  The jet-level CFM network (Jet) then samples the particle-level jet kinematics $J_\text{part}$ conditioned on $x_\text{reco}$ and $N_\text{part}$.
+  Finally, the constituent CFM network (Const.) generates the full set of $N_\text{part}$ particle-level constituents $x_\text{part}$ conditioned on $x_\text{reco}$, $N_\text{part}$, and $J_\text{part}$.
+  The orange squares represent the jet four-momentum components, and the yellow squares represent the constituent three-momenta $(\delta_{\log p_T}, \delta_\phi, \delta_\eta)$.}
+  \label{fig:cfm_model}
+\end{figure}
+
+The decomposition provides two distinct benefits.
+First, independently trained multiplicity and jet networks allow those sub-problems to be solved with high precision without being overwhelmed by the high dimensionality of the full constituent phase space.
+Second, expressing the constituent kinematics in the relative frame of \cref{eq:cfm_relative} decouples the bulk jet kinematics from the substructure, allowing the constituent flow matching network to focus entirely on the internal structure of the jet.
+
+\subsubsection{Application to \texorpdfstring{$Z$}{Z}+Jets}
+
+The first experiment is performed with the benchmark unfolding dataset of Ref.~\cite{Andreassen:2019cjw}.
+It consists of light-flavor jets produced in association with a $Z$ boson in proton-proton collisions at $\sqrt{s} = 14$~TeV.
+The process $pp \to Z + \text{jets}$ with $p_T^Z > 150$~GeV is simulated using \textsc{Pythia}~8.243~\cite{Sjostrand:2014zea}, with detector response modeled by \textsc{Delphes}~3.4.2~\cite{deFavereau:2013fsa} using the default CMS card.
+Detector- and particle-level constituents are clustered into jets using the anti-$k_T$ algorithm~\cite{Cacciari:2008gp} with $R = 0.4$.
+The dataset contains 1.6 million jets, with 80\% used for training and the rest for evaluation.
+
+The multiplicity and jet kinematics networks are trained first.
+Both converge to accurate predictions, with the multiplicity network reproducing the particle-level constituent count distribution to percent-level accuracy.
+The predicted $p_T$ and mass of the particle-level jet from the jet unfolding stage also agree with truth at the percent level.
+
+The first panel of \cref{fig:cfm_z_constituents1} shows the unfolded distributions for the jet $p_T$, $\eta$, and mass.
+Note that these quantities are computed from the unfolded constituent kinematics instead of output directly by the jet unfolding network.
+The closure is excellent and at the few-percent level throughout.
+The second row of \cref{fig:cfm_z_constituents1} shows three other derived substructure observables: the groomed momentum fraction $z_g$~\cite{Larkoski:2014wba}, the logarithm of the soft drop mass $\log\rho$, and the two-point energy-energy correlator (EEC)~\cite{Moult:2025nhu}.
+Accurate unbinned of these observables had previously only been achieved with generative models by targeting them directly.Here they are unfolded to within 10\% accuracy.
+
+\begin{figure}[phtb]
+  \centering
+  \includegraphics[width=0.325\linewidth, alt={Unfolded jet transverse momentum for Z+jets, showing truth and unfolded distributions with a ratio panel. Percent-level agreement is seen in the bulk.}, page=6]{figures/ch5/cfm_jets/plots_z}
+  \includegraphics[width=0.325\linewidth, alt={Unfolded jet pseudorapidity for Z+jets.}, page=8]{figures/ch5/cfm_jets/plots_z}
+  \includegraphics[width=0.325\linewidth, alt={Unfolded jet mass for Z+jets.}, page=9]{figures/ch5/cfm_jets/plots_z}\\[6pt]
+  \includegraphics[width=0.325\linewidth, alt={Groomed momentum fraction z_g for Z+jets, showing percent-level agreement between truth and unfolded.}, page=30]{figures/ch5/cfm_jets/plots_z}
+  \includegraphics[width=0.325\linewidth, alt={Soft drop mass log rho for Z+jets.}, page=29]{figures/ch5/cfm_jets/plots_z}
+  \includegraphics[width=0.325\linewidth, alt={Two-point energy-energy correlator EEC for Z+jets.}, page=46]{figures/ch5/cfm_jets/plots_z}
+  \caption{Unfolded distributions for $Z$+jets events computed from the full set of unfolded constituent kinematics.
+  Top row: jet-level observables (transverse momentum, pseudorapidity, mass).
+  Bottom row: jet substructure observables (groomed momentum fraction $z_g$, soft drop mass $\log\rho$, and two-point EEC).
+  Both transformer (blue) and L-GATr (green) predictions are shown alongside the truth particle-level distribution (red).
+  Closure is within 10\% throughout the top row, and the bottom-row substructure observables are unfolded at the percent level in the bulk, with deviations appearing only in low-statistics tails.}
+  \label{fig:cfm_z_constituents1}
+\end{figure}
+
+\Cref{fig:cfm_z_constituents2} shows three more challenging substructure observables: the jet width $w \equiv \tau_1^{\beta=1}$, the 2-subjettiness $\tau_2^{\beta=1}$, and the 21-subjettiness ratio $\tau_{21}^{\beta=1}$~\cite{Thaler:2010tr}.
+The jet width is unfolded with percent level accuracy.
+The 2-subjettiness $\tau_2$ proves more challenging, and $\tau_{21}$ is the toughest observable with large deviations across the distribution.
+No difference in performance between L-GATr and the standard transformer is observed for these light-jet results.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.325\linewidth, alt={Jet width (tau_1) for Z+jets.}, page=22]{figures/ch5/cfm_jets/plots_z}
+  \includegraphics[width=0.325\linewidth, alt={2-subjettiness (tau_2) for Z+jets.}, page=23]{figures/ch5/cfm_jets/plots_z}
+  \includegraphics[width=0.325\linewidth, alt={21-subjettiness ratio (tau_21) for Z+jets, showing the most challenging observable with 5-10 percent deviations.}, page=26]{figures/ch5/cfm_jets/plots_z}
+  \caption{Challenging substructure observables for $Z$+jets events computed from the unfolded constituents: jet width $w = \tau_1^{\beta=1}$, 2-subjettiness $\tau_2^{\beta=1}$, and the 21-subjettiness ratio $\tau_{21}^{\beta=1}$~\cite{Thaler:2010tr}.
+  The jet width is reproduced at percent level. The 2-subjettiness is more challenging, and $\tau_{21}$ shows 5--10\% deviations in the bulk, representing the current frontier for high-dimensional generative unfolding.}
+  \label{fig:cfm_z_constituents2}
+\end{figure}
+
+\subsubsection{Application to Boosted Top Jets}
+
+The method is also applied to the more demanding task of unfolding the full substructure of boosted top jets taken from semi-leptonic $t\bar{t}$ events~\cite{Favaro:2025psi}.
+The hard process $pp \to t\bar{t} \to (bq\bar{q}') (\bar{b}\ell\bar{\nu}) + \text{c.c.}$ is generated with \textsc{MadGraph}~5~\cite{Alwall:2011uj} assuming $m_t = 173$~GeV, parton showering and hadronization with \textsc{Pythia}~8.313~\cite{Sjostrand:2014zea}, and detector response with \textsc{Delphes}~3.5.0~\cite{deFavereau:2013fsa} using the default CMS card.
+Jets are clustered with the anti-$k_T$ algorithm~\cite{Cacciari:2008gp} with a large radius $R = 1.2$ to capture the full three-body hadronic decay of the boosted top.
+Events are required to have exactly one lepton with $p_T > 60$~GeV and $|\eta| < 2.4$, and the jet with the largest angular distance to the lepton is selected as the top jet candidate, required to satisfy $p_T > 400$~GeV and $|\eta| < 2.4$.
+After all selections, there are 6 million top jets in the dataset, with 90\% used for training and the rest for evaluation.
+
+Top jets present a more challenging unfolding task than $Z$+jets for three reasons.
+First, the constituent multiplicity is substantially higher due to the three-body hadronic decay $t \to W(\to q\bar{q}')b$.
+Second, the substructure is more complex, featuring three-prong structure from the three hard quarks, in contrast to the predominantly single-prong structure of light jets.
+Third, the invariant mass of the jet is sharply peaked near $m_t = 173$~GeV, the kind of sharp feature that is difficult to reproduce with generative models as discussed in \cref{sec:vl-vld}.
+
+The unfolding results are shown in \cref{fig:cfm_t_constituents}.
+Notably, the invariant jet mass, which is sharply peaked at the top mass, is reproduced to within 10\% accuracy by L-GATr, while the standard transformer shows a small but significant deviation in the mass peak.
+This is a large improvement over the VL-VLD results of \cref{sec:vl-vld}, where the analogous particle-level top quark mass distribution showed substantially larger mis-modeling.
+The groomed momentum fraction $z_g$ is reproduced at the percent level, while the soft drop mass remains challenging due to its narrow peak structure.
+The EEC observable, which is discussed further in \cref{ch:zjets} of this thesis, is reproduced with slight mis-modeling in the tail of the peaked distribution at the lowest values, while the shoulder around $z \approx 10^{-3}$ is well reproduced.
+The $n$-subjettiness observables $\tau_1$, $\tau_2$, $\tau_3$ and the ratios $\tau_{21}$, $\tau_{32}$, $\tau_{43}$~\cite{Thaler:2010tr} show substantially better performance for top jets than for $Z$+jets.
+This can be understood from the three-prong substructure of the top jet: the n-subjettiness observables are sensitive to the number of hard prongs in the jet, and the harder substructure of top jets makes these distributions more tractable for the generative model.
+Deviations of the ratios $\tau_{32}$ and $\tau_{43}$ from truth distributions appear only below $\tau \lesssim 0.3$, where the distribution is in the statistical tail.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.30\linewidth, alt={Unfolded jet transverse momentum for top jets.}, page=11]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={Unfolded jet mass for top jets, showing sharply peaked truth distribution at the top mass.}, page=13]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={Unfolded jet pseudorapidity for top jets.}, page=14]{figures/ch5/cfm_jets/plots_t}\\[3pt]
+  \includegraphics[width=0.30\linewidth, alt={Groomed momentum fraction z_g for top jets.}, page=35]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={Soft drop mass for top jets.}, page=34]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={Energy-energy correlator EEC for top jets.}, page=51]{figures/ch5/cfm_jets/plots_t}\\[3pt]
+  \includegraphics[width=0.30\linewidth, alt={Jet width (tau_1) for top jets.}, page=28]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={2-subjettiness (tau_2) for top jets.}, page=29]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={3-subjettiness (tau_3) for top jets.}, page=31]{figures/ch5/cfm_jets/plots_t}\\[3pt]
+  \includegraphics[width=0.30\linewidth, alt={21-subjettiness ratio (tau_21) for top jets.}, page=30]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={32-subjettiness ratio (tau_32) for top jets.}, page=32]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.30\linewidth, alt={43-subjettiness ratio (tau_43) for top jets.}, page=33]{figures/ch5/cfm_jets/plots_t}
+  \caption{Unfolded distributions for boosted top jet events computed from the full set of unfolded constituent kinematics.
+  Both transformer (orange) and L-GATr (green) predictions are shown alongside the detector-level (blue) and truth particle-level distributions (black).}
+  \label{fig:cfm_t_constituents}
+\end{figure}
+
+\subsubsection{Summary}
+
+Ref.~\cite{Petitjean:2025tgk} demonstrated the first generative unfolding of the full substructure of jets, achieving $\mathcal{O}(100)$-dimensional unfolding that was previously out of reach for methods using generative models for the posterior.
+The key ingredient was to decompose the unfolding task into an autoregressive setup where the results of simpler unfolding tasks were used to condition the unfolding of the complicated point-cloud that described jet substructure.
+For both light-flavor $Z$+jets and boosted top jets, all jet-level observables and most substructure observables were reproduced at the percent level.
+The most challenging observables were the $n$-subjettiness ratios, particularly $\tau_{21}$ for light jets.
+For the top jets, the jet mass is reproduced to within 10\%, which is state-of-the-art performance for a generative model and approaches the precision needed for LHC measurements.
+
+\FloatBarrier
+
 \section{Omnifold}
 \label{sec:omnifold}
+
 
