@@ -2,7 +2,7 @@
 \chapter{Unfolding}
 \label{ch:unfolding}
 
-This Chapter is a detailed treatment of \textit{unfolding}, a problem in particle physics data analysis that has been a primary focus of my Ph.D. research.
+This chapter is a detailed treatment of \textit{unfolding}, a problem in particle physics data analysis that has been a primary focus of my Ph.D. research.
 It will introduce the problem and why it is important in LHC physics, then illustrate conventional solutions that have been in use for many years.
 Then it will turn to AI/ML based unfolding methods, highlighting a few methods that I played a role in developing.
 These methods enable very high dimensional cross section measurements with many downstream physics applications.
@@ -14,15 +14,15 @@ This method is applied to experimental data to produce such a high dimensional c
 
 The detectors used in particle physics experiments are not perfect.
 Every measurement they make has finite resolution and acceptance.
-For example the ATLAS calorimeters are divided into calorimeter cells whose size place a firm lower bound on the angular resolution, and ATLAS as a whole has limited acceptance in the foward region because detectors cannot be placed inside the beampipe.
+For example the ATLAS calorimeters are divided into calorimeter cells whose size place a firm lower bound on the angular resolution, and ATLAS as a whole has limited acceptance in the forward region because detectors cannot be placed inside the beampipe.
 These imperfect measurements introduce \textit{detector effects} which must be accounted for in order to compare cross section measurements to theoretical predictions\footnote{Note that it is possible to neglect these effects if the measurement is performed in sufficiently coarse bins and in regions of phase space where acceptance effects are negligible. In this case the response matrix (see \Cref{sec:binned-unfolding-methods}) is completely diagonal and the detector-level and truth-level histograms are identical. These cases are rare because measurements are typically designed to make full use of the detector response, and so use finer binning and more inclusive phase space selection at the expense of introducing significant detector effects.}.
 There are two general approaches to accounting for detector effects.
 The first is \textit{forward folding} in which theoretical predictions, specifically a Monte Carlo (MC) event generator output that specifies the final state four-momenta of all long-lived particles produced in a collision, are passed through a simulation of the detector response and compared to the raw experimental data.
 In this case the data and theoretical predictions are said to exist at \textit{detector level}, since the detector distortions are present in both.
 The second strategy is \textit{unfolding}.
-Instead of passing the theoretical preedictions through a detector simulation, statistical methods are used to construct an approximate inversion of the detector response, which is then applied to the data~\cite{Cowan:2002in}.
-This removes detector effects from the measurement so that it can directly compared to theoretical predictions without passing the predictions through the detector simulation.
-This process of removing distortions is called \textit{deconvolution} in other fields, since one can think of detector effects as the convolution of a noise function with the spectrum of interest
+Instead of passing the theoretical predictions through a detector simulation, statistical methods are used to construct an approximate inversion of the detector response, which is then applied to the data~\cite{Cowan:2002in}.
+This removes detector effects from the measurement so that it can be directly compared to theoretical predictions without passing the predictions through the detector simulation.
+This process of removing distortions is called \textit{deconvolution} in other fields, since one can think of detector effects as the convolution of a noise function with the spectrum of interest.
 In the case that the unfolding adjusts only for detector distortions, the cross section measurement is said to exist at \textit{particle level}, since it makes a claim about the configuration of final state particles before interaction with the detector.
 Some unfolding applications additionally account for the distortions produced by the parton shower and hadronization processes (see \Cref{ch:qcd}).
 In this case the cross section measurement is said to exist at \textit{parton level}, since it makes a claim about the configuration of partons produced in the underlying hard scatter.
@@ -31,41 +31,41 @@ Both of these are unfolding and the methods discussed in this chapter apply to b
 In practice detector distortions are not the only effects that must be considered when unfolding.
 A complete list is:
 \begin{enumerate}[label={(\arabic*)}]
-    \item Acceptance and efficiency: particles produced may not be measured.
-    \item Detector noise: particles measured may not be from real particles, at least not the desired particles (e.g. fakes) within a fiducial volume (migrating into acceptance).
+    \item Acceptance and efficiency: particles produced may not be measured, or migrate out of the fiducial volume targeted by the measurement between truth level and detector level.
+    \item Fakes: particles measured may not be from real particles, or migrate in to the fiducial volume targeted by the measurement between truth level and detector level.
     \item Background processes: if one wants to measure the differential cross section of a particular process, then you may want to subtract the contributions from background processes.
     \item Combinatorics: if there are $n$ particles and you want to measure the properties of a particular order (e.g. leading $p_T$), the detector effects can change the order.
     \item Detector distortions: the detector response introduces bias and resolution effects.
 \end{enumerate}
-The unfolding in a well-structure measurement will primarily have to deal with (5).
+In a well-structured measurement, the unfolding will primarily need to address effect (5).
 For the measurement presented in \Cref{ch:zjets}, item (3) is dealt with but is a very sub-leading effect, and items (1,2,4) are irrelevant.
 This is not generally the case for all particle physics measurements, but for the purposes of this thesis those items will be ignored as irrelevant effects.
 
-Forward folding and unfolding are both actively used in cross section measurements an have distinct advantages and disadvantages.
+Forward folding and unfolding are both actively used in cross section measurements and have distinct advantages and disadvantages.
 Forward folding is strictly more precise than unfolding because unfolding methods will always incur additional systematic uncertainties.
-These may be very sub-leading in which case the precision of both approaches is equivalent, but the unfolding approach will never be more accurate than forward folding\footnote{This claim is mostly true, but unfolded measurements can be more precise than forward folding if unfolding removes the need for some systematic uncertainties. This is sometimes the case for theoretical modeling uncertainties, where the difference between two MC generators is understood as an uncertainty for detector level spectra but only an arbitrary choice of prior for unfolded spectra. This ambiguity stems from the fact that modeling uncertainties are not true systematic uncertainties with a nuisance parameter that can be varied. Whether or not they should be included in a given context is often a somewhat philosophical question.}.
+These may be very sub-leading in which case the precision of both approaches is equivalent, but the unfolding approach is almost never more accurate than forward folding\footnote{Unfolded measurements can be more precise than forward folding if unfolding removes the need for some systematic uncertainties. This is sometimes the case for theoretical modeling uncertainties, where the difference between two MC generators is understood as an uncertainty for detector level spectra but only an arbitrary choice of prior for unfolded spectra. This ambiguity stems from the fact that modeling uncertainties are not true systematic uncertainties with a nuisance parameter that can be varied. Whether or not they should be included in a given context is often a somewhat philosophical question.}.
 Despite this limitation, unfolding is often worth the added uncertainty for a few reasons which are worth spelling out in detail:
 
 \begin{itemize}
     \item Unfolded measurements can be compared directly to theoretical predictions furnished by MC event generators without the need to pass the simulated events through the detector simulation. This is an enormous practical benefit. The general hope with any cross section measurement is that it will be used to improve our knowledge of particle physics, for example by constraining a free parameter of the Standard Model or tuning a hadronization model used to provide theoretical predictions. All of these downstream tasks are greatly simplified when detector simulation is not needed. For LHC datasets, the detector simulation is mostly proprietary, computationally expensive, and requires substantial expertise to run, making the forward folding approach inconvenient\footnote{Note that ``inconvenient'' can mean anything from hard to do within the personnel and funding constraints of a research group, to computationally infeasible with existing computational resources. Some downstream applications, for example fitting many Wilson coefficients of an effective field theory to measured spectra, require large amounts of simulation that may be impossible to produce at detector level.}. For legacy datasets, such as those produced by experiments at LEP or SLC, the detector simulation is no longer available, making the forward folding approach impossible. Unfolding can then be understood as a way of preserving cross section measurements for future unforeseen use cases, which might be understood only many years after the intial data taking of an experiment is complete.
-    \item Unfolded measurements can be compared to non fully-inclusive theory predictions. In particular they can be compared to resummed calculations of jet substructure observables, which are defined at particle level but are represented as smooth functions rather than lists of final state particle four-momenta. This is an underappreciated motivation for unfolding. It is \textbf{required} to compare data to the rigourously understood theoretical predictions provided by state-of-the-art QCD calculations.
-    \item Finally unfolded measurements are much easier to combine with other measurements, perhaps from different experiments, to exploit additional statistical power. Combining forward folded measurements is possible, but require access to the detector simulation for proper correlation of uncertainties. This becomes especially difficult if results from different experiments are combined. In contrast combining unfolded spectra is trivial. See Ref.~\cite{Heimel:2024drk} for an excellent example.
+    \item Unfolded measurements can be compared to non fully-inclusive theory predictions. In particular they can be compared to resummed calculations of jet substructure observables, which are defined at particle level but are represented as smooth functions rather than lists of final state particle four-momenta. This is an underappreciated motivation for unfolding. It is \textbf{required} to compare data to the rigorously understood theoretical predictions provided by state-of-the-art QCD calculations.
+    \item Finally unfolded measurements are much easier to combine with other measurements, perhaps from different experiments, to exploit additional statistical power. Combining forward folded measurements is possible, but requires access to the detector simulation for proper correlation of uncertainties. This becomes especially difficult if results from different experiments are combined. In contrast combining unfolded spectra is trivial. See Ref.~\cite{Heimel:2024drk} for an excellent example.
 \end{itemize}
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.66\linewidth]{figures/ch5/paper_citations.png}
-    \caption{Histograms of all ATLAS and CMS physics results in the number of citations recieved. The tail of the distribution at very high citation counts is not shown. Histograms are shown for searches, measurements which forward fold, and measurements which unfold. Data scraped from the InspireHEP archive, and sorted based on keywords in abstracts and whether they cite key papers. Note these data are very approximate given unfolding is not always labeled explicitly.}
+    \caption{Histograms of all ATLAS and CMS physics results in the number of citations received. The tail of the distribution at very high citation counts is not shown. Histograms are shown for searches, measurements which forward fold, and measurements which unfold. Data scraped from the InspireHEP archive, and sorted based on keywords in abstracts and whether they cite key papers. Note these data are very approximate given unfolding is not always labeled explicitly.}
     \label{fig:paper-citations}
 \end{figure}
 
-Given these motivations may or may not apply depending on the goals of any measurement, the decision to use forward folding or unfolding is highly context specific.
+Given that these motivations may or may not apply depending on the goals of a given measurement, the decision to use forward folding or unfolding is highly context specific.
 It's worth mentioning a few contexts from LHC physics before moving on.
 Searches for beyond-Standard-Model (BSM) particles almost never unfold.
 Such searches look for coherent shapes like resonances in low-statistics regions of phase space, and unfolding would substantially reduce sensitivity.
 It is true that a search using unfolded spectra would be vastly easier to re-interpret, but there is little practical motivation for doing this since well-established procedures exist within the experimental collaborations for re-interpreting searches via forward folding.
 Among measurements of Standard Model processes, unfolding is used in roughly one third of published ATLAS and CMS measurements (excluding for example detector performance papers and searches), as illustrated in \Cref{fig:paper-citations}.
-Extractions of parameters such as particle masses of Wilson coefficients typically do not unfold unless one of the goals of the result is to be used in combinations, while differential cross section measurements typically do.
+Extractions of parameters such as particle masses or Wilson coefficients typically do not unfold unless one of the goals of the result is to be used in combinations, while differential cross section measurements typically do.
 This picture is complicated by the fact that some unfolded measurements are not described as such explicitly.
 The Simplified Template Cross Section (STXS) framework used in ATLAS and CMS Higgs measurements~\cite{Berger:2019wnu}, for example, is an instance of profile likelihood unfolding (see \Cref{sec:binned-unfolding-methods}), but is rarely labeled as such in publications.
 In summary, unfolding occupies a niche but important role in the LHC physics program, and is essential for data preservation and comparisons to resummed theory calculations.
@@ -96,7 +96,7 @@ The (maximum likelihood) solution to \Cref{eq:foldingequation} is
 In practice this direct matrix inversion is often not useful.
 The response matrix $\textbf{R}$ is frequently ill-conditioned, meaning that its smallest singular values are close to zero.
 Matrix inversion then amplifies statistical fluctuations in the detector-level histogram $\textbf{d}$ by a factor proportional to the condition number of $\textbf{R}$, producing a truth-level estimate with very large variance.
-Put another way the naive algebraic solution to the unfolding problem can be highly numerically unstable.
+In other words the naive algebraic solution to the unfolding problem can be highly numerically unstable.
 Small changes in the detector level histogram (e.g. from statistical fluctuations) lead to large and unphysical oscillations in the unfolded histogram.
 Most binned unfolding methods address this by deliberately injecting a small bias into the solution in order to reduce the variance, a procedure known as \textit{regularization} with conceptual ties to the bias-variance tradeoff discussed in \Cref{sec:ml-overview}.
 In HEP applications this bias is typically estimated and propagated as a systematic uncertainty on the final result.
@@ -122,7 +122,8 @@ Then assuming Poisson distributed bin counts, the log-likelihood is
 \end{equation}
 where $N_d$ is the number of detector-level bins.
 This replaces the linear system in \Cref{eq:unfolding} with a non-linear system that can be solved numerically.
-Note that although there is no explicit inversion of the response matrix, if the response matrix is ill-conditioned then there are directions in $\textbf{t}$ where the likelihood is essentially flat at the same numerical issues can result.
+Note that although the profile likelihood approach does not require explicit matrix inversion, it does not circumvent the ill-conditioning problem.
+If $\mathbf{R}$ is ill-conditioned, there exist directions in $\mathbf{t}$ along which the likelihood is essentially flat, and the same numerical instabilities can result.
 This is why additional regularization of the likelihood is often required.
 See for example Ref.~\cite{Tikhonov:1963}.
 
@@ -141,8 +142,8 @@ See Ref.~\cite{Collaboration:2944725} for an example of relatively high-dimensio
 \label{sec:ibu}
 
 Probably the most widely used binned unfolding method in HEP is \textit{Iterative Bayesian Unfolding} (IBU)~\cite{DAgostini:1994fjx}, also known as Lucy-Richardson deconvolution in other fields~\cite{Lucy:1974yx, Richardson:1972}.
-IBU is an expectation-maximization (EM) algorithm, where a likelihood over the bin counts in both the dector-level and truth-level histograms is approximated with an expectation value (expectation step) and then maximized (maximization step).
-Note the expectation step is required because we don't know the truth-level bin counts by construction.
+IBU is an expectation-maximization (EM) algorithm, where a likelihood over the bin counts in both the detector-level and truth-level histograms is approximated with an expectation value (expectation step) and then maximized (maximization step).
+Note that the expectation step is required because we don't know the truth-level bin counts by construction.
 Instead we have a prior furnished by MC simulation that is iteratively updated, which is why the method is referred to as Bayesian even though it is attempting to maximize a likelihood.
 For clarity, the equations below assume $\textbf{b}=\textbf{0}$ and $\textbf{f}=\textbf{c}=\textbf{1}$, so that the folding equation reduces to $\textbf{R}\cdot\textbf{t} = \textbf{d}$.
 
@@ -158,7 +159,8 @@ The prior for the first iteration is taken from simulation, $\Pr^{(0)}(t_i) \pro
 It has been shown that as $n \to \infty$ the IBU estimate converges to the maximum likelihood estimator~\cite{Shepp:1982}.
 
 The EM algorithm structure can be read off from these equations.
-First, in \Cref{eq:ibu2} the current prior $\Pr^{(n)}(t_i)$ is held fixed and one calculates the posterior probability $\Pr(t_i | d_j)$ that a detector-level event in bin $j$ originated from truth-level bin $i$, using Bayes' theorem with the response matrix elements $R_{ji} = \Pr(d_j | t_i)$ as the likelihood.
+First, in \Cref{eq:ibu2} the current prior $\Pr^{(n)}(t_i)$ is held fixed and one calculates the posterior probability $\Pr(t_i | d_j)$ that a detector-level event in bin $j$ originated from truth-level bin $i$, using Bayes' theorem.
+The response matrix elements $R_{ji}$ are interpreted as the likelihood $\Pr(d_j|t_i)$.
 This is the expectation step, since the method is calculating the expectation value of latent observables (how the events in bin $j$ of the detector-level histogram split across the truth-level bin $i$) given the current parameters $t_i^{(0)}$ and observations $d_j$.
 The maximization step corresponds to the sum over $j$ and multiplication of the posterior probability by the detector-level bin counts $d_j$.
 The posterior weights are used to redistribute the observed detector-level counts $d_j$ back to truth-level bins, yielding the updated estimate $t_i^{(n)}$, which then serves as the prior for the next iteration.
@@ -203,8 +205,8 @@ Measurements of many observables can then be accomplished with a single analysis
 However the most ambitious application of high-dimensional unfolding is to extend the measurement to the full phase space, unfolding the kinematics of every particle measured by the detector.
 This approach is maximally information preserving, in that the primary measurements actually made by the detector are corrected for detector effects rather than individual summary observables.
 Note that because the number of particles produced in collisions is variable, this application defines a cross section measurement on a variable-dimensional space.
-Such a measurement implicitly contains every observable computable from the final state, making the downstream application potential immense.
-Future of observables of interest can be quickly measured and furture theoretical calculations can be quickly compared to data, without the need to conduct a new analysis, which can either be time and resource intensive or impossible if the detector simulation is no longer available.
+Such a measurement implicitly contains every observable computable from the final state, making the potential for downstream applications immense.
+Future observables of interest can be quickly measured and future theoretical calculations can be quickly compared to data, without the need to conduct a new analysis, which can either be time and resource intensive or impossible if the detector simulation is no longer available.
 Realizing this greatly increased flexibility and physics potential requires two major technical advances: machine learning methods powerful enough to unfold variable-length sets of particle four-momenta, and systematic uncertainties defined at the level of individual particle measurements.
 The machine learning methods described below have already been shown to be capable of unfolding in high and variable dimensions.
 The requirement for systematic uncertainties on individual particles is already satisfied for charged particles but difficult for neutral particles, which is why the measurement in \Cref{ch:zjets} uses charged particles only.
@@ -218,7 +220,7 @@ This also links directly to the bottom-up approach to systematic uncertainties i
 A growing number of experimental measurements have now been performed using unbinned and high-dimensional unfolding methods.
 \Cref{tab:unbinned-unfolding-measurements} summarizes these results.
 All of them use the \Omnifold algorithm, which is described in detail in \Cref{sec:omnifold}.
-The measurements span a range of collision systems, inlcuding $pp$, $ep$, $e^+e^-$, and neutrino scattering, illustrating that these methods are general purpose and not only for use in LHC experiments.
+The measurements span a range of collision systems, including $pp$, $ep$, $e^+e^-$, and neutrino scattering, illustrating that these methods are general purpose and not only for use in LHC experiments.
 The ALEPH thrust measurement~\cite{Electron-PositronAlliance:2025nbl} is notable as a reanalysis of archival $e^+e^-$ data, demonstrating how unbinned unfolding enables new physics from legacy datasets.
 The current record for the highest-dimensional cross section measurement is held by a preliminary H1 result~\cite{H1:prelim}, which targets the full final-state phase space of high-$Q^2$ DIS events with a variable-dimensional unfolding reaching a few hundred dimensions.
 This is the first measurement of its kind and a proof of concept for the full phase-space program described above.
@@ -237,7 +239,7 @@ p_{\mathrm{data}}(x) = \int p(x \mid z)\, p_{\mathrm{unfold}}(z)\, dz,
 \end{align}
 where $x$ denotes the detector-level event representation, $z$ the truth-level event representation, $p(x \mid z)$ the detector response (the conditional probability of observing $x$ at detector level given the truth-level configuration $z$), and $p_{\mathrm{data}}(x)$ the observed data distribution.
 The goal of unfolding is to find the truth-level distribution $p_{\mathrm{unfold}}(z)$ such that smearing it through the detector response reproduces the data.
-This is generally and ill-posed problem.
+This is generally an ill-posed problem.
 In the binned case this was visible in the ill-conditioned response matrix.
 In the unbinned case the response function $p(x \mid z)$ is ``information destroying'', meaning that there are many different truth-level configurations that can produce the same detector-level configuration.
 
@@ -335,7 +337,8 @@ Training both models simultaneously requires constructing a single ELBO that enc
 \subsubsection{The VLD Loss Function}
 
 The VLD model is illustrated schematically in \Cref{fig:vld-diagram}.
-Following the notation of \Cref{sec:generative-unfolding-methods}, let $x$ denote the truth-level event configuration and $y$ the detector-level event configuration.
+In this section the notation is different from that used in \Cref{sec:generative-unfolding-methods}
+Let $x$ denote the truth-level event configuration and $y$ the detector-level event configuration.
 The model introduces a latent variable $z_t$ parametrized by a continuous diffusion time $t \in [0, 1]$.
 At $t = 0$, a sample $z_0$ is drawn from the VAE encoder posterior $q(z_0 \mid x, y)$.
 The forward diffusion process then progressively corrupts $z_0$ with Gaussian noise so that $z_1$ is approximately distributed as the standard normal $p(z_1) = \mathcal{N}(0, I)$.
@@ -369,7 +372,7 @@ Translating to the notation of \Cref{sec:ddpm}, $\hat{\varepsilon}_\theta$ is th
 \paragraph{Noise schedule.}
 Following Ref.~\cite{kingma2021variational} the noise schedule is learned through the parametrization
 \begin{equation}
-    \sigma_t^2 = \textrm(sigmoid)(\gamma_\eta(x))
+    \sigma_t^2 = \textrm{sigmoid}(\gamma_\eta(x))
     \label{eq:noise-schedule}
 \end{equation}
 where $\gamma_n(t)$ is a monotonic neural network with learned parameters $\eta$.
@@ -460,7 +463,7 @@ The VLD model faithfully reproduces the truth distributions across a wide range 
 The closure is not perfect, but a generative model based unfolding of parton-level mass peaks is very ambitious.
 This performance was state of the art at the time.
 The non-latent baseline CINN and the pre-trained LDM produce significantly worse mass peaks.
-The CINN predictions are shifted and signficantly broader than the group truth, perhaps because of the invertibility requirement in flow based models.
+The CINN predictions are shifted and significantly broader than the ground truth, perhaps because of the invertibility requirement in flow based models.
 The LDM model actually produces overly sharp mass peaks compared to truth.
 
 \begin{figure}[t]
@@ -502,8 +505,8 @@ Third, by simultaneously unfolding all 55 dimensions of the $t\bar{t}$ parton-le
 The VLD model of \Cref{sec:vld-unfolding} demonstrated the power of latent diffusion for generative unfolding, achieving state-of-the-art results on the 55-dimensional parton-level $t\bar{t}$ unfolding task.
 However, three important limitations remained.
 First, the fixed-dimensional architecture could not scale to full phase space unfolding, since collision events contain a variable number of reconstructed objects.
-Second, most LHC measurement target the particle-level phase space since parton-level unfolding is not theoretically well-defined and incurs significant modeling uncertainties from the parton shower and hadronization processes.
-Third, the prior dependence of the learned posterior was not examined in \citeauthor{Shmakov:2023kjj}.
+Second, most LHC measurements target the particle-level phase space since parton-level unfolding is not theoretically well-defined and incurs significant modeling uncertainties from the parton shower and hadronization processes.
+Third, the prior dependence of the learned posterior was not examined in Ref.~\cite{Shmakov:2023kjj}.
 Ref.~\cite{Shmakov:2024gkd} addresses all three of these limitations, introducing a Variable-Length VLD (VL-VLD) model capable of performing generative unfolding over sets of objects with variable cardinality.
 
 \subsubsection{Model Architecture}
@@ -548,7 +551,9 @@ Because multiplicities are positive counts, a deep MLP then predicts the shape a
 
 \paragraph{Latent Diffusion.}
 The conditional distribution $P(X | Y)$ is learned via an element-wise extension of the VLD diffusion process.
-Because sets have no intrinsic ordering, the denoising loss term on its own is ambiguous when the signal-to-noise ratio is low and latent vectors look nearly identical under the prior, since there is no way to determine which noisy sample corresponds to which object.
+Because sets have no intrinsic ordering, the denoising loss term on its own is ambiguous.
+At low signal-to-noise ratios the latent vectors look nearly identical under the prior since they are all mostly noise.
+This means there is no way to assign a denoising target to a given object.
 This is resolved by imposing a \pt-ordering on the set $X$ prior to diffusion, breaking the permutation equivariance of the denoising network while leaving all other components equivariant.
 
 With this ordering fixed, each position $i$ in the sequence is assigned its own learned noise schedule $\gamma_\phi(i, t)$, a monotonically decreasing log signal-to-noise ratio function of time $t \in [0,1]$.
@@ -649,7 +654,7 @@ During the bulk of the generation process at intermediate $t$, the SNR increases
   The ``Event'' curve corresponds to the event-level observable element.
   (\subref{subfig:vl_vld_snr}) The learned log signal-to-noise ratio (SNR) as a function of diffusion time $t$.
   (\subref{subfig:vl_vld_beta}) The corresponding $\beta$ schedule used during inference in the DDPM framework~\cite{Ho:2020ddpm}.
-  The SNR rises fastest for the two highest \pt objects, reflecting the model learning to reduce the noise fastests for the most important objects in the event.}
+  The SNR rises fastest for the two highest \pt objects, reflecting the model learning to reduce the noise fastest for the most important objects in the event.}
   \label{fig:vl_vld_noise_schedule}
 \end{figure}
 
@@ -787,7 +792,7 @@ A key motivation for full-event unfolding is the ability to measure arbitrary de
 \Cref{fig:vl_vld_top_kinematics} shows the kinematic distributions of the hadronically- and leptonically-decaying top quark candidates and the $t\bar{t}$ system, reconstructed from the unfolded jets and leptons using the pseudo-top algorithm.
 Closure is noticeably worse here than for the individual jet and lepton kinematics, which is not surprising since the network is not directly optimized to predict these quantities.
 In particular, the sharp mass peaks at the top quark mass are not well reproduced after unfolding.
-As mentioned before modeling sharp features is a known difficulty for generative models.
+As mentioned before, modeling sharp features is a known difficulty for generative models.
 This mis-modeling of derived observables involving complex inter-object correlations is an important limitation of the current approach, and motivates further developments discussed in \cref{sec:cfm-jets}.
 
 \begin{figure}[htb]
@@ -875,7 +880,7 @@ Modeling of the posterior with a generative model is only the first step in the 
 The maximization step and subsequent iterations exist to remove the prior dependence from the learned posterior and arrive at the maximum likelihood solution.
 While this paper did not perform the iterative procedure explicitly, it did explore this direction by examining the prior dependence of the learned posterior.
 Specifically the VL-VLD network trained on Standard Model $t\bar{t}$ events is evaluated on an alternative test sample containing BSM physics injected through a non-zero EFT coefficient in the top-gluon vertex ($c_{tg} = 25$).
-This modification shifts the kinematic distributions of the top quarks and the $t\bar{t}$ system substantially away from the SM training distribution.
+This is a large coefficient and is rather unphysical, but it produces a sizeable shift in the kinematic distributions of the top quarks and $t\bar{t}$ system that is useful for assessing the prior dependence.
 
 \Cref{fig:vl_vld_eft} shows the reconstructed top quark and $t\bar{t}$ kinematics in the EFT test dataset alongside the corresponding SM distributions.
 The unfolded EFT distributions track the EFT truth closely and are clearly distinguishable from the SM distributions, demonstrating that VL-VLD is not simply reproducing the SM prior.
@@ -1030,7 +1035,7 @@ The first panel of \cref{fig:cfm_z_constituents1} shows the unfolded distributio
 Note that these quantities are computed from the unfolded constituent kinematics instead of output directly by the jet unfolding network.
 The closure is excellent and at the few-percent level throughout.
 The second row of \cref{fig:cfm_z_constituents1} shows three other derived substructure observables: the groomed momentum fraction $z_g$~\cite{Larkoski:2014wba}, the logarithm of the soft drop mass $\log\rho$, and the two-point energy-energy correlator (EEC)~\cite{Moult:2025nhu}.
-Accurate unbinned of these observables had previously only been achieved with generative models by targeting them directly.Here they are unfolded to within 10\% accuracy.
+Accurate unfolding of these observables had previously only been achieved with generative models by targeting them directly. Here they are unfolded to within 10\% accuracy.
 
 \begin{figure}[phtb]
   \centering
@@ -1118,7 +1123,7 @@ For the top jets, the jet mass is reproduced to within 10\%, which is state-of-t
 \label{sec:omnifold}
 
 \Omnifold~\cite{Andreassen:2019cjw} is a classifier-based implementation of the EM algorithm.
-It can also be understood as the limit of IBU as the bin width goes to zero.
+As will be shown, it can also be understood as the limit of IBU as the bin width goes to zero.
 Rather than modeling the posterior $p(z \mid x)$ directly with a generative model as in the generative unfolding methods of \Cref{sec:generative-unfolding-methods}, \Omnifold models two likelihood ratios per EM iteration using machine-learned classifiers.
 These furnish per-event reweighting functions $w_n(m)$ defined on the detector-level phase space and $\nu_n(t)$ defined on the truth-level phase space, where $n$ is the EM iteration index.
 The product of the $\nu_n$ weights accumulated across all iterations is the final \Omnifold weight that encodes the unfolded distribution.
@@ -1186,9 +1191,9 @@ A second classifier is trained to separate the reweighted truth-level MC (signal
 When training this classifier the events forming signal and background are identical and differ only by their weights.
 The classifier output furnishes $\nu_n(t)$, which is multiplied by all weights from previous iterations to obtain the updated \Omnifold weight $\nu^{\mathrm{of}}_n(t)$ via \Cref{eq:omnifold-prior-update}.
 
+\textbf{Push to detector level.}
 If the desired number of iterations has been reached, the procedure terminates.
-The unfolded result is the truth-level MC simulation together with the final weights $\nu^{\mathrm{of}}_N(t)$.
-If more iterations are required, the updated weights are pushed back to the detector-level simulation and Steps 1 and 2 repeat\footnote{Events that pass the detector-level event selection but fail the detector-level selection can be assigned the weight of the prior at this step as well}.
+The unfolded result is the truth-level MC simulation together with the final weights $\nu^{\mathrm{of}}_N(t)$.If more iterations are required, the updated weights are pushed back to the detector-level simulation and Steps 1 and 2 repeat\footnote{Events that pass the detector-level event selection but fail the truth-level selection can be assigned the weight of the prior at this step as well}.
 
 \subsection{Properties}
 \label{sec:omnifold-properties}
