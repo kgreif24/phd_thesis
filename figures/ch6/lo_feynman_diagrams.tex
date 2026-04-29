@@ -1,0 +1,105 @@
+% figures/ch6/lo_feynman_diagrams.tex
+% 2x2 grid of leading-order Feynman diagrams for V+jets (V = Z or W) production.
+% Included via \input inside a figure environment in chapter6.tex.
+
+% ---------------------------------------------------------------
+% Row 1: quark--antiquark annihilation channel  qq' -> Vg
+% ---------------------------------------------------------------
+\begin{subfigure}[b]{0.46\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{feynman}
+      % Incoming legs enter horizontally from the left
+      \vertex (iq)  at (0.0,  1.0) {\(q\)};
+      \vertex (iqb) at (0.0, -1.0) {\(\bar{q}'\)};
+      % Interaction vertices: v1 on the upper rail, v2 at centre-right
+      \vertex (v1)  at (2.0,  1.0);
+      \vertex (v2)  at (2.0, -1.0);
+      % Outgoing: V exits upper-right at 45 deg, gluon exits horizontally
+      \vertex (fV)  at (4.0,  1.0) {\(V\)};
+      \vertex (fg)  at (4.0, -1.0) {\(g\)};
+      \diagram* {
+        (iq)  -- [fermion]      (v1),
+        (iqb) -- [anti fermion] (v2),
+        (v1)  -- [boson]        (fV),
+        (v1)  -- [fermion]      (v2),
+        (v2)  -- [gluon]        (fg),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+  \caption*{(a)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.46\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{feynman}
+      % Mirror of (a): V emitted from antiquark rail instead
+      \vertex (iq)  at (0.0,  1.0) {\(q\)};
+      \vertex (iqb) at (0.0, -1.0) {\(\bar{q}'\)};
+      \vertex (v1)  at (2.0,  1.0);
+      \vertex (v2)  at (2.0, -1.0);
+      \vertex (fV)  at (4.0, -1.0) {\(V\)};
+      \vertex (fg)  at (4.0,  1.0) {\(g\)};
+      \diagram* {
+        (iq)  -- [fermion]      (v1),
+        (iqb) -- [anti fermion] (v2),
+        (v2)  -- [boson]        (fV),
+        (v1)  -- [fermion]      (v2),
+        (v1)  -- [gluon]        (fg),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+  \caption*{(b)}
+\end{subfigure}
+
+\vspace{2em}
+
+% ---------------------------------------------------------------
+% Row 2: quark--gluon Compton channel  qg -> Vq
+% ---------------------------------------------------------------
+\begin{subfigure}[b]{0.46\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{feynman}
+      % t-channel variant: g absorbed first, then V emitted
+      \vertex (iq)  at (0.0,  1.0) {\(q\)};
+      \vertex (ig)  at (0.0, -1.0) {\(g\)};
+      \vertex (v1)  at (1.33,  0.0);
+      \vertex (v2)  at (2.66,  0.0);
+      \vertex (fV)  at (4.0,  1.0) {\(V\)};
+      \vertex (fq)  at (4.0, -1.0) {\(q\)};
+      \diagram* {
+        (iq)  -- [fermion] (v1),
+        (ig)  -- [gluon]   (v1),
+        (v1)  -- [fermion] (v2),
+        (v2)  -- [boson]   (fV),
+        (v2)  -- [fermion] (fq),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+  \caption*{(c)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.46\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \begin{feynman}
+      % t-channel variant: g absorbed first, then V emitted
+      \vertex (iq)  at (0.0,  1.0) {\(q\)};
+      \vertex (ig)  at (0.0, -1.0) {\(g\)};
+      \vertex (v1)  at (2.0,  1.0);
+      \vertex (v2)  at (2.0,  -1.0);
+      \vertex (fV)  at (4.0,  1.0) {\(V\)};
+      \vertex (fq)  at (4.0, -1.0) {\(q\)};
+      \diagram* {
+        (iq)  -- [fermion] (v1),
+        (ig)  -- [gluon]   (v2),
+        (v1)  -- [fermion] (v2),
+        (v1)  -- [boson]   (fV),
+        (v2)  -- [fermion] (fq),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+  \caption*{(d)}
+\end{subfigure}
