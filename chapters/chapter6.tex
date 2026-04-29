@@ -707,7 +707,7 @@ At particle-level, charged pions account for about 75\% of the jet $p_T$ for all
 The \mgpy sample predicts roughly 5\% more (fewer) protons (charged kaons) than the \sherpa sample.
 The fraction of $p_T$ carried by the other category, which is mainly composed of the strange baryons $\Omega$, $\psi$, and $\Sigma$, is roughly consistent between the generators.
 Since the fraction of charged kaons versus protons are not constrained at detector level given the pion mass assumption, the unfolding returns the unfolding prior and does not alter the truth hadron fractions at all.
-This is illustrated in \Cref{fig:zjets-unfold-hadron-fraction}, which plots the hadron fractions before and after unfolding, and compares to the truth pseudodata target.
+This is illustrated in \Cref{fig:zjets-unfold-hadron-fractions}, which plots the hadron fractions before and after unfolding, and compares to the truth pseudodata target.
 The unfolding does not shift the hadron fractions at all, leaving this observable completely prior dependent, as expected for a hidden variable.
 However changing this hidden variable also adjusts the jet mass distributions, meaning an unfolding built with the \mgpy sample versus the \sherpa sample will yield slightly different results.
 
@@ -989,37 +989,40 @@ These results show that with the methodological improvements discussed in \Cref{
 \section{Results: Four Physics Use Cases}
 \label{sec:zjets-results}
 
-The un-binned, full phase-space cross section produced by the \Omnifold measurement of \Cref{sec:zjets-omnifold} is not in itself a histogram; it is a reweighted MC sample that, when binned in any observable computable from the charged final state, yields the differential cross section for that observable.
-This section presents four such projections, chosen to span a broad range of QCD phenomena and to illustrate features of the measurement that are either difficult or impossible to access with conventional binned unfolding.
-In each case, the \Omnifold spectrum is compared to the truth-level predictions of the \textsc{MG5}~FxFx and \textsc{Sherpa}~2.2.11 samples used throughout the analysis.
-The first two applications---underlying-event observables and jet-shape observables---are projections onto conventional observables, and are included to demonstrate precisely the advantages the un-binned measurement affords over conventional binned unfolding on familiar ground.
-The last two---the energy-energy correlator and the nearest-neighbor intrinsic dimension---are observables that cannot be measured with any binned unfolding technique because their construction involves sums or reductions over a variable number of final-state particles.
-None of the results in this section required a dedicated unfolding exercise; each is a histogram of a different function applied to the same un-binned output.
-The un-binned spectra and an example codebase for reproducing these measurements, along with the tooling to run the closure tests of \Cref{sec:zjets-validation-chi2} for any user-defined observable, will be released publicly with the forthcoming ATLAS publication~\cite{STDM-2024-02}.
-
+Unlike standard binned cross section measurements, the unbinned full phase space measurement is best understood as a dataset that can be processed to produce measurements of arbitrary observables.
+This section presents four applications of this dataset to produce measurements of observables that could help the broader community improve our ability to model QCD processes, addressing one of the open problems discussed in \Cref{ch:intro}.
+In each of these applications the \Omnifold spectrum is compared to the truth-level predictions of the \mgpy and \sherpa generators used throughout this analysis.
+The first application, measurements of the underlying event observables $N_{ch}$ and $H_T$, could have equally well been performed using standard binned unfolding methods like IBU.
+The motivation to feature these measurements is their very poor modeling as shown in \Cref{fig:zjets-trackmcdata}.
+The other three applications would either require significant approximations, or be simply impossible to unfolding with binned methods.
 
 \subsection{Underlying Event Observables}
 \label{sec:zjets-results-ue}
 
 The simplest applications of the measurement are projections onto conventional event-level observables.
-The full phase-space measurement nonetheless affords two concrete advantages over a conventional binned unfolding of these same observables.
-First, the binning is not fixed at unfolding time and can be adjusted on the fly, allowing variable-width binning and retroactive optimization of the bin edges.
-Second, additional selection criteria may be applied to the unfolded spectra post-unfolding, because the reweighted MC carries the full per-event kinematics.
-\Cref{fig:zjets-results-ue} shows the unfolded charged-particle multiplicity $N_{\mathrm{ch}}$ and the scalar sum of charged-particle transverse momenta $H_T^{\mathrm{ch}}$, together with an independent IBU measurement of the same two observables and the truth-level predictions of the \textsc{MG5}~FxFx and \textsc{Sherpa}~2.2.11 samples.
-The muons from the $Z$ boson decay are excluded from both observables.
-The \Omnifold and IBU results agree with one another within their respective total uncertainties.
-Poor agreement with the generator predictions is observed for $N_{\mathrm{ch}}$: \textsc{MG5}~FxFx over-predicts the multiplicity at low $N_{\mathrm{ch}}$ and under-predicts it at high $N_{\mathrm{ch}}$, while \textsc{Sherpa}~2.2.11 is wrong in the opposite direction, with deviations from the data at the $50\%$ level at the two ends of the spectrum.
-The modelling of $H_T^{\mathrm{ch}}$ is better, with the \textsc{Sherpa}~2.2.11 prediction agreeing with the measurement within uncertainties across the full range and the \textsc{MG5}~FxFx prediction showing residual $10$--$20\%$ shape differences.
-That the two generators disagree with the data in opposite directions on $N_{\mathrm{ch}}$, and that the \Omnifold measurement is nonetheless able to recover the pseudodata truth for this observable (\Cref{fig:zjets-pd-ue}), is a useful illustration of the non-trivial role of the unfolding uncertainty: no single MC prior is assumed to be correct, and the measurement uncertainty is sized to cover the generator ambiguity.
+Unlike standard binned measurements the binning used to measure these observables can be changed on-the-fly, and the observables can be measured in sub-regions of the full fiducial volume.
+Two measurements of standard observables that show particularly poor modeling by the MC generators, $N_{ch}$ and $H_T$, are shown in this section.
+\Cref{fig:zjets-results-ue} shows the measurement of both observables together with the truth-level predictions of the \mgpy and \sherpa samples.
+As already shown in \Cref{fig:zjets-trackmcdata}, the generator predictions are very different for the $N_{ch}$ observable.
+This is understood to be primarily due to the different hadronization models.
+The data measurement is between the two generators, with both generators showing deviations from the data of 30\% or more.
+In the $H_T$ observable, substantial mismodeling of up to 20\% is observed for the \mgpy sample, but the \sherpa sample is able to reproduce the data to within 10\%.
+
+Explicitly tuning the hadronization models to these measurements should substantially improve the modeling.
+Since the measurement is simultaneous in both observables this can be done while taking correlations into account, which would not be possible with the independent IBU measurements in \Cref{sec:zjets-validation-ibu}.
+Further because this measurement is unbinned, it is possible to use it to tune entirely new types of hadronization models, specifically those built using deep learning techniques.
+There is a growing body of work on this topic, many of which assume that unbinned measurements such as this one exist and are able to furnish training data~\cite{Assi:2025gog,Bierlich:2023fmh,Bierlich:2023zzd,Bierlich:2024xzg,Chan:2023ume,Ghosh:2022zdz,Ilten:2022jfm}.
+As morre unbinned measurements are performed in the future, hopefully these new deep learning based approaches will be able to better reproduce the LHC data and provide more accurate measurements and searches in runs 4 and 5 of the LHC.
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.48\linewidth, alt={Unfolded differential cross section of the charged-particle multiplicity N_ch compared to the IBU measurement and to the MG5 FxFx and Sherpa 2.2.11 truth predictions.}]{figures/ch6/Ntracks_data.pdf}
     \includegraphics[width=0.48\linewidth, alt={Unfolded differential cross section of the scalar sum H_T of charged-particle transverse momenta compared to the IBU measurement and to the MG5 FxFx and Sherpa 2.2.11 truth predictions.}]{figures/ch6/HT_data.pdf}
-    \caption{Unfolded differential cross section of the charged-particle multiplicity $N_{\mathrm{ch}}$ (left) and the scalar sum of charged-particle transverse momenta $H_T^{\mathrm{ch}}$ (right). The \Omnifold measurement (black points) is shown together with an independent IBU measurement (green points) and the truth-level predictions of the \textsc{MG5}~FxFx (blue) and \textsc{Sherpa}~2.2.11 (pink) samples. Error bars on the data show the total uncertainty; shaded boxes on the generator predictions show the theory uncertainty. The muons from the $Z$ boson decay are not included.}
+    \caption{Unfolded differential cross section of the charged-particle multiplicity $N_{ch}$ (left) and the scalar sum of charged-particle transverse momenta $H_T$ (right). The \Omnifold measurement (black points) is shown together with the particle-level predictions of the \mgpy (blue) and \sherpa (pink) samples. Error bars on the data show the total uncertainty and shaded boxes on the generator predictions show the theory uncertainty.}
     \label{fig:zjets-results-ue}
 \end{figure}
 
+\FloatBarrier
 
 \subsection{Jet Shape Observables}
 \label{sec:zjets-results-shape}

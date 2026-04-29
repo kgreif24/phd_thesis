@@ -252,7 +252,7 @@ For high order correlators the number of pairs (or tuples) of objects grows comb
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.65\linewidth, alt={Log-log plot of the normalized two-point energy correlator versus angular scale R sub L for CMS 2011 open data AK5 jets. The figure highlights three regions labeled Free Hadron at low R sub L, Transition at intermediate R sub L, and Quarks/Gluons at larger R sub L.}]{figures/ch2/anec_cms_open.png}
-  \caption{The two-point energy correlator measured in CMS 2011 open data for high \pt jets, showing distinct free-hadron, transition, and quark/gluon regimes as a function of the angular scale $R_L$ (called $z$ in the text). Figure adapted from Ref.~\cite{Komiske:2022enw}.}
+  \caption{The two-point energy correlator measured in CMS 2011 open data for high \pt jets, showing distinct free-hadron, transition, and quark/gluon regimes as a function of the angular scale $R_L$ (called $z$ in the text). Figure adapted from Ref.~\cite{Komiske:2022enw} under a CC~BY~4.0 license.}
   \label{fig:cms-open-eec}
 \end{figure}
 
@@ -352,7 +352,7 @@ Fractal dimensions are expected as interpolations betwen the dimensions illustra
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.85\linewidth, alt={Illustration of the scale dependence of the intrinsic dimension of a dataset, showing that at large distances the data appear zero-dimensional while at smaller scales their manifold structure is revealed.}]{figures/ch2/id_scale}
-  \caption{Illustration of the scale dependence of the intrinsic dimension. At large length scales the data appear as a single point (zero dimensions); at smaller scales the geometry of the underlying data manifold becomes visible and the estimated dimension increases. \textbf{TODO: cite!}}
+  \caption{Illustration of the scale dependence of the intrinsic dimension. At large length scales the data appear as a single point (zero dimensions); at smaller scales the geometry of the underlying data manifold becomes visible and the estimated dimension increases. Figure adapted from Ref.~\cite{id-figure} under a CC~BY~4.0 license.}
   \label{fig:id_scale}
 \end{figure}
 
@@ -383,11 +383,11 @@ A quick summary is as follows:
 
 Most intrinsic dimension estimators require that the vector space used to describe the data be equipped with a metric so that pairwise distances between points can be calculated.
 For jet data, the natural choice is the Energy Mover's Distance (EMD), introduced in \cite{Komiske:2019fks}.
-The EMD between two jets $\mathcal{E}$ and $\mathcal{E}'$ is defined as the minimum amount of ``work'' required to rearrange the energy flow of one jet into the other,
+The EMD between two jets $\mathcal{E}$ and $\mathcal{E'}$ is defined as the minimum amount of ``work'' required to rearrange the energy flow of one jet into the other,
 \begin{equation}
-  EMD(\mathcal{E}_k, \mathcal{E}_l) = \min_{f_{ij}} \sum_{i,j} f_{ij} \frac{\theta_{ij}}{R} + | \sum_i E_i - \sum_j E_j |,
+  EMD(\mathcal{E}, \mathcal{E'}) = \min_{f_{ij}} \sum_{i,j} f_{ij} \frac{\theta_{ij}}{R} + | \sum_i E_i - \sum_j E_j |,
 \end{equation}
-where $f_{ij}$ is the optimal transport plan moving energy from particle $i$ in one jet to particle $j$ in the other, $\theta_{ij}$ is the angle between the three-momentum vectors of the $i$-th and $j$-th particles, and $R$ is the radius of the jet.
+where $f_{ij}$ is the optimal transport plan moving energy from particle $i$ in jet $\mathcal{E}$ to particle $j$ in jet $\mathcal{E'}$, $\theta_{ij}$ is the angle between the three-momentum vectors of the $i$ and $j$ particles, and $R$ is the radius of the jets.
 The second term accounts for differences in the overall energy normalization between the jets.
 The $f_{ij}$ satisfy the following constraints:
 \begin{align}
@@ -400,17 +400,16 @@ Given the cost function for the EMD is weighted by the particle energies, the EM
 This makes it a physically well-motivated metric for jet data.
 To use the EMD as a substructure observable, it is useful to preprocess the jets to remove any irrelevant features, such as the location of the jet in the pseudorapidity-azimuth ($\eta$-$\phi$) plane or its rotation.
 The standard approach, used throughout, is to apply a lorentz boost and rotation to the jets such that they are centered in the $\eta$-$\phi$ plane, and then rotate the jets about their axis such that the first principle component of the jet radiation pattern points toward the positive $\phi$ axis.
-See Chapter~\ref{ch:zjets} for more details.
 
 \subsection{The Nearest-Neighbor Intrinsic Dimension Estimator}
 
 Given a set of $N$ jets with EMDs calculated between all pairs (the number of EMDs to compute is $N^2$), the nearest-neighbor intrinsic dimension (NNID) estimator~\cite{NIPS2004_74934548, DAgnolo:2025qqr} constructs a likelihood from the ratios of distances to successive nearest neighbors.
 For a jet $k$, define the distance ratio
 \begin{equation}
-  \mu_{k,ij} = \frac{\mathrm{EMD}(k, \mathrm{NN}_j(k))}{\mathrm{EMD}(k, \mathrm{NN}_i(k))},
+  \mu_{k,ij} = \frac{\mathrm{EMD}(\mathcal{E}_k, \mathrm{NN}_j(k))}{\mathrm{EMD}(k, \mathrm{NN}_i(k))},
   \label{eqn:mu_ratio}
 \end{equation}
-where $\mathrm{NN}_i(k)$ denotes the $i$th nearest neighbor of jet $k$ in the EMD metric.
+where $\mathrm{NN}_i(k)$ denotes the $i$th nearest neighbor of jet $k$ by the EMD metric.
 These distance ratios depend on the values of the unphysical indices $i$ and $j$.
 In what follows, I follow Ref.~\cite{DAgnolo:2025qqr} and set $j = 2i$ throughout, reducing the number of free parameters to one.
 An illustration of these ratios is provided for two dimensional data in Figure~\ref{fig:nnid_illustration}.
@@ -440,38 +439,34 @@ To do this each jet's contribution to the likelihood is scaled by its weight, an
 \subsection{Generator-Level Results}
 
 Given the novelty of this observable in particle physics, it is worth presenting some generator level results before moving on.
-Jets clustered from particle-level charged particles are sampled from the \textsc{MadGraph} and \textsc{Sherpa} samples described in Chapter~\ref{ch:zjets}.
-See (\textbf{TODO: make foward reference better}) for more details.
+Jets clustered from particle-level charged particles are sampled from the \mgpy and \sherpa samples described in Chapter~\ref{ch:zjets}.
+See \Cref{sec:zjets-eventsel} for more details.
 Each point in the curves corresponds to a given choice of the unphysical index $i$, which produces a NNID and median EMD estimate.
-The uncertainties on the theoretical predictions are shown as colored boxes.
-The results are shown in three panels covering different regions of the NNID vs median EMD curve in order to resolve the fine structure.
+The uncertainties on the theoretical predictions are shown as shaded bands about the curve.
+The results are shown in two views covering different regions of the NNID vs median EMD curve in order to resolve the fine structure.
+In general the NNID versus median EMD curves agree within uncertainties between the two generators.
+The observation that the intrinsic dimension of jets is low, only several dimensions, is striking given the naive representation in terms of the four-momenta of the jet constituents has several tens of dimensions.
+Further the intuition about the intrinsic dimensionality of \Cref{fig:id_scale} generally applies to jet data as well.
+The apparent dimensionality of the manifold decreases as the length scale increases.
+There is however a small increase in the NNID between median EMD values of roughly $20$ to $30$~GeV.
+This is an empirical observation that is difficult to explain from a theoretical standpoint.
 
 \begin{figure}[t]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth, alt={NNID versus median EMD at low EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_low}
+    \includegraphics[width=\linewidth, alt={NNID versus median EMD at low EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/gen_meas_nnid_low}
     \label{fig:nnid_low}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth, alt={NNID versus median EMD at intermediate EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_mid}
-    \label{fig:nnid_mid}
-  \end{subfigure}
-  \\[1em]
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth, alt={NNID versus median EMD at high EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/truth_gen_nnid_high}
+    \includegraphics[width=\linewidth, alt={NNID versus median EMD at high EMD scales, comparing MadGraph and Sherpa generators.}]{figures/ch2/gen_meas_nnid_high}
     \label{fig:nnid_high}
   \end{subfigure}
-  \caption{Nearest-neighbor intrinsic dimension (NNID) as a function of the median EMD scale, computed at truth level for the \textsc{MadGraph} (purple) and \textsc{Sherpa} (gold) event generators used in Chapter~\ref{ch:zjets}. The three panels show the same curve over different ranges of the EMD axis to resolve fine structure. Differences between the generators are most pronounced at very low EMD scales.}
+  \caption{Nearest-neighbor intrinsic dimension (NNID) as a function of the median EMD scale, computed at truth level for the \textsc{MadGraph} (blue) and \textsc{Sherpa} (pink) event generators used in Chapter~\ref{ch:zjets}. The two views show the same curve over different ranges of the EMD axis to resolve fine structure. General agreement within uncertainties is observed.}
   \label{fig:nnid_generators}
 \end{figure}
-
-The two generators generally agree but show visible differences at very low EMD values.
-The NNID at the lowest scales probes fine differences in jet substructure between two jets that globally look very similar.
-It is not surprising that these subtle differences are sensitive to imperfections in the event generators.
 
 The first experimental measurement of the intrinsic dimensionality of jets is presented in this thesis.
 It represents a somewhat different approach to jet physics, in which the focus is on asking basic questions about the experimental data ``as data'' and then evaluating the ability of QCD and the Standard Model to reproduce the answers.
