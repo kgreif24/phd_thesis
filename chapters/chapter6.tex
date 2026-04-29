@@ -952,35 +952,39 @@ In this context, the slightly degraded accuracy of the measurement is a very sma
 \subsection{Comparison to the previous round Multifold measurement}
 \label{sec:zjets-validation-mf}
 
-The previous round Multifold measurement~\cite{STDM-2020-17} measured the same 24 observables in the same fiducial volume using the same input dataset and MC samples.
-The principal methodological differences relative to the present measurement are the classifier (MLP operating on a fixed-length input versus ParT operating on variable-length inputs), the absence of pretraining, and the treatment of the top background (a $100\%$ uncertainty on the total top yield versus an explicit un-binned subtraction).
-Direct comparison between the two measurements on their 24 common observables tests whether these methodological changes produce a statistically consistent result.
+The previous round Multifold measurement~\cite{ATLAS:2024xxl} measured the same 24 observables in the same fiducial volume using the same input dataset and MC samples.
+The unbinned spectra from the Multifold measurement are publicaly available, allowing the results from the full phase space measurement to be compared to its smaller scale counterpart.
+The principal methodological differences between the measurements are the classifier (MLP operating on a fixed-length input versus ParT operating on variable-length inputs) and the absence of pretraining in the Multifold measurement.
 
-\Cref{fig:zjets-mf-pd-data} shows this comparison for two representative observables, $p_T^{\mu\mu}$ and $m_{j1}$, on both pseudodata and data.
-The \Omnifold and Multifold central values and total uncertainties agree within statistical fluctuations for every bin shown.
-The network-initialization uncertainty, derived from the spread of per-run unfolded spectra across independent training seeds, is substantially smaller in the present measurement than in the previous round---directly a consequence of the pretraining step of \Cref{sec:zjets-pretraining}, which reduces the run-to-run variance of the ParT classifier output by roughly a factor of two (cf. \Cref{fig:zjets-pretrain-uncert}).
-The reduction is sufficiently large that the present analysis uses only ten training seeds to estimate the network-initialization uncertainty, where the previous round used one hundred, at the same nominal precision on the ensemble mean.
+\Cref{fig:zjets-mf-data} shows this comparison for the same four representative observables used in the IBU comparison.
+Unlike the IBU comparison the central values predicted by the full phase space measurement are shifted uniformly up from the Multifold measurement.
+This is because the full run 2 luminosity measurement was revised upward between the Multifold and Omnifold measurements~\cite{ATLAS:2022hro}.
+Beyond this the measurements are very similar in these four observables and the other 20 observables which are not explicitly shown here.
+This is expected given the data inputs and unfolding methodology are very similar.
+These results show that with the methodological improvements discussed in \Cref{sec:zjets-omnifold}, unfolding the full phase space comes with almost no reduction in precision compared with unfolding the more limited 24 dimensional phase space.
 
-\begin{figure}[tb]
+\begin{figure}[p]
     \centering
-    \includegraphics[width=0.95\linewidth, alt={Side-by-side Omnifold versus previous round Multifold pseudodata measurement comparison for dimuon pT and leading track jet mass.}]{figures/ch6/mf_pd_pT_ll.pdf} \\
-    \includegraphics[width=0.95\linewidth, alt={Side-by-side Omnifold versus previous round Multifold pseudodata measurement comparison for leading track-jet mass.}]{figures/ch6/mf_pd_m_trackj1.pdf}
-    \caption{Comparison of the present \Omnifold measurement with the previous round Multifold measurement on pseudodata for two representative observables: dimuon transverse momentum $p_T^{\mu\mu}$ (top) and leading track-jet mass $m_{j1}$ (bottom). Each row shows the \Omnifold result in the first two sub-panels (main plot and uncertainty budget) and the Multifold result in the last two.}
-    \label{fig:zjets-mf-pd-data}
-\end{figure}
-
-\begin{figure}[tb]
-    \centering
-    \includegraphics[width=0.95\linewidth, alt={Same comparison of Omnifold versus previous round Multifold on data for dimuon pT and leading track jet mass.}]{figures/ch6/mf_data_pT_ll.pdf} \\
-    \includegraphics[width=0.95\linewidth, alt={Same comparison of Omnifold versus previous round Multifold on data for leading track-jet mass.}]{figures/ch6/mf_data_m_trackj1.pdf}
-    \caption{As \Cref{fig:zjets-mf-pd-data}, but on real data. The two measurements agree within their respective total uncertainties across both observables.}
+    \begin{tabular}{@{}ccc@{}}
+        \textbf{\Omnifold{} vs. Multifold} & \textbf{\Omnifold{} uncertainty} & \textbf{Multifold uncertainty} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the dimuon transverse momentum observable.}]{figures/ch6/multifold/mf_data_pT_ll.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the dimuon transverse momentum observable.}]{figures/ch6/data_disp_pT_ll.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the dimuon transverse momentum observable.}]{figures/ch6/multifold/mf_pT_ll_uncert_budget.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the leading track-jet mass observable.}]{figures/ch6/multifold/mf_data_m_trackj1.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the leading track-jet mass observable.}]{figures/ch6/data_disp_m_trackj1.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the leading track-jet mass observable.}]{figures/ch6/multifold/mf_m_trackj1_uncert_budget.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the sub-leading track-jet rapidity observable.}]{figures/ch6/multifold/mf_data_y_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/data_disp_y_trackj2.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/multifold/mf_y_trackj2_uncert_budget.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/multifold/mf_data_tau3_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/data_disp_tau3_trackj2.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/multifold/mf_tau3_trackj2_uncert_budget.pdf}
+    \end{tabular}
+    \caption{Comparison of the present \Omnifold data measurement with the previous round Multifold measurement for four representative observables. The first column compares the unfolded spectra, the second column shows the \Omnifold uncertainty budget, and the third column shows the Multifold uncertainty budget. Rows show $p_T^{\mu\mu}$, $m_{j1}$, $y_{j2}$, and $\tau_3^{j2}$.}
     \label{fig:zjets-mf-data}
 \end{figure}
 
-Taken together, the pseudodata closure tests, the IBU comparison, and the Multifold comparison cover three independent dimensions of validation.
-The \Omnifold measurement reproduces its truth target in every observable tested, it agrees with a conventional binned unfolding wherever the two overlap, and it reproduces a previously-published ATLAS measurement on the 24 observables common to both.
-None of these tests exposes a residual systematic effect not already captured by the method uncertainties of \Cref{sec:zjets-uncert}, and the measurement is therefore taken to be fit for purpose across the full range of observables presented in \Cref{sec:zjets-results}.
-
+\FloatBarrier
 
 \section{Results: Four Physics Use Cases}
 \label{sec:zjets-results}
