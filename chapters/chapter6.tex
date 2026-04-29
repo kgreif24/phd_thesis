@@ -852,39 +852,102 @@ The usage recommendations for the public spectra (see \Cref{sec:zjets-discussion
 \subsection{Comparison to Iterative Bayesian Unfolding}
 \label{sec:zjets-validation-ibu}
 
-An independent IBU measurement~\cite{DAGOSTINI1995487} of the same 24 previous round observables has been produced with the same input data, MC samples, and uncertainty treatment as the \Omnifold measurement.
-IBU is a standard binned unfolding technique in which a response matrix built from the MC is iteratively applied to the binned detector-level data to produce an unfolded spectrum.
-It is not un-binned, it is not multi-dimensional, and its 24 outputs each require a separate unfolding exercise.
-It is nonetheless the natural reference for validating any new method, and the extent to which the \Omnifold and IBU results agree for the subset of observables accessible to both is the strongest method-level cross-check available.
+A second method of validation is to compare the results to independent measurements of the 24 observables measured by the Multifold analysis, plus $N_{ch}$ and $H_T$, performed with IBU~\cite{DAgostini:1994fjx}.
+See \Cref{sec:binned-unfolding-methods} for a review of IBU.
+This comparison was done for both the pseudodata and data measurements, but only the results of the data measurement will be shown here since the pseudodata measurement can be independently validated using the $\chi^2$ tests in \Cref{sec:zjets-validation-chi2}.
 
-Comparing the \Omnifold and IBU unfolded spectra on pseudodata, the two methods agree on the central value within the quoted statistical and method uncertainties for every bin of every observable, and their uncertainty budgets have comparable overall size.
-On data, where there is no truth target against which to diagnose accuracy, the agreement between the two methods is itself the cross-check: if both methods recovered the data correctly they should agree, and they do.
-Full side-by-side comparisons for all 24 observables are provided in the internal analysis note.
-What is shown here instead is a more quantitative comparison of the unfolding uncertainty, which is the most diagnostic feature for assessing whether the extra degrees of freedom afforded by the un-binned method are being fully exploited.
-The per-bin unfolding uncertainty is projected onto the observable family (muon kinematics, track-jet kinematics, substructure, underlying event) and displayed as a single summary histogram.
-\Cref{fig:zjets-ibu-unfold-uncert} shows the result for the total unfolding uncertainty, on both pseudodata and data.
-The \Omnifold unfolding uncertainty is slightly larger than the IBU one across all four observable families and in both pseudodata and data; the difference is on the order of $10$--$30\%$ relative to the IBU value depending on observable.
-This is perhaps surprising: the \Omnifold approach is fully differential in the input particle-level feature space and should therefore be less sensitive to hidden-variable effects than IBU, which must marginalize over them.
-The observed behavior has two plausible contributions.
-First, the \Omnifold classifier's performance is known to depend on hyperparameter choices, and the single set of hyperparameters used across all hidden-variable alternatives is not individually optimal for each alternative prior; a per-alternative optimization was judged computationally infeasible.
-Second, the dominant hidden variable is the hadron composition, which is truly un-constrained at detector level and therefore produces identical behavior in \Omnifold and IBU.
-The hadron-composition uncertainty alone, shown in \Cref{fig:zjets-ibu-hadcomp-uncert}, is essentially identical between the two methods, confirming that both are equally insensitive to this variable.
+Comparisons of the \Omnifold and IBU based measurements of four observables are shown  in \Cref{fig:zjets-ibu-data-comparison}.
+In general excellent agreement between the \Omnifold and IBU measurements is observed, with differences in the central values always less than a few percent.
+The largest difference occurs in the last bin of the $m_{j1}$ observable which has large uncertainties for both measurements.
+The total uncertainties produced by both measurements are generally similar but have noticeable differences in a few of the bins shown.
+For example the total uncertainty for \Omnifold is smaller than IBU in the bulk of the $m_{j1}$ and $\tau_{3}^{j2}$ distributions but larger in the tail.
+All differences between the uncertainty budgets are due to the unfolding uncertainties.
+Note that it is a non-trivial cross check that the \Omnifold measurement is able to nearly exactly reproduce the experimental, theoretical, and statistical uncertainties of IBU.
+A possible explanation for the larger unfolding uncertainties of \Omnifold in the tails of distributions is that there are limited data statistics in this region.
+IBU avoids this issue by binning over low statistics regions, but the binning in the \Omnifold results is done only after the unfolding is performed.
+The unfolding itself is unbinned and so suffers from the lack of data statistics.
+Practically this corresponds to a limited amount of data events to use in the step one neural network trainings.
 
-\begin{figure}[tb]
+\begin{figure}[p]
     \centering
-    \includegraphics[width=0.95\linewidth, alt={Total unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for pseudodata.}]{figures/ch6/IBU_vs_Omnifold_Total_pseudodata_proj_subfam.pdf} \\
-    \includegraphics[width=0.95\linewidth, alt={Total unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/IBU_vs_Omnifold_Total_data_proj_subfam.pdf}
-    \caption{Bin-by-bin total unfolding uncertainty, projected onto the four observable families (muon kinematics, track-jet kinematics, substructure, underlying event), for the \Omnifold and IBU measurements. Top: pseudodata. Bottom: data. The \Omnifold unfolding uncertainty is slightly larger than IBU across all four families and in both pseudodata and data, with the largest difference in the substructure observables.}
-    \label{fig:zjets-ibu-unfold-uncert}
+    \begin{tabular}{@{}ccc@{}}
+        \textbf{\Omnifold{} vs. IBU} & \textbf{\Omnifold{} uncertainty} & \textbf{IBU uncertainty} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the dimuon transverse momentum observable.}]{figures/ch6/of_data_with_ibu_pT_ll.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the dimuon transverse momentum observable.}]{figures/ch6/data_disp_pT_ll.pdf} &
+        \includegraphics[page=28, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the dimuon transverse momentum observable.}]{figures/ch6/ibu_pseudodata_results.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the leading track-jet mass observable.}]{figures/ch6/of_data_with_ibu_m_trackj1.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the leading track-jet mass observable.}]{figures/ch6/data_disp_m_trackj1.pdf} &
+        \includegraphics[page=343, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the leading track-jet mass observable.}]{figures/ch6/ibu_pseudodata_results.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the sub-leading track-jet rapidity observable.}]{figures/ch6/of_data_with_ibu_y_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/data_disp_y_trackj2.pdf} &
+        \includegraphics[page=488, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/ibu_pseudodata_results.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/of_data_with_ibu_tau_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/data_disp_tau3_trackj2.pdf} &
+        \includegraphics[page=604, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/ibu_pseudodata_results.pdf}
+    \end{tabular}
+    \caption{Comparison of the \Omnifold data measurement with the corresponding IBU measurement for four representative observables. The first column compares the unfolded spectra, the second column shows the \Omnifold uncertainty budget, and the third column shows the corresponding IBU uncertainty budget. Rows show $p_T^{\mu\mu}$, $m_{j1}$, $y_{j2}$, and $\tau_3^{j2}$. In the left column, the black (green) markers indicate the \Omnifold (IBU) measurement, and the blue and pink markers indicate the \mgpy and \sherpa generator predictions respectively.}
+    \label{fig:zjets-ibu-data-comparison}
 \end{figure}
 
-\begin{figure}[tb]
+Given the unfolding uncertainties are the only noticeable differences between the \Omnifold and IBU based measurements, it is also worth performing a global comparison of these uncertainties across measurements of many different observables.
+This is done by binning the \Omnifold measurement in the same bins measured by IBU in the 24 + 2 observables, calculating the unfolding uncertainties, and using the magnitude of the unfolding uncertainties to fill a histogram.
+Importantly the bin entries all correspond to the same high dimensional measurement for \Omnifold, but to 26 independent single dimensional measurements for IBU.
+The results for the data measurement are shown in \Cref{fig:zjets-ibu-global-hidden-data,fig:zjets-ibu-global-unfold-data}.
+\Cref{fig:zjets-ibu-global-hidden-data} shows the hidden variable and hadron composition uncertainties.
+
+Overall the magnitude of the uncertainties is very similar between the IBU and \Omnifold measurements, with \Omnifold showing slightly larger uncertainties globally.
+This is particularly true in the hidden variable uncertainty for the substructure observables, which correspond to the $\tau_1$, $\tau_2$, and $tau_3$ observables for the leading and sub-leading track jets.
+From the discussion in \Cref{sec:zjets-uncert-unfold}, naively an \Omnifold based measurement should be \textit{less} sensitive to hidden variables.
+This somewhat unexpected behavior is understood as the combination of two factors.
+The first is that \Omnifold is data limited in the tails of distributions given the need to train neural networks.
+This explanation is backed up by the observation that the data driven unfolding uncertainty, which roughly corresponds to the method bias produced by each unfolding method, is also slightly larger for \Omnifold in the substructure observables as seen in \Cref{fig:zjets-ibu-global-unfold-data}.
+\Omnifold simply provides a less accurate unfolding in the tails of these distributions due to the limited data and this results in larger unfolding uncertainties.
+The second factor is that \Omnifold only has an advantage with respect to hidden variables if the dominant hidden variables are constrained at detector-level by some observable used in the unfolding.
+As noted in \Cref{sec:zjets-uncert-unfold}, the most dominant hidden variables in this measurement are the truth hadron fractions, which are not constrained at detector level and so remain hidden variables even for \Omnifold.
+The first factor is a limitation of \Omnifold that is partially addressed by the pretraining procedure.
+The second factor is a feature of the target phase spce rather than \Omnifold itself, and could be more or less relevant in other measurements.
+See \Cref{sec:zjets-discussion} for further discussion of these points.
+
+Importantly the total unfolding uncertainties shown in the bottom panel of \Cref{fig:zjets-ibu-global-unfold-data} are largely very similar between the two methods.
+It is worth placing the slight degradation of the measurement accuracy in perspective.
+The IBU measurements used to fill the histograms are of a single observable with fixed binning.
+Though they are more accurate, most of the applications of the measurement shown in \Cref{sec:zjets-results} would be either difficult or impossible perform with IBU unfolding.
+The \Omnifold measurement encodes vastly more information and unlocks entirely new types of measurements.
+In this context, the slightly degraded accuracy of the measurement is a very small price to pay.
+
+\begin{figure}[p]
     \centering
-    \includegraphics[width=0.95\linewidth, alt={Hadron composition hidden variable unfolding uncertainty comparison between IBU and Omnifold on data, showing the two methods essentially agree.}]{figures/ch6/IBU_vs_Omnifold_HVHad_data_proj_subfam.pdf}
-    \caption{Bin-by-bin hadron-composition hidden-variable unfolding uncertainty on data, projected onto the four observable families, for the \Omnifold and IBU measurements. The two methods yield essentially identical values for this uncertainty, confirming that both are equally insensitive to the hadron-composition hidden variable.}
-    \label{fig:zjets-ibu-hadcomp-uncert}
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Hidden-variable unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_HV_data_proj_subfam.pdf}
+        \caption{Hidden-variable unfolding}
+    \end{subfigure}\\
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Hadron-composition hidden-variable unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_HVHad_data_proj_subfam.pdf}
+        \caption{Hadron-composition hidden variable}
+    \end{subfigure}
+    \caption{Histograms of the hidden variable (top) and hadron composition (bottom) unfolding uncertainties, where each entry in the histogram corresponds to a bin in the \Omnifold or IBU based measurements of the 24 observables from the Multifold analysis plus $N_{ch}$ and $H_T$. In each panel, these observables are broken into muon (top left), track-jet (top right), substructure (bottom left), and underlying event (bottom right) groups. The shaded histograms represent the IBU uncertainty and the lines represent the \Omnifold uncertainty.}
+    \label{fig:zjets-ibu-global-hidden-data}
 \end{figure}
 
+\begin{figure}[p]
+    \centering
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Data-driven unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_DD_data_proj_subfam.pdf}
+        \caption{Data-driven unfolding}
+    \end{subfigure}\\
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Total unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_Total_data_proj_subfam.pdf}
+        \caption{Total unfolding}
+    \end{subfigure}
+    \caption{Histograms of the data-driven (top) and total (bottom) unfolding uncertainties, where each entry in the histogram corresponds to a bin in the \Omnifold or IBU based measurements of the 24 observables from the Multifold analysis plus $N_{ch}$ and $H_T$. In each panel, these observables are broken into muon (top left), track-jet (top right), substructure (bottom left), and underlying event (bottom right) groups. The shaded histograms represent the IBU uncertainty and the lines represent the \Omnifold uncertainty.}
+    \label{fig:zjets-ibu-global-unfold-data}
+\end{figure}
+
+\FloatBarrier
 
 \subsection{Comparison to the previous round Multifold measurement}
 \label{sec:zjets-validation-mf}
