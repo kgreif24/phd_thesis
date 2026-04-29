@@ -759,67 +759,95 @@ Given the top background is small the practical important of this uncertainty in
 \section{Unfolding validation}
 \label{sec:zjets-validation}
 
-Because the un-binned cross section is only useful to the extent that it can faithfully be projected onto any reasonable observable, the validation program for this measurement is extensive.
+Given the novel nature of this cross section measurement extensive validation of the results is required.
 Three layers of validation are presented in this section.
-First, a set of binned $\chi^2$ closure tests on pseudo-data quantify the agreement between the unfolded distributions and their known truth target for every observable measured in the previous round, together with the newly introduced $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$ observables.
-Second, the measurement is compared to an independent Iterative Bayesian Unfolding (IBU) measurement of the same 24 observables performed with the same input data and MC samples.
+First, a set of binned $\chi^2$ goodness of fit tests between the pseudodata measurement and the truth pseudodata target are performed in the twenty four observables measured in the Multifold analysis plus the $N_{ch}$ and $H_T$ observables.
+Second, the measurement is compared to a Iterative Bayesian Unfolding (IBU) based measurements of these 26 observables which use the same data inputs but are only differential in one observable at a time.
 Third, the measurement is compared directly to the previous round Multifold result on the 24 observables common to both, providing a cross-check against a method that has already been used in an ATLAS publication.
 
-
-\subsection{Statistical closure tests on pseudo-data}
+\subsection{Statistical closure tests}
 \label{sec:zjets-validation-chi2}
 
-The pseudo-data used throughout the analysis consist of the \textsc{Sherpa}~2.2.11 sample used as data.
-Because the pseudo-data truth is known exactly, comparing the unfolded result to the pseudo-data truth quantifies the combined method bias and statistical precision of the measurement.
-A binned $\chi^2$ test is performed for every observable that was measured in the previous round~\cite{STDM-2020-17}, together with $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$, using a fiducial-volume selection requiring the sub-leading track-jet $p_T$ to exceed $5$~GeV (a standard recommendation carried over from the previous round to ensure all events have non-trivial hadronic activity).
+In the pseudodata measurement the desired truth distribution is known.
+This allows the method bias and uncertainty model to be jointly through a binned $\chi^2$ goodness of fit test between the measurement and the truth pseudodata.
+This test can be run in many different observables to ensure the measurement is accurate in the full phase space as desired.
 The test statistic is
 \begin{equation}
     \chi^2 \;=\; (\hat{\vec{\sigma}} - \vec{T})^{\top} \Sigma^{-1} (\hat{\vec{\sigma}} - \vec{T}),
 \end{equation}
-where $\hat{\vec{\sigma}}$ is the vector of unfolded cross sections, $\vec{T}$ is the vector of pseudo-data truth values, and $\Sigma$ is the covariance matrix of the unfolded cross section built from the method uncertainties of \Cref{sec:zjets-uncert}.
-Experimental nuisance parameters (muon, tracking, pileup, luminosity) are not included in $\Sigma$ for this test because the nominal MC and pseudo-data are generated with identical detector-level simulation settings; only the method uncertainties and the statistical uncertainties on the finite MC and pseudo-data samples are relevant.
-A Gaussian-kernel smoothing is applied to the hidden-variable unfolding uncertainty for all observables except the jet-mass observables, where the uncertainty carries a sharp shape that smoothing was found to distort.
+where $\hat{\vec{\sigma}}$ is the vector of unfolded cross sections, $\vec{T}$ is the vector of pseudodata truth values, and $\Sigma$ is the covariance matrix of the unfolded cross section built from the uncertainties of \Cref{sec:zjets-uncert} excepting the experimental uncertainties since the nuisance parameters are fixed to their nominal values for the nominal MC and pseudodata.
+The hidden variable uncertainty was observed to show some mild statistical fluctuations after propagation through the unfolding because it is built with an entirely independent sample of particle-level events.
+To eliminate these a Gaussian kernal smoothing is applied to the hidden variable uncertainty before it is used to fill the covariance matrix, except for in the jet mass observables because the uncertainty has a sharp shape that smoothing was found to distort.
+The signed uncertainties and covariance matrix used as input to the $\chi^2$ tests are shown for the $N_{ch}$ and $m_{j1}$ observables in \cref{fig:zjets-closure-uncert-page15,fig:zjets-closure-uncert-page25} respectively.
+For most observables, as with the observables shown here, the unfolding uncertainties are leading, followed by the tracking uncertainties and then the remaining uncertainties are generally negligible.
 
-\Cref{tab:zjets-closure-pvalues} shows the resulting $p$-values for the full phase-space \Omnifold measurement, together with the corresponding values from the previous round Multifold measurement on the 24 common observables.
-For every observable, the \Omnifold $p$-value exceeds the $0.05$ threshold, indicating no significant tension between the unfolded distribution and the pseudo-data truth.
-The smallest \Omnifold $p$-value is $0.056$ for the sub-leading track-jet mass, and the smallest Multifold $p$-value is $0.17$ for the leading track-jet mass; the two methods trade off on which individual observable is most tense, and neither approaches the $0.05$ threshold.
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=15, width=0.48\linewidth, alt={Signed uncertainty contributions used as inputs to the chi-squared closure test for the observable shown on page 15.}]{figures/ch6/uncert_signed_merged.pdf}
+    \includegraphics[page=15, width=0.48\linewidth, alt={Correlation matrix used as input to the chi-squared closure test for the observable shown on page 15.}]{figures/ch6/uncert_corr_matrix_merged.pdf}
+    \caption{Signed uncertainty contributions (left) and covariance-matrix correlations (right) used as inputs to the binned $\chi^2$ closure test, shown for the $m_{j1}$ observable.}
+    \label{fig:zjets-closure-uncert-page15}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=25, width=0.48\linewidth, alt={Signed uncertainty contributions used as inputs to the chi-squared closure test for the observable shown on page 25.}]{figures/ch6/uncert_signed_merged.pdf}
+    \includegraphics[page=25, width=0.48\linewidth, alt={Correlation matrix used as input to the chi-squared closure test for the observable shown on page 25.}]{figures/ch6/uncert_corr_matrix_merged.pdf}
+    \caption{Signed uncertainty contributions (left) and covariance-matrix correlations (right) used as inputs to the binned $\chi^2$ closure test, shown for the $N_{ch}$ observable.}
+    \label{fig:zjets-closure-uncert-page25}
+\end{figure}
+
+Under the null hypothesis that the reweighted particle-level MC is drawn from the same distribution as the target truth pseudodata, this test statistic should follow a $\chi^2$ distribution with degrees of freedom equal to the number of bins used minus one.
+Since running sufficient bootstraps to observe this is computationally infeasible, instead a p-value is calculated for each test.
+The p-value quantifies the probability of observing a test statistic larger than the one actually observed under the null hypothesis.
+A large p-value indicates that the probability of the observed test statistic is large under the null hypothesis and the null hypothesis can be accepted.
+A small p-value indicates the opposite and that the null hypothesis should be rejected.
+A typical threshold for acceptable p-values is $0.05$, indicating that there is a 5\% chance of the observed statistic or greater under the null hypothesis.
+\Cref{tab:zjets-closure-pvalues} shows the resulting p-values for the full phase-space \Omnifold measurement, together with the corresponding values from the previous round Multifold measurement on the 24 common observables.
+For every observable, the \Omnifold p-value exceeds the $0.05$ threshold, indicating no significant tension between the unfolded distribution and the pseudodata truth.
+The smallest \Omnifold p-value is $0.056$ for the sub-leading track-jet mass, and the smallest Multifold $p$-value is $0.17$ for the leading track-jet mass.
 
 \begin{table}[tb]
     \centering
-    \caption{Binned $\chi^2$ and $p$-value from the pseudo-data closure test, for every observable measured in the previous round plus $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$. Results are shown for the full phase-space \Omnifold measurement and for the previous round Multifold measurement on the 24 common observables. Empty cells correspond to observables not measured by a particular method. The closure test is performed in the fiducial volume restricted to events with sub-leading track-jet $p_T > 5$~GeV, with Gaussian-kernel smoothing applied to the hidden-variable unfolding uncertainty for every observable except the jet-mass observables.}
+    \caption{Binned $\chi^2$ and $p$-value from the pseudodata closure test, for every observable measured in the previous round plus $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$. Results are shown for the full phase-space \Omnifold measurement and for the previous round Multifold measurement on the 24 common observables. Empty cells correspond to observables not measured by a particular method. The closure test is performed in the fiducial volume restricted to events with sub-leading track-jet $p_T > 5$~GeV, with Gaussian-kernel smoothing applied to the hidden-variable unfolding uncertainty for every observable except the jet-mass observables.}
     \label{tab:zjets-closure-pvalues}
     \input{tables/ch6/closure_pvalues.tex}
 \end{table}
 
-That every observable passes the closure test is a non-trivial result.
-The charged-particle multiplicity, in particular, is mis-modelled by both \textsc{MG5}~FxFx and \textsc{Sherpa}~2.2.11 at the $10\%$ level pre-unfolding (\Cref{fig:zjets-trackmcdata}), and the closure test demonstrates that this large mis-modelling is recovered by the unfolding to within the quoted uncertainties.
-\Cref{fig:zjets-pd-ue} shows the unfolded $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$ spectra on pseudo-data together with their full uncertainty budgets.
-The uncertainty budgets are dominated by tracking-efficiency uncertainties and the three unfolding uncertainties of \Cref{sec:zjets-uncert-unfold}; the network-initialization and top-background uncertainties are sub-leading throughout.
-The method bias is fully covered by the total uncertainty in every bin.
-\Cref{fig:zjets-pd-trackjet} shows the analogous plots for two representative track-jet observables, the leading track-jet mass $m_{j1}$ and the leading track-jet transverse momentum $p_T^{j1}$; both also close within uncertainties.
+These results are highly non-trivial.
+Large differences between the nominal MC and truth pseudodata are present before unfolding, but these closure tests demonstrate that these are recovered by the unfolding such that the pseudodata measurement and the truth pseudodata agree within the quoted uncertainties.
+\Cref{fig:zjets-pd-ue} shows the unfolded $N_{ch}$ and $H_T$ spectra on pseudodata together with the uncertainty budgets.
+The unfolding uncertainties are dominant for $N_{ch}$ and the tracking uncertainties are dominant for $H_T$.
+Equivalent plots can be drawn for any other observable that is a function of the full phase space.
+\Cref{fig:zjets-pd-trackjet} shows the results for two representative track-jet observables, the leading track-jet mass $m_{j1}$ and the leading track-jet transverse momentum $p_T^{j1}$.
+Notably the method bias is larger than the total uncertainty in a few of the bins of the $m_{j1}$ observable, but the uncertainty budget produces an acceptable p-value of about 0.26 in the $\chi^2$ test.
+The unfolding uncertainties, and in particular the hadron composition uncertainty, is dominant in the $m_{j1}$ observable while the tracking uncertainties are dominant in $p_{T,j1}$.
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.95\linewidth, alt={Pseudodata measurement of the charged particle multiplicity N_ch with uncertainty budget on the right showing dominant tracking and unfolding uncertainties and full coverage of the method bias.}]{figures/ch6/Ntracks_pseudodata.pdf} \\
-    \includegraphics[width=0.95\linewidth, alt={Pseudodata measurement of the scalar sum H_T of charged track transverse momenta with uncertainty budget showing dominant tracking and unfolding uncertainties.}]{figures/ch6/HT_pseudodata.pdf}
-    \caption{Pseudo-data measurement of the event-level charged-particle multiplicity $N_{\mathrm{ch}}$ (top) and scalar sum of charged-track transverse momenta $H_T^{\mathrm{ch}}$ (bottom). Each row shows, left, the unfolded cross section (blue points) compared with the pseudo-data truth (black dashed line) and, right, the uncertainty budget with the total uncertainty (black), the individual uncertainty groups (colored), and the method bias (shaded). Tracking and unfolding uncertainties dominate the budget, and the method bias is covered by the total uncertainty in every bin.}
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the charged particle multiplicity N_ch, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/Ntracks_pseudodata.pdf}
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the scalar sum H_T of charged track transverse momenta, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/HT_pseudodata.pdf} \\
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the charged particle multiplicity N_ch, showing dominant tracking and unfolding uncertainties and full coverage of the method bias.}]{figures/ch6/Ntracks_pseudodata.pdf}
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the scalar sum H_T of charged track transverse momenta, showing dominant tracking and unfolding uncertainties.}]{figures/ch6/HT_pseudodata.pdf}
+    \caption{Pseudodata measurement of the event-level charged-particle multiplicity $N_{\mathrm{ch}}$ (left) and scalar sum of charged-track transverse momenta $H_T^{\mathrm{ch}}$ (right). The top row shows the unfolded cross sections compared with the pseudodata truth, and the bottom row shows the corresponding uncertainty budgets. Tracking and unfolding uncertainties dominate the budget, and the method bias is covered by the total uncertainty in every bin.}
     \label{fig:zjets-pd-ue}
 \end{figure}
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.95\linewidth, alt={Pseudodata measurement of the leading track-jet mass with uncertainty budget showing that the unfolding uncertainty carries a sharp shape to cover the method bias.}]{figures/ch6/of_pd_m_trackj1.pdf}
-    \caption{Pseudo-data measurement of the leading track-jet mass $m_{j1}$. Left: unfolded cross section (blue points) versus pseudo-data truth (black dashed line). Right: uncertainty budget. The hidden-variable unfolding uncertainty carries a sharp shape to cover the method bias at low mass, where hadron-composition effects in the jet interior are most pronounced.}
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the leading track-jet mass, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/pd_disp_m_trackj1.pdf}
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the leading track-jet transverse momentum, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/pd_disp_pT_trackj1.pdf} \\
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the leading track-jet mass, showing that the unfolding uncertainty carries a sharp shape to cover the method bias.}]{figures/ch6/pd_disp_m_trackj1.pdf}
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the leading track-jet transverse momentum.}]{figures/ch6/pd_disp_pT_trackj1.pdf}
+    \caption{Pseudodata measurement of the leading track-jet mass $m_{j1}$ (left) and leading track-jet transverse momentum $p_T^{j1}$ (right). The top row shows the unfolded cross sections compared with the pseudodata truth, and the bottom row shows the corresponding uncertainty budgets. The hidden-variable unfolding uncertainty carries a sharp shape in the leading track-jet mass to cover the method bias at low mass, where hadron-composition effects in the jet interior are most pronounced.}
     \label{fig:zjets-pd-trackjet}
 \end{figure}
 
-The closure tests presented here use the $24+2$ observables from the previous round and the newly introduced event-level quantities.
-For the remaining observables featured in the results section (\Cref{sec:zjets-results}), the same closure-test procedure can be run, and doing so is strongly recommended before using the un-binned measurement to extract any new observable.
-This recommendation is particularly important for observables that may be sensitive to hadron-composition effects, as discussed in \Cref{sec:zjets-uncert-unfold}.
-A closure-test failure is the cleanest signal available that an observable falls outside of the effective resolution of the measurement, and the public release of the un-binned spectra will include tooling to reproduce the closure test for any observable the user wishes to measure.
-The same closure-test procedure, repeated in three restricted phase-space regions---high-$p_T^{\mu\mu}$, $\Delta y_{jj}$- and $m_{jj}$-enhanced electroweak-like, and high-mass $t\bar{t}$/diboson-enhanced---yields $p$-values comparable to those in \Cref{tab:zjets-closure-pvalues}, indicating that the unfolded result retains its accuracy when projected onto narrower fiducial volumes.
-Full details of these limited phase-space tests are given in the internal note and are not reproduced here.
+Additional closure tests also verified good agreement between the pseudodata measurement and the truth pseudodata target in restricted phase space regions, where cuts are placed on the unbinned spectra to further reduce the fiducial volume of the measurement.
+Closure tests were also performed for the applications of the measurement presented in \Cref{sec:zjets-results}.
+The usage recommendations for the public spectra (see \Cref{sec:zjets-discussion}) additionally require that these tests be performed to validate re-interpretations of the measurement on new observables.
 
+\FloatBarrier
 
 \subsection{Comparison to Iterative Bayesian Unfolding}
 \label{sec:zjets-validation-ibu}
@@ -829,13 +857,13 @@ IBU is a standard binned unfolding technique in which a response matrix built fr
 It is not un-binned, it is not multi-dimensional, and its 24 outputs each require a separate unfolding exercise.
 It is nonetheless the natural reference for validating any new method, and the extent to which the \Omnifold and IBU results agree for the subset of observables accessible to both is the strongest method-level cross-check available.
 
-Comparing the \Omnifold and IBU unfolded spectra on pseudo-data, the two methods agree on the central value within the quoted statistical and method uncertainties for every bin of every observable, and their uncertainty budgets have comparable overall size.
+Comparing the \Omnifold and IBU unfolded spectra on pseudodata, the two methods agree on the central value within the quoted statistical and method uncertainties for every bin of every observable, and their uncertainty budgets have comparable overall size.
 On data, where there is no truth target against which to diagnose accuracy, the agreement between the two methods is itself the cross-check: if both methods recovered the data correctly they should agree, and they do.
 Full side-by-side comparisons for all 24 observables are provided in the internal analysis note.
 What is shown here instead is a more quantitative comparison of the unfolding uncertainty, which is the most diagnostic feature for assessing whether the extra degrees of freedom afforded by the un-binned method are being fully exploited.
 The per-bin unfolding uncertainty is projected onto the observable family (muon kinematics, track-jet kinematics, substructure, underlying event) and displayed as a single summary histogram.
-\Cref{fig:zjets-ibu-unfold-uncert} shows the result for the total unfolding uncertainty, on both pseudo-data and data.
-The \Omnifold unfolding uncertainty is slightly larger than the IBU one across all four observable families and in both pseudo-data and data; the difference is on the order of $10$--$30\%$ relative to the IBU value depending on observable.
+\Cref{fig:zjets-ibu-unfold-uncert} shows the result for the total unfolding uncertainty, on both pseudodata and data.
+The \Omnifold unfolding uncertainty is slightly larger than the IBU one across all four observable families and in both pseudodata and data; the difference is on the order of $10$--$30\%$ relative to the IBU value depending on observable.
 This is perhaps surprising: the \Omnifold approach is fully differential in the input particle-level feature space and should therefore be less sensitive to hidden-variable effects than IBU, which must marginalize over them.
 The observed behavior has two plausible contributions.
 First, the \Omnifold classifier's performance is known to depend on hyperparameter choices, and the single set of hyperparameters used across all hidden-variable alternatives is not individually optimal for each alternative prior; a per-alternative optimization was judged computationally infeasible.
@@ -846,7 +874,7 @@ The hadron-composition uncertainty alone, shown in \Cref{fig:zjets-ibu-hadcomp-u
     \centering
     \includegraphics[width=0.95\linewidth, alt={Total unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for pseudodata.}]{figures/ch6/IBU_vs_Omnifold_Total_pseudodata_proj_subfam.pdf} \\
     \includegraphics[width=0.95\linewidth, alt={Total unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/IBU_vs_Omnifold_Total_data_proj_subfam.pdf}
-    \caption{Bin-by-bin total unfolding uncertainty, projected onto the four observable families (muon kinematics, track-jet kinematics, substructure, underlying event), for the \Omnifold and IBU measurements. Top: pseudo-data. Bottom: data. The \Omnifold unfolding uncertainty is slightly larger than IBU across all four families and in both pseudo-data and data, with the largest difference in the substructure observables.}
+    \caption{Bin-by-bin total unfolding uncertainty, projected onto the four observable families (muon kinematics, track-jet kinematics, substructure, underlying event), for the \Omnifold and IBU measurements. Top: pseudodata. Bottom: data. The \Omnifold unfolding uncertainty is slightly larger than IBU across all four families and in both pseudodata and data, with the largest difference in the substructure observables.}
     \label{fig:zjets-ibu-unfold-uncert}
 \end{figure}
 
@@ -865,7 +893,7 @@ The previous round Multifold measurement~\cite{STDM-2020-17} measured the same 2
 The principal methodological differences relative to the present measurement are the classifier (MLP operating on a fixed-length input versus ParT operating on variable-length inputs), the absence of pretraining, and the treatment of the top background (a $100\%$ uncertainty on the total top yield versus an explicit un-binned subtraction).
 Direct comparison between the two measurements on their 24 common observables tests whether these methodological changes produce a statistically consistent result.
 
-\Cref{fig:zjets-mf-pd-data} shows this comparison for two representative observables, $p_T^{\mu\mu}$ and $m_{j1}$, on both pseudo-data and data.
+\Cref{fig:zjets-mf-pd-data} shows this comparison for two representative observables, $p_T^{\mu\mu}$ and $m_{j1}$, on both pseudodata and data.
 The \Omnifold and Multifold central values and total uncertainties agree within statistical fluctuations for every bin shown.
 The network-initialization uncertainty, derived from the spread of per-run unfolded spectra across independent training seeds, is substantially smaller in the present measurement than in the previous round---directly a consequence of the pretraining step of \Cref{sec:zjets-pretraining}, which reduces the run-to-run variance of the ParT classifier output by roughly a factor of two (cf. \Cref{fig:zjets-pretrain-uncert}).
 The reduction is sufficiently large that the present analysis uses only ten training seeds to estimate the network-initialization uncertainty, where the previous round used one hundred, at the same nominal precision on the ensemble mean.
@@ -874,7 +902,7 @@ The reduction is sufficiently large that the present analysis uses only ten trai
     \centering
     \includegraphics[width=0.95\linewidth, alt={Side-by-side Omnifold versus previous round Multifold pseudodata measurement comparison for dimuon pT and leading track jet mass.}]{figures/ch6/mf_pd_pT_ll.pdf} \\
     \includegraphics[width=0.95\linewidth, alt={Side-by-side Omnifold versus previous round Multifold pseudodata measurement comparison for leading track-jet mass.}]{figures/ch6/mf_pd_m_trackj1.pdf}
-    \caption{Comparison of the present \Omnifold measurement with the previous round Multifold measurement on pseudo-data for two representative observables: dimuon transverse momentum $p_T^{\mu\mu}$ (top) and leading track-jet mass $m_{j1}$ (bottom). Each row shows the \Omnifold result in the first two sub-panels (main plot and uncertainty budget) and the Multifold result in the last two.}
+    \caption{Comparison of the present \Omnifold measurement with the previous round Multifold measurement on pseudodata for two representative observables: dimuon transverse momentum $p_T^{\mu\mu}$ (top) and leading track-jet mass $m_{j1}$ (bottom). Each row shows the \Omnifold result in the first two sub-panels (main plot and uncertainty budget) and the Multifold result in the last two.}
     \label{fig:zjets-mf-pd-data}
 \end{figure}
 
@@ -886,7 +914,7 @@ The reduction is sufficiently large that the present analysis uses only ten trai
     \label{fig:zjets-mf-data}
 \end{figure}
 
-Taken together, the pseudo-data closure tests, the IBU comparison, and the Multifold comparison cover three independent dimensions of validation.
+Taken together, the pseudodata closure tests, the IBU comparison, and the Multifold comparison cover three independent dimensions of validation.
 The \Omnifold measurement reproduces its truth target in every observable tested, it agrees with a conventional binned unfolding wherever the two overlap, and it reproduces a previously-published ATLAS measurement on the 24 observables common to both.
 None of these tests exposes a residual systematic effect not already captured by the method uncertainties of \Cref{sec:zjets-uncert}, and the measurement is therefore taken to be fit for purpose across the full range of observables presented in \Cref{sec:zjets-results}.
 
@@ -915,7 +943,7 @@ The muons from the $Z$ boson decay are excluded from both observables.
 The \Omnifold and IBU results agree with one another within their respective total uncertainties.
 Poor agreement with the generator predictions is observed for $N_{\mathrm{ch}}$: \textsc{MG5}~FxFx over-predicts the multiplicity at low $N_{\mathrm{ch}}$ and under-predicts it at high $N_{\mathrm{ch}}$, while \textsc{Sherpa}~2.2.11 is wrong in the opposite direction, with deviations from the data at the $50\%$ level at the two ends of the spectrum.
 The modelling of $H_T^{\mathrm{ch}}$ is better, with the \textsc{Sherpa}~2.2.11 prediction agreeing with the measurement within uncertainties across the full range and the \textsc{MG5}~FxFx prediction showing residual $10$--$20\%$ shape differences.
-That the two generators disagree with the data in opposite directions on $N_{\mathrm{ch}}$, and that the \Omnifold measurement is nonetheless able to recover the pseudo-data truth for this observable (\Cref{fig:zjets-pd-ue}), is a useful illustration of the non-trivial role of the unfolding uncertainty: no single MC prior is assumed to be correct, and the measurement uncertainty is sized to cover the generator ambiguity.
+That the two generators disagree with the data in opposite directions on $N_{\mathrm{ch}}$, and that the \Omnifold measurement is nonetheless able to recover the pseudodata truth for this observable (\Cref{fig:zjets-pd-ue}), is a useful illustration of the non-trivial role of the unfolding uncertainty: no single MC prior is assumed to be correct, and the measurement uncertainty is sized to cover the generator ambiguity.
 
 \begin{figure}[tb]
     \centering
