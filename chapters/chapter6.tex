@@ -1164,47 +1164,43 @@ Ideally this measurement also serves as some motivation for the theory community
 
 This chapter has presented a full phase space measurement of $Z(\to\mu\mu)$+jets production in proton--proton collisions at $\sqrt{s} = 13$~TeV using the full Run~2 ATLAS dataset.
 The measurement is the highest-dimensional cross section measurement ever performed, reaching up to 843 simultaneous dimensions and a mean of 150 dimensions per event.
-It supersedes the previous round Multifold measurement~\cite{ATLAS:2024xxl}, extending from a fixed set of 24 observables to the entire charged particle-level phase space.
-The result is best understood not as a traditional histogram but as a dataset: a reweighted sample of particle-level MC events encoding the full differential cross section, which can be projected onto any observable of interest without repeating the measurement.
+It supersedes the previous round Multifold measurement~\cite{ATLAS:2024xxl}, extending from a fixed set of 24 observables to the phase space of all charged particles.
+The result of the is best understood as a dataset rather than a histogram, which can be projected onto any observable of interest without repeating the measurement.
 Four physics use cases were presented in \Cref{sec:zjets-results}, but these represent only a small fraction of the possible applications.
 
-To support further analyses, the unbinned spectra are made publicly available alongside a codebase that documents best practices and reproduces the four use cases presented here.
-Prospective users of the public spectra should follow two important recommendations.
+To support further analyses, the unbinned spectra are planned to be made publicly available alongside a codebase that documents best practices and reproduces the four use cases presented here\footnote{The equivalent documentation for the Multifold analysis is available at \href{https://gitlab.cern.ch/atlas-physics/public/sm-z-jets-omnifold-2024}{https://gitlab.cern.ch/atlas-physics/public/sm-z-jets-omnifold-2024}}.
+The documentation contains a set of usage recommendations, two of which are worth highlighting.
 First, the particle-level MC sample used for unfolding must provide sufficient support in any phase space region of interest.
 In practice this is enforced by requiring that at least 5,000 effective events are contained in each bin of any histogram constructed from the particle-level data.
-Second, and more critically, users must validate the measurement in their desired binning and phase space by running the pseudodata measurement described in \Cref{sec:zjets-pseudodata} and computing a $\chi^2$ test statistic and p-value as was done for the 26 observables in \Cref{sec:zjets-validation-chi2}.
+Second, users must validate the measurement in their desired binning and phase space by running the pseudodata measurement described in \Cref{sec:zjets-pseudodata} and computing a $\chi^2$ test statistic and p-value as was done for the 26 observables in \Cref{sec:zjets-validation-chi2}.
 This validation step is essential because the unfolded spectra contain truth-level information, such as the truth hadron fractions discussed in \Cref{sec:zjets-uncert-unfold}, that is not constrained at detector level.
-Observables sensitive to such hidden variables will fail this check and should not be reported without additional uncertainty coverage.
+Observables sensitive to such hidden variables will fail this check, indicating that the observables cannot be constrained with this measurement.
 
-There are many natural extensions of this measurement that could be pursued in future analyses.
-Several are immediately apparent.
+There are many applications of this measurement that can and should be pursued in the future.
+A few are worth mentioning here.
 The EEC observable measured in \Cref{sec:zjets-results-eec} provides a direct avenue for extracting the strong coupling $\alpha_s$ from the perturbative QCD scaling regime, and extensions to higher-point energy correlators are straightforward given the unbinned representation of the final state.
 The underlying event results of \Cref{sec:zjets-results-ue} can be used to tune conventional event generators, or to fit machine learning based hadronization models which assume precisely this kind of unbinned measurement~\cite{Assi:2025gog,Bierlich:2023fmh,Bierlich:2023zzd,Bierlich:2024xzg,Chan:2023ume,Ghosh:2022zdz,Ilten:2022jfm}.
 The $Z$ boson kinematic distributions, including the signed $\Delta\phi$ observable, can be used for EFT fits to anomalous couplings.
 Because the measurement is fully differential in the hadronic recoil, it can also constrain backgrounds in other measurements and searches, for example electroweak $Zjj$ production is a significant background in many Higgs boson measurements.
 The Lund jet plane~\cite{Dreyer:2020brq} can be measured directly from the unfolded charged particles, including the second and tertiary jet planes which have never been measured experimentally.
 Finally, quark/gluon tagging applied to the charged particle jets would allow differences in substructure between quark- and gluon-initiated jets to be extracted from data.
-
 One limitation of the measurement is that all observables are constructed from charged particles only, so direct comparison to perturbative QCD calculations is complicated by the absence of the neutral component.
-Significant theoretical progress has been made in this direction through the track function formalism~\cite{Chang:2013rca,Chang:2013iba}, which provides a systematic framework for performing perturbative calculations on charged-particle observables, so this limitation is not fundamental.
+Significant theoretical progress has been made in this direction through the track function formalism~\cite{Chang:2013rca,Chang:2013iba}, which provides a systematic framework for performing perturbative calculations on charged-particle observables.
 
-This measurement also demonstrates that full phase space cross section measurements are technically feasible at a hadron collider.
-The natural question is what other processes can be treated this way.
+This measurement also demonstrates that full phase space cross section measurements are technically feasible at a hadron collider, so extension of these methods to measurements of other processses is natural next step.
 Dijet production, top quark pair production, Higgs processes, and multi-lepton final states are all promising targets.
-Measurements of these processes would greatly enrich the data available for global EFT fits~\cite{CMS:2023xyc,Heimel:2024drk}, which currently rely on a patchwork of binned measurements that do not jointly capture the full information available.
-
-Two practical limitations of the present measurement deserve attention.
-The acceptance effects in the $Z$+jets phase space discussed in \Cref{sec:zjets-omnifold} are small enough to be negligible, but they become significant when the event selection involves jets.
+Measurements of these processes would be very useful for global EFT fits~\cite{CMS:2023xyc,CMS:2025ugn,Heimel:2024drk}, which currently rely on a patchwork of binned measurements that do not capture all available information.
+Two practical limitations of unbinned and high dimensional unfolding methods will need to be overcome to perform these future measurements.
+The acceptance effects in the $Z$+jets phase space discussed in \Cref{sec:zjets-omnifold} are small enough to be negligible, but they become significant when the event selection involves jets, which is necessary in top process measurements.
 Methods for handling acceptance effects in unbinned unfolding have been proposed~\cite{Butter:2025mek,Canelli:2025ybb} but have not yet been applied in a real analysis.
-Addressing this will be necessary before the approach can be extended to jet-triggered final states.
 The computational cost of the measurement is also substantial.
 Fine-tuning roughly 25 thousand transformer networks required approximately 400,000 A100 GPU-hours.
-While this is large in absolute terms, it is a fraction of the resources consumed by frontier language model training, and significant optimizations are certainly possible.
+While this is large in absolute terms, it is a fraction of the resources consumed by frontier language model training, and significant optimizations are possible.
 As GPU resources become more available and methodologies mature, computational cost should become less of a bottleneck.
 
-The HL-LHC era will produce datasets of unprecedented size and quality, and the question of how to preserve the information they contain for future use is a central one for the field.
-Unbinned full phase space measurements are the most information-preserving method of data archival currently available, and represent the closest analog to retaining the raw collision data indefinitely.
-The HL-LHC datasets will remain scientifically useful for decades, and methods like the one presented here are well suited to ensuring that utility is not lost to the limitations of binned representations.
+The HL-LHC era will produce datasets of unprecedented size and quality that will be useful many years into the future.
+A central goal of particle physics over the next two decades should be to allow wide and open access to these data, and preserve them for future use.
+Unbinned and high dimensional cross section measurements are a tool that address many of the challenges, in addition to offering the ability to measure new observables and improve our understanding of LHC data at present.
+They should become standard practice in the HL-LHC physics program.
 
 \FloatBarrier
-
