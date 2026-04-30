@@ -440,7 +440,7 @@ To do this each jet's contribution to the likelihood is scaled by its weight, an
 
 Given the novelty of this observable in particle physics, it is worth presenting some generator level results before moving on.
 Jets clustered from particle-level charged particles are sampled from the \mgpy and \sherpa samples described in Chapter~\ref{ch:zjets}.
-See \Cref{sec:zjets-eventsel} for more details.
+See \Cref{sec:zjets-results-id} for more details.
 Each point in the curves corresponds to a given choice of the unphysical index $i$, which produces a NNID and median EMD estimate.
 The uncertainties on the theoretical predictions are shown as shaded bands about the curve.
 The results are shown in two views covering different regions of the NNID vs median EMD curve in order to resolve the fine structure.
@@ -467,6 +467,19 @@ This is an empirical observation that is difficult to explain from a theoretical
   \caption{Nearest-neighbor intrinsic dimension (NNID) as a function of the median EMD scale, computed at truth level for the \textsc{MadGraph} (blue) and \textsc{Sherpa} (pink) event generators used in Chapter~\ref{ch:zjets}. The two views show the same curve over different ranges of the EMD axis to resolve fine structure. General agreement within uncertainties is observed.}
   \label{fig:nnid_generators}
 \end{figure}
+
+% Additionally the NNID estimator at low values of $i$, which probes the short distances in the dataset, is very sensitive to negative weights, as shown in \Cref{fig:zjets-results-nnid-neg-weights}.
+% The figure shows that the \mgpy MC sample, which has some fraction of negative event weights, produces NNID estimates with unphysical noise at small median EMD scales, corresponding to low values of the unphysical index $i$.
+% This behavior is absent in the all-positive reweighted \mgpy sample and the detector level data.
+% The negative weights cause the instability because some jets add negative mass to the nearest neighbor calculation.
+% For this reason the measurements in \Cref{ch:zjets} are not compared to the generator predictions at very low median EMD scales.
+
+% \begin{figure}[tb]
+%     \centering
+%     \includegraphics[width=0.65\linewidth, alt={Comparison of nearest-neighbor intrinsic dimension estimates with and without negative weights, showing that the estimator is sensitive to negative weights at low neighbor index values.}]{figures/ch2/nnid_neg_weight_comparison.pdf}
+%     \caption{Comparison of NNID estimates provided by three datasets, the raw \mgpy generator predictions with a fraction of negative event weights, an all positive reweighted version of the \mgpy sample, and detector-level data which has event weights of $1.0$ by construction. The NNID estimator on the MC sample with a fraction of negative weights has unphysical noise at small median EMD. This behavior is absent in the all-positive reweighted MC sample and the detector level data.}
+%     \label{fig:zjets-results-nnid-neg-weights}
+% \end{figure}
 
 The first experimental measurement of the intrinsic dimensionality of jets is presented in this thesis.
 It represents a somewhat different approach to jet physics, in which the focus is on asking basic questions about the experimental data ``as data'' and then evaluating the ability of QCD and the Standard Model to reproduce the answers.

@@ -1027,34 +1027,36 @@ As morre unbinned measurements are performed in the future, hopefully these new 
 \subsection{Jet Shape Observables}
 \label{sec:zjets-results-shape}
 
-Because the un-binned measurement is differential in the kinematics of individual charged particles, jets can be clustered on the fly post-unfolding using any algorithm and any radius parameter, without having to re-run the measurement.
-This is a qualitative change relative to conventional jet measurements, in which each combination of algorithm and radius requires its own dedicated jet energy scale and resolution calibration.
-Here the jet itself is not a calibrated input to the measurement; it is a function constructed on the unfolded charged particles.
-As an illustration, this section presents an unfolded measurement of the charged-particle $p_T$ density profile about the jet axis,
+Because the un-binned measurement is differential in the kinematics of individual charged particles, jets can be clustered on the fly post-unfolding using any jet clustering algorithm and any radius parameter without the need to repeat the measurement with a different jet definition.
+In typical jet measurement, each combination of algorithm and radius requires its own dedicated jet energy scale and resolution calibration, making performing a measurement with many different types of jets difficult.
+However in this measurement the jet itself is not a calibrated input to the measurement.
+It is a function constructed on the unfolded charged particles, just like any other event-level observable.
+As an illustration of this ability, this section presents an unfolded measurement of the charged-particle $p_T$ density profile about the jet axis,
 \begin{equation}
     \langle \rho(r) \rangle \;=\; \frac{1}{N_{\mathrm{jets}}} \sum_{\mathrm{jets}} \frac{p_T(r - \Delta r / 2,\, r + \Delta r / 2)}{A_{\mathrm{annulus}}(r, \Delta r)},
     \label{eqn:zjets-rho-r}
 \end{equation}
 where $r$ is the angular distance from the jet axis in $(y, \phi)$ space, $\Delta r$ is the width of an annulus centered at $r$, $p_T(r - \Delta r / 2, r + \Delta r / 2)$ is the scalar $p_T$ sum of all charged particles falling in that annulus, and $A_{\mathrm{annulus}}(r, \Delta r) = \pi[(r + \Delta r / 2)^2 - (r - \Delta r / 2)^2]$ is the annulus area.
-Because the sum is averaged over jets, the observable is invariant under overall normalization changes and is therefore a purely geometric probe of the radiation pattern.
+Because the sum is averaged over jets, the observable is invariant under overall normalization changes and cannot be interpreted as a cross section.
+Note also that a given jet contributes some $p_T$ density to each bin in the radius $r$.
+Accounting for these correlations is difficult with binned unfolding methods, but they are tracked naturally in the unbinned \Omnifold measurement since a single event weight is applied to the jets contribution to each bin.
 All charged particles in the event are considered, including those that do not fall within the clustered jet.
-The jet selection is $p_T^{\mathrm{jet}} \in [120,\,150]$~GeV and $|y^{\mathrm{jet}}| < 1$, a narrow window just above the peak of the leading-jet $p_T$ spectrum that balances statistics and a reasonably uniform underlying kinematics.
+The jet selection is $p_T^{\mathrm{jet}} \in [120,\,150]$~GeV and $|y^{\mathrm{jet}}| < 1$, a narrow window just above the peak of the leading-jet $p_T$ spectrum.
 
 \Cref{fig:zjets-results-shape-akt} shows $\langle \rho(r) \rangle$ for jets clustered with the anti-$k_t$ algorithm~\cite{Cacciari:2008gp} with radius parameter $R = 0.4$, together with its uncertainty budget.
+The \mgpy and \sherpa generators reproduce the overall shape of $\langle \rho(r) \rangle$ reasonably well for all three algorithms, though residual differences at the $5$--$10\%$ level are visible both in the core and in the tails.
 The observed profile is sharply peaked at small $r$ and falls off as radiation is captured further from the jet axis, with a characteristic dip near $r \approx R$ before rising again at the jet boundary.
-This dip, often noted in jet-shape literature, is understood to be an artifact of the anti-$k_t$ clustering's tendency to produce nearly circular jets; it is not a physical feature of the underlying radiation pattern.
+This dip is an artifact of the anti-$k_t$ clustering algorithm which centers the jet axis on the highest $p_T$ jet constituent rather then some average over the entire radiation pattern, possibly preventing particles near the jet boundary from being included in the jet.
 The un-binned measurement provides a direct test of this interpretation.
 Because the unfolded charged-particle kinematics are preserved, the same events can be re-clustered with any choice of algorithm and the profile recomputed from scratch.
-\Cref{fig:zjets-results-shape-algos} compares $\langle \rho(r) \rangle$ computed with the anti-$k_t$, $k_t$~\cite{Ellis:1993tq}, and Cambridge--Aachen (C/A)~\cite{Dokshitzer:1997in,Wobisch:1998wk} algorithms, all at $R = 0.4$.
-The dip at $r \approx R$ is pronounced for anti-$k_t$, absent for C/A, and intermediate for $k_t$, confirming that the feature is driven by the clustering algorithm rather than by the data.
-\textsc{Sherpa}~2.2.11 and \textsc{MG5}~FxFx reproduce the overall shape of $\langle \rho(r) \rangle$ reasonably well for all three algorithms, though residual differences at the $5$--$10\%$ level are visible both in the core and in the tails.
-A conventional binned measurement of $\langle \rho(r) \rangle$ would have required an independent jet calibration for each algorithm; here all three are produced from the same un-binned input.
+\Cref{fig:zjets-results-shape-algos} compares $\langle \rho(r) \rangle$ computed with the anti-$k_t$, $k_t$~\cite{Ellis:1993tq}, and Cambridge--Aachen (C/A)~\cite{Dokshitzer:1997in} algorithms, all at $R = 0.4$.
+The dip at $r \approx R$ is absent for $k_t$ and C/A jets, confirming that the feature is driven by the clustering algorithm rather than by the data.
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.48\linewidth, alt={Measurement of the charged-particle pT density profile rho(r) about the jet axis using the anti-kt R=0.4 algorithm, compared to the MG5 FxFx and Sherpa 2.2.11 truth predictions.}]{figures/ch6/radial_profile_rho.pdf}
     \includegraphics[width=0.48\linewidth, alt={Uncertainty budget for the charged-particle pT density profile measurement with the anti-kt R=0.4 algorithm.}]{figures/ch6/radial_profile_rho_uncertainties.pdf}
-    \caption{Unfolded charged-particle $p_T$ density profile $\langle \rho(r) \rangle$ about the jet axis, for jets clustered with the anti-$k_t$ algorithm at $R = 0.4$ and satisfying $p_T^{\mathrm{jet}} \in [120, 150]$~GeV and $|y^{\mathrm{jet}}| < 1$. Left: the \Omnifold measurement (black points) compared to the truth-level predictions of the \textsc{MG5}~FxFx (blue) and \textsc{Sherpa}~2.2.11 (pink) samples. Right: the uncertainty budget, with the total uncertainty (black dashed line) and the individual uncertainty groups (colored bands). All charged particles in the event are included in the sum over the annulus, not only those assigned to the jet.}
+    \caption{Unfolded charged-particle $p_T$ density profile $\langle \rho(r) \rangle$ about the jet axis, for jets clustered with the anti-$k_t$ algorithm at $R = 0.4$ and satisfying $p_T^{\mathrm{jet}} \in [120, 150]$~GeV and $|y^{\mathrm{jet}}| < 1$. Left: the \Omnifold measurement (black points) compared to the truth-level predictions of the \mgpy (blue) and \sherpa (pink) samples. Right: the uncertainty budget, with the total uncertainty (black dashed line) and the individual uncertainty groups (colored bands). All charged particles in the event are included in the sum over the annulus, not only those assigned to the jet.}
     \label{fig:zjets-results-shape-akt}
 \end{figure}
 
@@ -1065,68 +1067,85 @@ A conventional binned measurement of $\langle \rho(r) \rangle$ would have requir
     \label{fig:zjets-results-shape-algos}
 \end{figure}
 
+\FloatBarrier
 
 \subsection{Energy Correlator Observables}
 \label{sec:zjets-results-eec}
 
-Energy correlation functions are a class of observables that measure inter-correlations in the distribution of energy produced in particle collisions~\cite{Moult:2025nhu}.
-They are of particular theoretical interest because they can be calculated to high precision in perturbative QCD~\cite{Jaarsma:2025tck}, they carry direct sensitivity to the strong coupling constant $\alpha_s$~\cite{Chen:2023zlx,CMS-SMP-22-015}, and they exhibit deep structural relationships to the formal structure of the QCD theory~\cite{Lee:2022uwt}.
-The two-point energy-energy correlator (EEC), which quantifies the correlation between the energies of two particles as a function of the opening angle between their momentum vectors, is the simplest and most widely studied member of this class.
-It is defined as
-\begin{equation}
-    \mathrm{EEC}(z) \;=\; \frac{1}{\sigma} \sum_{i,j} \int \mathrm{d}\sigma \, \frac{E_i E_j}{Q^2} \, \delta\!\left(z - \frac{1 - |\cos\theta_{ij}|}{2}\right),
-    \label{eqn:zjets-eec}
-\end{equation}
-where $E_i$ and $E_j$ are the energies of the two particles in the correlation, $\theta_{ij}$ is the opening angle between their momentum vectors, $z$ is the dimensionless angular separation observable, $Q^2$ is the sum of the energies of all particles included in the sum, and $\sigma$ is the total cross section in the fiducial volume.
-Existing LHC measurements of the EEC either use the particles within individual jets~\cite{CMS-SMP-22-015,STAR:2025jut} or target lower-moment correlations that avoid the need to evaluate a statistical moment during unfolding~\cite{STDM-2014-03,STDM-2016-10,STDM-2018-51}; neither approach measures the full-event EEC differentially in $z$.
-Because the EEC involves a double sum over particles followed by a statistical moment, it is not accessible to conventional binned unfolding of any fixed-dimensional observable.
-The un-binned measurement presented here lifts this restriction: the EEC is simply a function applied to the unfolded charged-particle kinematics, with no additional unfolding exercise required.
+Energy correlator observables were introduced in \Cref{sec:eec}.
+All existing experimental measurements of the two-point energy correlator, summarized in \Cref{tab:eec-measurements}, use binned unfolding methods to correct for the detector response.
+This is a difficult observable to unfold with binned methods for two reasons.
+First, both the opening angle $\theta_{ij}$ and the energy weight $E_i E_j$ in \Cref{eqn:eec} receive corrections from the unfolding, requiring at least a two-dimensional unfolding to be performed.
+Further many measurements of the EEC are performed in bins of overal jet $p_T$ in order to extract a universal hadronization scale.
+This requires a three-dimensional unfolding, which is at the limit of what can be done with binned methods~\cite{CMS:2024mlf}.
+Second, even if binned methods can be made to work in two or three dimensions they do not account for correlations in the bin counts resulting from each particle in an event entering the histogram many times.
+As with the jet shape observables in \Cref{sec:zjets-results-shape}, the \Omnifold measurement handles this effect naturally since the correlations are preserved by the common event weight.
 
 \Cref{fig:zjets-results-eec} shows the EEC measured in the full charged final state as a function of $z$, with the sum running over all pairs of charged particles in the event.
-The measurement achieves $5\%$ accuracy or better across the full range of $z$.
-Three scaling regimes are visible, each corresponding to a distinct dynamical regime of the strong interaction.
-At large $z$ ($z > 10^{-2}$), the EEC scales approximately linearly with $z$, the behavior expected of uncorrelated radiation: this is the regime dominated by underlying-event processes which produce no coherent energy flow between particles.
-At intermediate $z$, between roughly $10^{-4}$ and $10^{-3}$, the EEC flattens into a nearly constant plateau; this is the perturbative QCD scaling regime in which the two-point correlation is set by the interactions of quarks and gluons above the confinement scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV.
-At small $z < 10^{-4}$, the linear scaling is restored, reflecting the free streaming of the final-state hadrons which are produced once the partons confine below $\Lambda_{\mathrm{QCD}}$ and no longer interact.
-The \textsc{MG5}~FxFx and \textsc{Sherpa}~2.2.11 predictions both reproduce the three-regime structure, and the transitions between regimes occur at the expected scales.
-\textsc{Sherpa}~2.2.11 nonetheless systematically over-predicts the correlation at small $z$, a feature that matches the analogous mis-modelling observed in the recent CMS measurement of the EEC within jets~\cite{CMS:2024mlf}.
-The covariance matrix of the measurement, which encodes the bin-to-bin correlations of the total uncertainty, is provided in the auxiliary material of the forthcoming publication and is required for any quantitative use of the measurement, such as a fit for $\alpha_s$.
+This is the first measurement of such an observable at a hadron collider, since all existing mesurements measure the EEC only inside jets.
+The measurement achieves $5\%$ accuracy or better across the full range of $z$, which corresponds to opening angles from $0.002$ to $0.64$ radians.
+Three scaling regimes are visible.
+At large $z$ ($z > 10^{-2}$), the EEC scales approximately linearly with $z$, the behavior expected of uncorrelated radiation.
+This is expected at large opening angles since there is no process that produces long range correlations in the radiation pattern.
+At intermediate $z$, between roughly $10^{-4}$ and $10^{-3}$, the EEC flattens into a nearly constant plateau.
+This is the perturbative QCD scaling regime in which the two-point correlation is set by the interactions of quarks and gluons above the confinement scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV.
+In previous measurements of the EEC performed inside jets, this scaling regime was cut off by the jet radius.
+At small $z < 10^{-4}$, the linear scaling is restored, reflecting the non-interacting final-state hadrons which are produced once the partons confine below $\Lambda_{\mathrm{QCD}}$.
+The \mgpy and \sherpa predictions both reproduce the three-regime structure,
+but \sherpa over-predicts the correlation at small $z$.
+A similar effect was observed in Ref.~\cite{CMS:2024mlf}.
+The covariance matrix of the measurement, shown in \cref{fig:zjets-results-eec-cov}, encodes the bin-to-bin correlations of the total uncertainty and is required for any quantitative use of the measurement, such as an extraction of $\alpha_s$.
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.65\linewidth, alt={Measurement of the two-point energy-energy correlator EEC as a function of the angular separation observable z, measured across all pairs of charged particles in the event.}]{figures/ch6/data_eec_xsec.pdf}
-    \caption{Unfolded measurement of the two-point energy-energy correlator EEC as a function of the dimensionless angular separation observable $z$, computed from all pairs of charged particles in the event. The \Omnifold measurement (black points) is shown together with the truth-level predictions of the \textsc{MG5}~FxFx (blue) and \textsc{Sherpa}~2.2.11 (pink) samples. Error bars on the measurement show the total uncertainty; shaded boxes on the generator predictions show the theory uncertainty. Three scaling regimes are visible: linear at large $z$ (uncorrelated underlying event), plateau at intermediate $z$ (perturbative QCD), and linear at small $z$ (free hadrons below $\Lambda_{\mathrm{QCD}}$).}
+    \caption{Unfolded measurement of the two-point energy-energy correlator EEC as a function of the dimensionless angular separation observable $z$, computed from all pairs of charged particles in the event. The \Omnifold measurement (black points) is shown together with the truth-level predictions of the \mgpy (blue) and \sherpa (pink) samples. Error bars on the measurement show the total uncertainty. Shaded boxes on the generator predictions show the theory uncertainty. Three scaling regimes are visible: linear at large $z$ (uncorrelated radiation), plateau at intermediate $z$ (perturbative QCD), and linear at small $z$ (free hadrons below $\Lambda_{\mathrm{QCD}}$).}
     \label{fig:zjets-results-eec}
 \end{figure}
 
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.65\linewidth, alt={Covariance matrix for the unfolded EEC measurement, showing the bin-to-bin correlations of the total measurement uncertainty as a function of the angular separation observable z.}]{figures/ch6/data_eec_cov.pdf}
+    \caption{Covariance matrix of the unfolded EEC measurement shown in \cref{fig:zjets-results-eec}. The matrix encodes the bin-to-bin correlations of the total uncertainty as a function of the dimensionless angular separation observable $z$.}
+    \label{fig:zjets-results-eec-cov}
+\end{figure}
+
+\FloatBarrier
 
 \subsection{Intrinsic Dimensionality of Jets}
 \label{sec:zjets-results-id}
 
-The intrinsic dimensionality (ID) of a dataset is the dimensionality of the manifold on which the data points lie~\cite{CAMASTRA201626}.
-The manifold hypothesis posits that this dimensionality can be substantially lower than the dimensionality of the feature space naively used to describe the data, and estimating it has been proposed as a useful substructure observable in its own right and as a probe of physics beyond the Standard Model~\cite{Komiske:2019fks,DAgnolo:2025qqr}.
-It has never previously been measured in particle physics, however, because it is a property of a dataset rather than a property of a single event or jet; a conventional unfolding, which requires a response matrix built event-by-event, cannot access it.
-The un-binned \Omnifold measurement circumvents this obstruction: the unfolded cross section is a reweighted MC sample and the ID of any subset of the unfolded charged-particle kinematics is directly computable.
-This section presents the first measurement of an ID estimator in LHC data, the nearest-neighbor intrinsic dimension (NNID)~\cite{NIPS2004_74934548} evaluated on a sample of jets drawn from the unfolded charged final state.
+The concept of intrinsic dimensionsality and the NNID estimator was introduced in \Cref{sec:id}.
+Intrinsic dimensionality has never been measured using particle physics data in part because it is a property of a dataset, not a single event or jet, making it impossible to construct the response matrix needed for binned unfolding.
+The un-binned \Omnifold measurement circumvents this obstruction since the result of the measurement is a dataset rather than a histogram.
+This section presents the first measurement of the intrinsic dimensionality of a particle physics dataset using the nearest-neighbor intrinsic dimension estimator (NNID)~\cite{NIPS2004_74934548} evaluated on a sample of jets drawn from the unfolded charged final state.
 
-An ID estimator requires a distance metric between data points.
-This measurement uses the energy mover's distance (EMD) introduced in Ref.~\cite{Komiske:2019fks}, which quantifies the minimum work required to re-arrange the radiation pattern of one jet into that of another and satisfies the triangle inequality.
-A sample of jets is constructed by clustering the unfolded charged particles with the anti-$k_t$ algorithm at $R = 1.0$ and selecting the leading jet in each event with $p_T \in [330, 370]$~GeV and $|\eta| < 2.5$.
-Each jet is assigned the weight of its parent event, and the sample is down-sampled to $50,000$ jets to keep the pairwise EMD computation (which scales as the square of the sample size) tractable.
-The NNID is computed following the recommendations of Ref.~\cite{DAgnolo:2025qqr}: for each jet the EMD to its $i$-th and $j$-th nearest neighbor is evaluated, the ratio of the two is recorded, and a likelihood minimization over the sample of ratios yields the NNID.
-Fixing $j = 2i$ leaves a single free parameter, the un-physical neighbor index $i$.
-The NNID is computed at a logarithmically spaced series of $i$ values, and to translate each $i$ into a physically meaningful scale the weighted median EMD between a jet and its $i$-th nearest neighbor is computed alongside the NNID.
-The final observable is the NNID as a function of the median EMD, obtained by scanning over $i$.
-The full procedure is repeated for every weight variation of the unfolded measurement, yielding uncertainty bands on both the NNID and the median EMD.
+The procedure for calculating the NNID starts with clustering jets with the anti-$k_T$ algorithm and a radius parameter of 1.0 using the particle-level MC samples needed to build the measurement.
+The choice of jet definition is irrelevant and could be changed at will.
+A jets are then taken from the $p_T$ range $[330, 370]$~GeV, which roughly corresponds to initiating parton $p_T$ in the range $[500, 550]$~GeV when accounting for the missing neutral component.
+Next, jets are pre-processed by applying a rotation about the beam axis and lorentz boost along the beam axis such that the jet is centered in the rapidity--azimuth plane.
+The jets are then rotated about the jet axis such that the principle component of the radiation pattern points in the positive $\phi$ direction in the $y$--$\phi$ plane.
+These pre-processing steps remove known symmetries of jets.
+Then the EMD (introduced in \Cref{sec:id}) between every pair of jets in the sample must be calculated.
+In practice this step is compute intensive and requires writing an $N \times N$ array of floating point numbers to disk, where $N$ is the number of jets in the dataset.
+To make the calculation manageable, $50,000$ jets are randomly sampled from the set of jets in the $p_T$ selection for each dataset.
+After calculation of the EMDs, the EMD ratios are calculated and used as input to a one-dimensional maximization of the likelihood in \Cref{eqn:likelihood}, given a choice of the unphysical index $i$.
+The result is an estimate of the intrinsic dimensionality $d$, along with the median EMD between all jets in the dataset and their $i$th nearest neighbor, which is a physical scale that can be used for plotting.
+These calculations must be repeated for each weight variation needed to assess the systematic uncertainties.
+
+Unlike the previous three applications of this measurement, the NNID estimator is entirely unbinned.
+It is a point estimate provided by the data given a choice of the unphysical index $i$.
+This makes the $\chi^2$ tests of \Cref{sec:zjets-validation-chi2} reduce to noting that the total uncertainty on the pseudodata measurement covers the method bias.
+It was checked that this test passes.
 
 \Cref{fig:zjets-results-nnid} shows the result in two complementary ranges of the median EMD.
-The low-EMD range highlights the fine-structure features of the NNID curve, while the high-EMD range captures its asymptotic behavior.
-Both the measurement and the generator predictions exhibit the expected decrease of the NNID with increasing median EMD, a characteristic property of intrinsic-dimension estimators: at low median EMD the jets under comparison have very similar substructure and many dimensions are needed to describe how they differ, while at high median EMD the jets differ coarsely and a low-dimensional manifold suffices.
-Below a median EMD of roughly $20$~GeV the decrease is approximately linear.
-Between $20$ and $30$~GeV the NNID decreases more slowly, and above $30$~GeV it settles to an approximately constant value.
-The \textsc{MG5}~FxFx and \textsc{Sherpa}~2.2.11 predictions capture the overall shape of the data but slightly over-estimate the NNID at the low- and high-median-EMD ends of the spectrum, and under-estimate it at intermediate scales.
-The dip at intermediate median EMD that is visible in both generators is less pronounced in the data.
-Because the NNID is a fundamentally statistical observable, this is the first measurement of such a quantity in particle physics, and it is a measurement that could not have been produced by any conventional binned unfolding.
+The left panel shows the NNID versus median EMD curve at low values of the median EMD.
+The generators reproduce the data within uncertainties, but tend to slightly overestimate the NNID.
+The right panel shows the same curve at higher median EMD values.
+The dip in NNID between $20$ and $30$~GeV is less pronounced in the data than in the generators, as is the increase in NNID above $30$~GeV.
+However overall the generators again agree with the data within uncertainties.
+The measurement also verifies that jet data has no more than several intrinsic dimensions, as predicted by the MC generators.
+This is many fewer dimensions than the several tens of dimensions used by the naive representation of jets in terms of the four-momenta of their constituents.
 
 \begin{figure}[tb]
     \centering
@@ -1136,30 +1155,10 @@ Because the NNID is a fundamentally statistical observable, this is the first me
     \label{fig:zjets-results-nnid}
 \end{figure}
 
+As mentioned in \Cref{sec:id}, intrinsic dimension observables are of interest here not because of a deep link to the underlying QCD theory but because they establish basic facts about jet data.
+Possible links between this class of observables and the QCD theory are interesting, but have never been explored in the theoretical literature, perhaps in part because measurement of these observables was not possible without unbinned and high dimensional unfolding methods.
+Ideally this measurement also serves as some motivation for the theory community to explore these observables in the future.
 
 \section{Discussion}
 \label{sec:zjets-discussion}
-
-The measurement presented in this chapter is, to our knowledge, the first un-binned and full phase-space differential cross section measurement ever published at a hadron collider.
-Its central result is not any one of the four projections of \Cref{sec:zjets-results}, but the un-binned reweighted MC sample from which all four---and arbitrarily many additional observables---can be derived.
-The event-level $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$ measurements demonstrate that conventional summary observables can be extracted from the un-binned spectrum at precision comparable to a dedicated binned unfolding, but with the added freedom to adjust the binning or impose post-unfolding selection criteria after the fact.
-The jet-shape observable $\langle \rho(r) \rangle$ demonstrates that any jet substructure observable defined on charged hadrons, with any clustering algorithm and radius, is constrained by the same underlying measurement, eliminating the need for a dedicated jet calibration per algorithm.
-The EEC and the NNID demonstrate access to a class of observables---those involving sums or statistical reductions over a variable number of final-state particles---that no binned unfolding can address.
-The latter, in particular, has never previously been measured in particle physics; the un-binned, full phase-space target is what makes its measurement possible.
-
-The un-binned spectra together with an example codebase, including tooling for the closure tests of \Cref{sec:zjets-validation-chi2}, will be released publicly with the forthcoming ATLAS publication~\cite{STDM-2024-02}, with the explicit goal of supporting re-interpretation of the measurement in observables that have not yet been envisaged.
-The un-binned top-background subtraction of \Cref{sec:zjets-bkg-subtraction} is not strictly required for this analysis given the $\sim 0.2\%$ top contamination, but it serves as a worked template for extensions of the technique to less pure final states; subsequent applications of these methods to other LHC processes are discussed in Ref.~\cite{Canelli:2025ybb}.
-
-The principal cost of the measurement is computational: producing the full set of unfolded weights and uncertainty variations required approximately $500$ thousand A100-GPU-hours on the Perlmutter supercomputer at NERSC.
-This is a significant resource, only feasible with the dedicated allocations available to the team for this analysis, but it is small relative to the compute budgets routinely deployed in industry-scale machine learning.
-Continued growth in GPU availability for the high-energy-physics community, together with algorithmic innovations to reduce the cost of propagating uncertainties through repeated network re-training, will be essential for broader adoption of the technique.
-The single largest opportunity for improvement remains the size and quality of the pretraining corpus introduced in \Cref{sec:zjets-pretraining}: extending it with more simulated events, with fast-simulation samples, or with externally-trained foundation models, will be required to maintain \Omnifold's precision in lower-statistics final states such as those involving the Higgs boson.
-
-Several concrete extensions of this analysis are natural near-term targets.
-The same measurement could be re-run with the combined Run 2 and Run 3 dataset; although the analysis is not statistically limited, the additional events would directly improve the precision of the un-binned reweighting itself.
-The set of input features per particle could be expanded beyond the kinematic four-vector to include track impact parameters and other displacement information, which would enable secondary-vertex reconstruction on the unfolded sample and open the un-binned measurement to flavor-tagging applications.
-Finally, the measurement could be extended to include the neutral component of the final state, completing the un-binned target.
-Both extensions of the input features will require dedicated work from the relevant ATLAS combined-performance groups to assign systematic uncertainties on the additional low-level objects, but neither is methodologically out of reach.
-A more thorough discussion of the broader implications of un-binned, full phase-space measurements for ATLAS and for the wider LHC programme is deferred to the conclusion of this thesis in \Cref{ch:conclusion}.
-
 
