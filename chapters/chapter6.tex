@@ -2,165 +2,1207 @@
 \chapter{Z+Jets Cross Section Measurement}
 \label{ch:zjets}
 
-% ---------------------------------------------------------------
-% WRITING NOTES:
-%   Target: ~15–20 pages (Week 7: Apr 27 – May 3)
-%   This is the culmination of the thesis.  Structure mirrors
-%   the Z+jets paper; the four physics use cases are the headline
-%   result.
-%   FLAG: this chapter depends on the Z+jets paper results being
-%   finalized.  Coordinate with collaborators on timeline.
-% ---------------------------------------------------------------
+This chapter presents the application of the \Omnifold unfolding method to ATLAS data.
+The analysis is currently in ATLAS review and the paper is expected to be published sometime in the summer of 2026.
+For now, all results presented in this chapter should be considered a work in progress.
 
 \section{Measurement Overview}
 \label{sec:zjets-overview}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Physics motivation
-%    - Z+jets production is one of the most precisely calculable
-%      processes in QCD (high-order calculations available).
-%    - The associated jets carry rich substructure information
-%      about QCD radiation patterns, hadronization, UE.
-%    - An unbinned, high-dimensional measurement with OmniFold
-%      can go far beyond traditional binned cross sections:
-%      it produces per-event particle-level weights that can
-%      be projected onto any observable post-unfolding.
-%    - Highlight novelty: first (or among first) fully
-%      differential unbinned unfolding measurement with this
-%      technique on ATLAS data.
-%
-% 2. Process: pp → Z(→ ll) + jets at sqrt(s) = 13 TeV
-%    - Z boson reconstructed from lepton pair (e+e- or mu+mu-).
-%    - Leading large-R jet selected; substructure observables computed.
-%    - Dataset: [FILL IN — Run 2 luminosity, year(s)].
+\begin{figure}[htb]
+    \centering
+    \input{figures/ch6/lo_feynman_diagrams}
+    \caption{Leading-order Feynman diagrams for $V$+jets production ($V = Z$ or $W$) in proton--proton collisions.
+    (a,\,b) The quark--antiquark annihilation channel $q\bar{q}' \to V g$, with the vector boson emitted from the quark leg (a) or the antiquark leg (b).
+    (c,d) The quark--gluon Compton channel $qg \to Vq$, with the vector boson emitted after (c) or before (d) the gluon is absorbed.
+    For $Z$ production $q$ and $\bar{q}'$ are the same flavour and for $W$ production they are different flavours.
+    Together these two partonic channels, each with two diagrams, constitute the complete set of $\mathcal{O}(\alpha_s)$ contributions to the inclusive $V$+1-jet cross section.}
+    \label{fig:zjets-lo-diagrams}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.85\linewidth, alt={Diagram of Z+jets production in proton-proton collisions, illustrating the hard scatter that produces the Z boson and associated partons, the parton shower, and the hadronization into final-state charged and neutral hadrons that are observed in the detector.}]{figures/ch6/zjets_production.pdf}
+    \caption{Schematic illustration of $Z$+jets production in proton--proton collisions. Two partons, a gluon from the left proton and a quark from the right, participate in a hard scatter producing a $Z$ boson recoiling against a quark. The $Z$ boson decays to two muons. The quark initiates the parton shower and hadronization processes, resulting in a collimated spray of hadrons. Additional processes produce radiation that did not result from the hard scatter. Beam--beam remnants (BBR) are hadrons resulting from the parton shower and hadronization of partons that did not participate in the hard scatter. Initial and final state radiation (ISR and FSR) result in radiation from the initial and final states of the hard scatter process. Finally multiple parton interactions (MPI) can occur between partons in the colliding protons that do not participate in the hard scatter.}
+    \label{fig:zjets-production}
+\end{figure}
+
+The analysis presented in this chapter is a differential cross section measurement of $Z(\to\mu\mu)$+jets production in proton--proton collisions at $\sqrt{s} = 13$~TeV, using the full Run~2 dataset collected by the ATLAS experiment in 2015--2018 and corresponding to an integrated luminosity of $140.1~\mathrm{fb}^{-1}$.
+This is the first full phase space measurement to be performed at the LHC, in which the measurement is differential in the kinematics of every charged final-state particle in the event.
+It is also the first variable-dimensional cross section measurement to be performed at the LHC.
+The target phase space has a minimum of six, a maximum of 843, and a mean of 150 dimensions.
+
+The primary physics goal is to measure jet substructure observables in an un-biased sample of high-$p_T$ jets obtained by placing selections on the dimuon system.
+High \pt muons offer a very clean experimental signature that can be used for triggering and event selection.
+This allows $Z$+jets events to be selected with high efficiency and almost no background, and the hadronic recoil in the event can then be studied without consideration of jet trigger thresholds or other complications.
+Several measurements of the hadronic recoil in $Z$+jets events have been performed at the LHC~\cite{ATLAS:2022nrp,CMS:2022ilp}.
+Most importantly, a previous ATLAS measurement targeting an identical phase space as the measurement presented here, used the Multifold variant of \Omnifold to simultaneously unfold 24 observables~\cite{ATLAS:2024xxl}.
+The measurement presented here is a direct follow-up to this work.
+The previous measurement will be referred to as the ``Multifold measurement'', and the current measurement will be referred to as the ``Omnifold measurement'' in what follows.
+
+The Multifold measurement was the first to apply an unbinned and high dimensional unfolding method to LHC data, and illustrated that these techniques can be used in a realistic context.
+There are two reasons to follow-up the Multifold measurement with a full phase space measurement.
+First, there are many jet substructure observables, and it is impossible to enumerate all of them and construct a measurement differential in each.
+As discussed in \Cref{sec:unbinned-motivation}, full phase space measurements are maximally information preserving and allow for unforeseen observables of interest to be measured without requiring a new analysis.
+Second, some classes of observables can't be trivially unfolded with a fixed-length set of observables.
+Two such observables are measured in this chapter: the two-point energy correlator and nearest neighbor intrinsic dimension observables introduced in \Cref{sec:eec,sec:id} respectively.
+
+A full phase space measurement of $Z$+jets production is substantially more complicated than a fixed-length measurement.
+Measuring the full phase space requires capturing the cross section including all of the complicated processes that occur within proton--proton collisions at the LHC.
+The leading order Feynman diagrams for $Z$+jets production at a hadron collider are illustrated in \Cref{fig:zjets-lo-diagrams}.
+The top (bottom) row diagrams result in events where the $Z$ boson recoils against a gluon (quark).
+Given the large gluon PDF at LHC energies the bottom $qg$ diagrams tend to dominate, so the hadronic recoil in $Z$+jets is primarily quark jets.
+However higher order diagrams, electroweak $Z+jj$ production, or diboson $VZ$ production all can produce events with two or more jets.
+The Multifold measurement only considered observables relating to the leading and sub-leading jets, but when measuring the full phase space all jets are implicitly measured.
+Beyond this additional sensitivity to the hard scatter, the full phase space is also sensitive to other processes in LHC collisions that can produce additional hadronic activity.
+A diagrammatic representation of some of these processes is provided in \Cref{fig:zjets-production}.
+After the parton shower and hadronization processes, a $Z$+jets event can contain several tens of stable charged particles that are measured by the detector.
+These could be the muons from the $Z$ boson decay, or hadrons from the hard scatter recoil, beam--beam remnants, initial or final state radiation, or multiple parton interactions.
+In principle a full phase space measurement is sensitive to all of these processes\footnote{In practice measuring the kinematics of beam--beam remnants is not possible given the limited coverage of ATLAS in the forward region.}, making it a powerful tool for improving the theoretical modeling of proton--proton collisions.
+
+The remainder of this chapter is organized as follows.
+\Cref{sec:zjets-eventsel} describes the event selection and Monte Carlo samples used for the measurement.
+\Cref{sec:zjets-omnifold} details the \Omnifold implementation, including the neural network classifiers, the pretraining procedure, and the un-binned background subtraction.
+\Cref{sec:zjets-uncert} describes the uncertainty propagation, and \Cref{sec:zjets-validation} presents the statistical validation including comparisons to alternative measurements, in particular IBU based measurements and the previous round Multifold result.
+\Cref{sec:zjets-results} then presents measurements of four classes of observables obtained from the full phase space measurement.
+In order, these are simple event-level observables that a poorly modeled by MC generators, jet-shape observables, the energy-energy correlator (EEC), and the nearest-neighbor intrinsic dimension (NNID) of jets.
+\Cref{sec:zjets-discussion} closes with a discussion of future extensions.
+
+\FloatBarrier
 
 \section{Event Selection and Simulation Samples}
 \label{sec:zjets-eventsel}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Data sample
-%    - ATLAS Run 2 dataset: [FILL IN — luminosity, triggers].
-%    - Lepton triggers: single-lepton and dilepton triggers.
-%    - Quality requirements: good runs list (GRL).
-%
-% 2. Object selection
-%    - Electrons: [FILL IN — pT, eta, ID WP, isolation].
-%    - Muons: [FILL IN — pT, eta, ID WP, isolation].
-%    - Z boson: dilepton mass window [FILL IN] GeV.
-%    - Large-R jets: anti-kT R=1.0, trimmed; pT > [FILL IN] GeV,
-%      |eta| < [FILL IN].
-%
-% 3. Simulation samples
-%    - Signal MC: Sherpa 2.2.x Z+jets (matrix element + parton shower).
-%    - Alternative generators: MadGraph+Pythia8, Herwig 7.
-%      Used for generator systematic uncertainties.
-%    - Detector simulation: ATLAS FullSim (Geant4) for nominal;
-%      AFII for large samples.
-%
-% 4. Observables
-%    - Particle-level: jet constituents from truth record.
-%    - Detector-level: calorimeter + track inputs to jet algorithm.
-%    - [FILL IN: list the specific substructure observables
-%      that are included in the OmniFold feature vector.]
+The data sample consists of the full Run~2 $pp$ collision dataset collected by the ATLAS detector between 2015 and 2018, corresponding to an integrated luminosity of $140.1~\mathrm{fb}^{-1}$ after application of the standard ATLAS good runs lists.
+STDM7 derivations are used as the input format because they retain all charged particle tracks.
+The event selection for the analysis is described in \Cref{tab:eventsel}.
+Events must pass a single-muon trigger~\cite{TRIG-2018-01}.
+Given the large dimuon \pt requirement described below all triggers are fully efficient in the target phase space.
+Standard event cleaning requirements reject events with detector errors or data-taking faults.
+To select $Z$+jets events, two opposite-sign muons are required which satisfy $81~\mathrm{GeV} < m_{\mu\mu} < 101~\mathrm{GeV}$ and $p_T^{\mu\mu} > 190~\mathrm{GeV}$.
+The first requirement ensures that the dimuon system falls within the $Z$ boson mass peak window and the second requirement ensures the dimuon system is produced with large \pt.
+The object-level requirements applied to muons and tracks are described in \Cref{tab:ObjCuts}.
+The most important requirement is that all tracks must satisfy $p_T > 0.5$~GeV, the minimum $p_T$ supported by ATLAS tracking measurements, and do not originate from muons.
+The muon isolation requirements ensure that this cut is fully efficient.
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{l|l}
+         \hline
+    \textbf{Event Selection} & \textbf{Description} \\ \hline
+    Good Runs List & Event must be part of GRL \\ \hline
+    Event Cleaning & No LAr, tile calorimeter, or tracker errors. Event is complete. \\ \hline
+    Trigger & Single muon trigger: \\
+    & \texttt{HLT\_mu20\_iloose\_L1MU15\_OR\_HLT\_mu50} (2015) \\
+    & \texttt{HLT\_mu26\_ivarmedium\_OR\_HLT\_mu50} (2016-18) \\ \hline
+    Primary Vertex & $N_{\text{PV}}\geq1$ \\ \hline
+    Muons & $N_{\text{muons}}\geq2$ \\
+          & Opposite charges \\
+          & Pass TTVA recommendations for muons \\
+          & $81\text{ GeV}\leq m_{\mu\mu}\leq 101\text{ GeV}$ \\
+          & $p_T^{\mu\mu}\geq 190$ GeV \\ \hline
+    \end{tabular}
+    \caption{Overview of the applied event selection.}
+    \label{tab:eventsel}
+\end{table}
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{l|l}
+    \hline
+     \textbf{Object} & \textbf{Additional selection criteria} \\ \hline
+     Muons & $p_T>25~\text{GeV}$, $|\eta|<2.4$ \\
+           & Medium quality, pass isolation \texttt{PflowLoose\_VarRad} \\ \hline
+     Tracks & $p_{\text{T}} > 500$ MeV \\
+            & Loose Quality \\
+            & Tight TTVA \\
+            & Do not originate from a muon \\ \hline
+    \end{tabular}
+    \caption{Object level cuts}
+    \label{tab:ObjCuts}
+\end{table}
+
+The fiducial volume targeted by the measurement is defined at particle level using all stable ($c\tau > 10~\mathrm{mm}$) charged particles.
+In general the particle-level requirements mirror the detector-level requirements, except that the dimuon $p_T$ must be greater than 200~GeV.
+As described below the \Omnifold procedure is run with all events that satisfy $p_T^{\mu\mu} > 190$~GeV and then the tighter selection is applied post-unfolding to reduce acceptance effects.
+An important feature of this measurement is that no requirements are placed on jets or on the number or configuration of charged particles (excepting muons).
+This avoids the substantial complications that result from selecting events based on jets, and results in an unbiased sample of jets that can be used for measuring substructure observables.
+The resulting detector-level event sample contains approximately 247~thousand data events.
+
+Monte Carlo simulation plays three roles in this analysis: it provides the nominal prior for \Omnifold, it provides an alternative prior used to estimate the unfolding uncertainty, and it supplies the background template which is subtracted from the data before unfolding.
+The primary contribution to the $Z$+jets signal comes from the production of a $Z$ boson via the strong interactions (the leading order Feynman diagrams for this process are shown in \Cref{fig:zjets-lo-diagrams}).
+The nominal strong $Z$+jets sample is produced with \texttt{MG5\_aMC@NLO}~v2.6.5 at NLO accuracy for up to three additional partons merged using the FxFx prescription~\cite{Alwall:2014hca,Frederix:2012ps} with the NNPDF3.1 NNLO PDF set, showered and hadronized with \textsc{Pythia}~8.240 using the A14 tune.
+This sample is referred to as \mgpy throughout.
+An alternative strong $Z$+jets sample is provided by \textsc{Sherpa}~2.2.11~\cite{Bothmann:2019yzt} with NLO matrix elements for up to two additional partons and LO for up to five, merged using the MEPS@NLO scheme and evolved with the default \textsc{Sherpa} parton shower and cluster hadronization model.
+This sample is referred to as \sherpa throughout.
+
+Sub-leading contributions to the $Z$+jets signal come from electroweak $Z(\to\mu\mu)jj$ production and diboson processes.
+Both processes are modeled with \textsc{Sherpa}~2.2.1 or 2.2.2, and these samples are appended to the strong $Z$+jets samples described above to produce the nominal or alternative MC samples used for unfolding.
+Background contributions from top processes ($t\bar{t}$, $tW$, and single top in $s$ and $t$ channels) are modeled nominally with \textsc{Powheg}~v2~\cite{Alioli:2010xd} interfaced to \textsc{Pythia}~8.230, and an alternative $t\bar{t}$ sample is produced with \textsc{Sherpa}~2.2.12 for evaluation of the background-modeling uncertainty.
+
+All simulated events are passed through a \textsc{Geant4} simulation of the ATLAS detector~\cite{ATLAS:2010arf}, overlaid with simulated minimum-bias pileup, and reconstructed with the same algorithms as data.
+After selection the signal sample is 95.3\% strong $Z$+jets production, 2.9\% diboson (mostly $ZV\to\mu\mu jj$), and 1.6\% electroweak $Zjj$.
+The analysis measures the inclusive sum of these contributions without attempting to separate them.
+
+The pre-unfolding agreement between data and the MC samples is worth examining, because it sets expectations for how much the unfolding will need to correct.
+\Cref{fig:zjets-trackmcdata} compares the charged-track multiplicity ($N_{ch}$) and the scalar sum of charged-track transverse momenta ($H_T^{\mathrm{ch}}$), between data, \mgpy, and \sherpa.
+The modeling of these observables is quite poor for both generators.
+\mgpy overpredicts the $N_{ch}$ observable by almost 50\% in the tails, and \sherpa underpredicts by a similar margin.
+The modeling for $H_T^{\mathrm{ch}}$ is better, but there are still deviations of up to 25\%.
+These observables are known to be particularly difficult to model accurately.
+In addition to making them good observables to measure, the poor modeling also makes them useful for examining the closure of any unfolding.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=1, width=0.48\linewidth, alt={Comparison of charged track multiplicity between data, MG5 FxFx, and Sherpa 2.2.11 showing approximately 10 percent disagreement in either direction.}]{figures/ch6/6_MGFxFx_Sherpa2211_and_Others_Vs_Data.pdf}
+    \includegraphics[page=2, width=0.48\linewidth, alt={Comparison of the scalar sum of charged track transverse momenta H_T between data, MG5 FxFx, and Sherpa 2.2.11.}]{figures/ch6/6_MGFxFx_Sherpa2211_and_Others_Vs_Data.pdf}
+    \caption{Comparison of the per-event charged-track multiplicity $N_{\mathrm{ch}}$ (left) and the scalar sum of charged-track transverse momenta $H_T^{\mathrm{ch}}$ (right) between data and the Monte Carlo samples used in this analysis.}
+    \label{fig:zjets-trackmcdata}
+\end{figure}
+
+\Cref{fig:zjets-eventdisplay} shows event displays for a single simulated event that passes the requirements at both detector and particle level.
+Most tracks have a clear truth counterpart, but examples of both missed charged hadrons (inefficiencies) and tracks without a truth counterpart (fakes) are visible.
+The separation between the dimuon system (and some possible final state radiation) and the hadronic recoil is also visible as the two large clusters of particles in both configurations.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[page=1, width=0.48\linewidth, alt={Reconstructed-level event display showing two muons, reconstructed tracks, and track jets for a simulated Z plus jets event.}]{figures/ch6/EventDisplays.pdf}
+    \includegraphics[page=2, width=0.48\linewidth, alt={Particle-level event display of the same Z plus jets event showing the dimuon pair and all charged hadrons.}]{figures/ch6/EventDisplays.pdf}\\
+    \includegraphics[page=3, width=0.48\linewidth, alt={Zoom-in of the leading jet for the simulated event showing the correspondence between reconstructed tracks and truth charged hadrons, including examples of missed and fake tracks.}]{figures/ch6/EventDisplays.pdf}
+    \caption{Event displays for a simulated event passing the detector-level and particle-level requirements. Top left: detector-level view showing muons (red dots), tracks (crosses), the dimuon system (red cross), and the leading five \ak track jets (blue circles). Top right: the same event but at particle-level. Bottom: zoom-in of the leading track jet showing the correspondence between reconstructed tracks (crosses) and truth hadrons (circles).}
+    \label{fig:zjets-eventdisplay}
+\end{figure}
+
+\subsection{Pseudodata Construction}
+\label{sec:zjets-pseudodata}
+
+Given the novelty of the unfolding method used in this measurement, it is important to validate the unfolding using a simulated data sample with a known truth target.
+This is done by constructing a ``pseudodataset'' from the MC samples above.
+Specifically, events were sampled from the \sherpa strong $Z$+jets, electroweak, and diboson samples along with the \textsc{Powheg}+\textsc{Pythia} $t\bar{t}$ sample.
+This produced a Monte Carlo estimate of the data sample, which was then reweighted at particle level to match the data at detector level.
+This reweighting was obtained with a series of one-dimensional Gaussian kernel reweighting functions, iteratively applied to many different observables.
+Following this step the pseudodata was further divided into two sets, one to serve as the detector level pseudodata treated as ``data'' for the unfolding, and the other serves as particle level ``truth'' pseudodata which sets the target for the unfolding of the pseudodata.
+Given this pseudodata sample, the unfolding procedure described below can be run entirely independently of results using data, defining an entirely simulation based auxiliary measurement referred to as the ``pseudo-measurement'' in what follows.
+Unlike the data measurement, the pseudo-measurement has a well defined and fixed target, which can be used to validate the unfolding method.
+See \Cref{sec:zjets-validation} for more details on the validation of the unfolding method using the pseudodata.
+The \Omnifold implementation described in the next section was designed using the pseudodata.
+This is because the \textit{method bias}, or the difference between the unfolded distribution and the pseudodata target distribution, can be explicitly checked when unfolding pseudodata.
+
+\FloatBarrier
 
 \section{OmniFold Implementation}
 \label{sec:zjets-omnifold}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Pre-training strategy
-%    - [FILL IN: describe the pre-training + network methodology
-%      used in the Z+jets measurement.  This is a key novel
-%      aspect of the analysis.]
-%    - Motivation: pre-training on large MC sample stabilizes
-%      classifier training before fine-tuning on data vs. MC.
-%    - Architecture: [FILL IN — MLP? transformer over constituents?]
-%
-% 2. Step 1: detector-level reweighting
-%    - Feature vector at detector level: [FILL IN — list observables].
-%    - Training: data vs. nominal MC reco.
-%    - Weight clipping / regularization applied: [FILL IN].
-%
-% 3. Step 2: particle-level reweighting
-%    - Feature vector at particle level: [FILL IN].
-%    - Reweight MC truth to match Step 1 corrected distribution.
-%
-% 4. Convergence and validation
-%    - Number of OmniFold iterations: [FILL IN].
-%    - Closure test: [FILL IN results].
-%    - Stress tests with alternative generators.
-%
-% 5. Uncertainty treatment
-%    - Statistical: bootstrap resampling of data events.
-%    - Systematic: generator variations (Sherpa vs. MadGraph vs. Herwig),
-%      detector systematics propagated through the reweighting.
-%    - [FILL IN: describe how systs are evaluated — eigenvector
-%      method? direct variation?]
+The \Omnifold algorithm is introduced in \Cref{sec:omnifold}.
+Running the algorithm to produce a cross section measurement requires a large number of practical choices that are the subject of this section.
+\Cref{sec:zjets-classifier} describes the machine learning details, specifically which neural network architecture is used for the classification tasks within \Omnifold.
+\Cref{sec:zjets-pretraining} describes the pretraining used to stabilize the results.
+\Cref{sec:zjets-bkg-subtraction} describes the un-binned subtraction, and \Cref{sec:zjets-method-norm} describes how the weights produced by \Omnifold are normalized to produce a cross section measurement.
+
+\subsection{Classifier Architecture and Training}
+\label{sec:zjets-classifier}
+
+\begin{figure}[htb]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/part_unfold_Ntracks.pdf}
+    }
+    \hfill
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/pet_unfold_Ntracks.pdf}
+    } \\
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/part_unfold_sum_pT_tracks.pdf}
+    }
+    \hfill
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/pet_unfold_sum_pT_tracks.pdf}
+    } \\
+    \caption{A comparison of ParT (left) and PET (right) unfoldings for the number of charged hadrons (top) and charged hadron $H_T$ (bottom). The top pad in the plots compares the unfolded density to the target, the ratio pad shows the ratio of the unfolded density to the target, and the bottom pad shows the NN initialization and MC stat uncertainties, in addition to the method bias. The ensemble used to create these plots consists of 10 runs of Omnifold.}
+    \label{fig:pet_unfolding1}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/part_unfold_m_trackj2.pdf}
+    }
+    \hfill
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/pet_unfold_m_trackj2.pdf}
+    } \\
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/part_unfold_hpT_R10.pdf}
+    }
+    \hfill
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/pet_unfold_hpT_R10.pdf}
+    } \\
+    \caption{A comparison of ParT (left) and PET (right) unfoldings for the mass of the sub-leading track jet (top) and the \pt of the leading \akfat jet (bottom). The top pad in the plots compares the unfolded density to the target, the ratio pad shows the ratio of the unfolded density to the target, and the bottom pad shows the NN initialization and MC stat uncertainties, in addition to the method bias. The ensemble used to create these plots consists of 10 runs of Omnifold.}
+    \label{fig:pet_unfolding2}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/lgatr_loss_curve.pdf}
+        \label{fig:lgatr_loss}
+    }
+    \hfill
+    \subfloat{
+        \includegraphics[width=0.45\textwidth]{figures/ch6/network_comparisons/lgatr_epoch_vs_time.pdf}
+        \label{fig:lgatr_time}
+    }
+    \caption{(Left) Validation loss curves for L-GATr (green) and ParT (black) as a function of epoch. (Right) The epoch number versus wall time for L-GATr (green) and ParT (black).}
+    \label{fig:lgatr_train}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.48\textwidth]{figures/ch6/network_comparisons/part_weights_v2.pdf}
+        \label{fig:part_weights_v2}
+    }
+    \subfloat{
+        \includegraphics[width=0.48\textwidth]{figures/ch6/network_comparisons/lgatr_weights.pdf}
+        \label{fig:lgatr_weights}
+    } \\
+    \subfloat{
+        \includegraphics[width=0.48\textwidth]{figures/ch6/network_comparisons/part_mj2_v2.pdf}
+        \label{fig:part_mj2_v2}
+    }
+    \subfloat{
+        \includegraphics[width=0.48\textwidth]{figures/ch6/network_comparisons/lgatr_mj2.pdf}
+        \label{fig:lgatr_mj2}
+    }
+    \caption{A comparison of ParT (left) and L-GATr (right) reweightings for the pretraining task. The top row shows the weight distributions produced by each network, and the bottom row shows the reweighting in the $m_{j2}$ dimension.}
+    \label{fig:lgatr_perf}
+\end{figure}
+
+Given both the detector-level and particle-level phase spaces in this measurement are variable dimensional, set processing neural networks are needed.
+This motivates using either graph or transformer networks.
+Rather than design a network architecture from scratch, some of the most successful architectures on HEP tasks like jet tagging are considered.
+These are the Particle Transformer (ParT)~\cite{Qu:2022mxj}, the Point-Edge Transformer (PET)~\cite{Mikuni:2024qsr}, the Lorentz-equivariant geometric transformer L-GATr~\cite{Brehmer:2024yqw}, and LundNet~\cite{Dreyer:2020brq}.
+ParT, PET, and L-GATr are all transformer architectures, while LundNet is a graph network.
+These models are chosen for the following motivations.
+ParT is a very popular transformer architecture for HEP tasks.
+It shows very strong performance on jet tagging tasks and is generally quite flexible.
+PET is a similar model to ParT, with the primary distinction being that PET uses local graph attention embeddings in place of ParT's pairwise features.
+Both of these networks have little inductive bias, or specialization for particle physics tasks.
+
+L-GATr is a Lorentz equivariant network whose output is constrained to be invariant under known symmetries of collider datasets.
+Prior to this work, no uses of equivariant networks for likelihood ratio estimation tasks were documented, so L-GATr is tested here to see if equivariance is helpful in this setting.
+Finally, LundNet is another successful jet tagging network that includes a different physics prior.
+It builds a graph using the Cambridge-Aachen jet clustering algorithm where the nodes are splittings rather than individual particles.
+The node features are kinematic properties of these splittings.
+This specifically incorporates features known to be very useful for understanding jet formation, which is a central concern of this measurement.
+Though all of these models are originally designed to process individual jets rather than entire events as is needed here, the extension to full events is trivial for the transformer networks.
+For LundNet, all tracks in the event are reclustered with the Cambridge-Aachen jet clustering algorithm and then the input graph is built with the clustering tree.
+These processing steps add significant compute overhead to using LundNet.
+
+ParT is chosen as the classifier architecture for all neural network trainings in the \Omnifold procedure given the following considerations.
+An explicit comparison of the method bias produced by unfolding with the ParT and PET networks is shown in \Cref{fig:pet_unfolding1} and \Cref{fig:pet_unfolding2}.
+The unfolding is shown in the observables $N_{\mathrm{ch}}$, $H_T$, $m_{j2}$, and the \pt of the leading jet clustered with the \akfat algorithm.
+In general ParT and PET produce similar unfolding results, but ParT has overall better performance especially in the $N_{\mathrm{ch}}$ observable.
+Notably PET is more accurate in the $m_{j2}$ observable.
+ParT is additionally slightly faster to train than PET, so is taken to be the best general purpose transformer architecture.
+
+Given this it remains to compare the performance of ParT to the more physics motivated architectures, LundNet and L-GATr.
+Unlike ParT and PET, LundNet and L-GATr are only tested on a single classification task (iteration 1 step 1 for LundNet and the pretraining task described in \Cref{sec:zjets-pretraining} for L-GATr) of the \Omnifold procedure rather than the full procedure.
+The reason is that both networks have substantial issues that make further studies not worth the effort.
+LundNet shows worse performance in numerical classification metrics than ParT even after some tuning.
+For example, the test AUC of LundNet is 0.734 versus 0.778 for ParT.
+Examining the reweightings produced by the classifiers shows that LundNet mostly captures the likelihood ratio, but is significantly less accurate than ParT in a few observables, namely the jet mass observables.
+This combined with the slow training of LundNet due to the need to recluster the tracks for each event make ParT preferable.
+
+L-GATr has shown strong performance in jet classification tasks and has explicit physics constraints that should help it learn even with the somewhat limited amount of training data.
+However much like LundNet, L-GATr is observed to train slower than ParT and produces only similar or slightly worse performance. 
+\Cref{fig:lgatr_train} shows validation loss curves for L-GATr and ParT as a function of optimizer step, as well as the epoch number versus wall time for each network with identical GPU hardware.
+\Cref{fig:lgatr_perf} shows the weight distributions and reweightings of the $m_{j2}$ observable for ParT and L-GATr.
+Note that significant departure of the weights produced by a classifier from 1.0 will degrade the statistical power of the dataset by reducing the number of effective events.
+L-GATr is significantly better than ParT in this regard, producing a weight distribution with smaller variance and a significantly better ``loss factor'', which is the ratio between the effective number of events post- and pre-reweighting.
+However L-GATr is also less accurate than ParT in the $m_{j2}$ observable even after a similar amount of effort to tune the network architecture and training hyperparameters.
+This is a surprising result since equivariant networks have been shown to be effective and highly data efficient in jet classification tasks conducted using Delphes-based detector simulation (see \Cref{sec:tagging-future}).
+See Ref.~\cite{Breso-Pla:2026tlz} for details on a follow-up study which applied L-GATr in other likelihood ratio estimation tasks.
+Given the findings of this study, a possible explanation is that equivariant networks struggle with more accurate simulation of the detector response, similar to the CNN jet tagging results discussed in \Cref{sec:constituent-top-tagging}.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.85\linewidth, alt={Schematic of the Particle Transformer architecture showing the particle embedding MLP, stack of particle attention blocks with pairwise physics-motivated features added to the attention logits, class attention block with learned class token, and final MLP producing a single output logit.}]{figures/ch6/part_arch.pdf}
+    \caption{Schematic of the Particle Transformer architecture, reproduced from Ref.~\cite{Qu:2022mxj} under a CC~BY~4.0 license. The input list of particle features is embedded into a fixed-length feature vector per particle, passed through a stack of particle attention blocks in which physics-motivated pairwise features ($\log k_T$, $\log z$, $\log \Delta R$, $\log m^2$) are added to the attention logits before the softmax, and aggregated into a single class-token output by a class attention block. A final MLP produces the output logit whose transformation via the sigmoid is a monotonic function of the likelihood ratio.}
+    \label{fig:zjets-part-arch}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.65\linewidth, alt={Plot of the learning rate schedules used in all trainings, with the pretraining schedule shown in red, step one in blue, and step two in gray, with fading colors indicating increasing iteration number of the Omnifold procedure.}]{figures/ch6/lr_schedules.pdf}
+    \caption{Learning rate schedules used in the pretraining task described below (red), as well as the step-one (blue) and step-two (gray) network trainings. Each schedule consists of a cosine annealing period followed by a linear decay to the minimum learning rate.}
+    \label{fig:zjets-lr-schedule}
+\end{figure}
+
+Following these optimizations, the ParT network is selected as the classifier for the \Omnifold procedure.
+\Cref{fig:zjets-part-arch} shows the ParT architecture used throughout the analysis.
+The public PyTorch implementation of ParT is used\footnote{\url{https://github.com/jet-universe/particle_transformer}.}.
+The input to the network is a set of particles, the two muons and the collection of charged hadrons, each described by a feature vector of ten entries.
+The first four features are the particle kinematics $(\log p_T, \eta, \phi, m)$.
+The \pt, $\eta$, and $\phi$ observables are directly measured by ATLAS at detector level, however ATLAS is insensitive to the masses of individual particles.
+Given the charged pion is the most abundant charged particle produced in LHC collisions, the mass of every particle (besides the muons) at detector level is taken to be the pion mass.
+This is a significant approximation that will have consequences for what follows.
+At particle level the masses of the individual particles are available from the generator.
+
+The remaining six features are one-hot encodings indicating whether the particle belongs to the leading, sub-leading, third, fourth, or fifth $R=0.4$ \textit{anti-}$k_T$ track jet in the event, or to none of these jets.
+No explicit flag is needed to distinguish muons from hadrons because the particle mass already does so.
+Including the track-jet indices as inputs is found to substantially improve the reweighting quality.
+It was also verified explicitly that jets clustered with alternative algorithms (different $R$ values or the Cambridge-Aachen algorithm) are unfolded with no loss of accuracy despite the $R=0.4$ track-jet information being present in the inputs.
+Each particle feature vector is passed through a per-particle MLP embedding, and the resulting vectors are stacked into a sequence.
+Six particle attention blocks operate on this sequence.
+In each block, standard multi-head self-attention is augmented with physics-motivated pairwise features $(\log k_T, \log z, \log \Delta R, \log m^2)$ computed between every pair of particles; these features are embedded by a shared MLP and added to the attention logits before the softmax.
+A single class-attention block then aggregates the per-particle representations into a single class-token vector, which is passed through a final MLP to produce a single output logit.
+The network has roughly 1.6 million trainable parameters.
+
+All classifiers are trained with the binary cross-entropy loss of \Cref{eqn:bce} and the Lion optimizer~\cite{chen2023symbolic}.
+Learning rate schedules consist of a cosine annealing ramp followed by a linear decay phase, with the schedule period tuned separately for the pretraining (14 million events per class), the step-one (data versus MC), and the step-two (MC versus reweighted MC) trainings.
+The resulting schedules are shown in \Cref{fig:zjets-lr-schedule}.
+The learning rate schedule was the subject of a large amount of hyperparameter optimization, since it was found to have a significant impact on the method bias produced by \Omnifold.
+The need to explicitly tune these schedules is one of the most difficult parts of implementing \Omnifold in practice.
+In particular the reweighting quality produced by the step one classifiers is very sensitive to the maximum and minimum learning rates, as well as the cosine annealing period.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Reweighting of the charged hadron H_T distribution derived from a checkpoint that minimizes the validation loss, showing visible over-correction in the tail.}]{figures/ch6/ht_low_val_loss.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Reweighting of the charged hadron H_T distribution derived from a checkpoint that minimizes the marginal Wasserstein distance, showing accurate closure without over-correction.}]{figures/ch6/ht_low_val_wass.pdf}
+    \caption{Reweightings of the charged $H_T^{\mathrm{ch}}$ observable produced by two checkpoints from the same training. Left: the checkpoint that minimizes the validation binary cross-entropy loss over-corrects the distribution in the tail. Right: the checkpoint that minimizes the summed marginal 1D Wasserstein distance over 26 observables produces an accurate reweighting. The Wasserstein-based stopping criterion is used throughout this analysis.}
+    \label{fig:zjets-overcorrection}
+\end{figure}
+
+A standard practice in neural network training is to select the final network weights by taking the checkpoint that minimizes the validation loss over the course of training.
+This practice was found to be sub-optimal for training networks within \Omnifold, because checkpoints with the lowest validation loss frequently produced reweightings that \textit{over-corrected} in the tails of distributions where training data is sparse.
+An example is shown in the left panel of \Cref{fig:zjets-overcorrection}, where the reweighting in the $H_T^{\mathrm{ch}}$ observable produced by the checkpoint with the lowest validation loss down-weights the tail of the distribution beyond what is needed to match the pseudodata.
+To select better checkpoints a different metric based on Wasserstein distances~\cite{panaretos2019statistical} is used.
+The Wasserstein distance between two 1D distributions with cumulants $F$ and $G$ is
+\begin{equation}
+    W(p, q) = \int \abs{F(x) - G(x)} \, dx,
+\end{equation}
+and has the intuitive interpretation of the minimum cost to move the probability mass of one distribution onto the other.
+High-dimensional generalizations of this one-dimensional expression exist but are computationally expensive.
+Instead the 1D Wasserstein distance is computed for each of 26 marginal observables (the 24 used in the previous round Multifold measurement, plus $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$) and summed.
+The network checkpoint minimizing this summed marginal Wasserstein distance is selected for the reweighting produced by each training within \Omnifold.
+The right panel of \Cref{fig:zjets-overcorrection} shows the $H_T^{\mathrm{ch}}$ reweighting produced by the checkpoint that minimizes this Wasserstein metric.
+The marginal Wasserstein distance was also used as the figure of merit in hyper-parameter optimization.
+It was independently verified that checkpoints selected by this criterion produce accurate reweightings even for observables outside of the 26 used in the calculation.
+
+Hyper-parameters were tuned through a random search guided by the Wasserstein metric above and by some visual inspection of the reweightings produced by the networks.
+Importantly it is computationally infeasible to optimize all hyperparameters of \Omnifold at once using the method bias or the final uncertainty budget.
+Instead three sub-tasks within \Omnifold were optimized: the pretraining step described below, and the step one and step two trainings of the first iteration.
+The hyperparameters for future iterations were taken to be the hyperparameters that were optimized in the first iteration.
+Architectural hyperparameters (number of attention blocks, number of class-attention blocks, dropout rates) were fixed by the pretraining optimization because the same architecture must be reused in all subsequent trainings.
+Training hyperparameters (learning rate, weight decay, cosine annealing period, choice of optimizer) were tuned separately in the step-one and step-two optimizations.
+
+\FloatBarrier
+
+\subsection{Pretraining}
+\label{sec:zjets-pretraining}
+
+The 247~thousand data events passing the event selection constitute an order of magnitude less training data than is typically advised for training a 1.6 million parameter model from scratch.
+The standard solution to this problem is to \textit{pretrain} the network on a large auxiliary dataset before fine-tuning it on the target task.
+This is also known as transfer learning, where a related task with better data statistics is leveraged to find better performance on the target task.
+Pretraining has become standard practice in many AI applications, especially language models which are pretrained on large corpora of text before being fine-tuned for specific applications.
+The underlying principle is that the representations learned by the hidden layers of the network when solving the auxiliary task transfer to the target task.
+
+The auxiliary task adopted here is MC-versus-MC classification, as opposed to the data-versus-MC classification task in the step one trainings of \Omnifold.
+These step one trainings are the important ones since they are limited by the data statistics whereas the step two trainings are not.
+In the pretraining task, ParT networks are trained from random initialization to discriminate between events drawn from the \mgpy and \sherpa strong $Z$+jets samples.
+Dedicated partitions of both samples are used to avoid any concerns about overfitting in the unfolding procedure.
+Roughly 14 million events are available between the two classes.
+The pretraining is performed using both the detector-level and particle-level event configurations, and the resulting models are used as starting points for the step one and step two trainings respectively.
+To avoid biasing the measurement by relying on the representations learned by a single pretrained starting point for each step of \Omnifold, ten independent ParT models are pretrained at each level using different random seeds.
+Each \Omnifold step-one training begins from one of the ten detector-level pretrained models, and each step-two training from one of the ten particle-level pretrained models.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Ten trajectories of marginal Wasserstein distance between reweighted truth-level MC and truth pseudodata as a function of Omnifold iteration for networks initialized without pretraining, showing high variance across runs and large final Wasserstein distance.}]{figures/ch6/no_pretrain_comp_wass_10.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Same ten trajectories for networks initialized from pretrained checkpoints, showing much lower final Wasserstein distance and significantly reduced variance across independent runs.}]{figures/ch6/with_pretrain_comp_wass_10.pdf}
+    \caption{Summed marginal Wasserstein distance between the reweighted truth-level MC and the truth pseudodata as a function of the \Omnifold iteration number for ten independent runs. Left: runs initialized with random network weights. Right: runs initialized from pretrained checkpoints. pretraining produces smaller final Wasserstein distances and markedly reduced run-to-run variance.}
+    \label{fig:zjets-pretrain-wass}
+\end{figure}
+
+A first method of determining the effectiveness of the pretraining is to use the Wasserstein distance metric introduced in \Cref{sec:zjets-classifier}.
+\Cref{fig:zjets-pretrain-wass} shows this distance, evaluated between the reweighted truth-level MC and the truth pseudodata (see \Cref{sec:zjets-validation}) as a function of \Omnifold iteration for ten independent runs of the procedure without (left) and with (right) pretraining.
+Pretraining reduces the final Wasserstein distance and substantially reduces the variance across the ten runs, but in a metric which is known to be very sensitive to outlier events which might have spuriously large weights.
+A more physical way to visualize the benefit of pretraining is to bin the reweighted truth-level MC and the truth pseudodata in some observables and plot the method bias and the variance.
+The variance is defined as the spread in the reweighted truth-level MC when running \Omnifold with identical data inputs but different random seeds.
+\Cref{fig:zjets-pretrain-uncert} plots preliminary results of the pseudodata measurement, performed without (left column) and with (right column) the pretraining step.
+The pretraining step dramatically reduces the method bias, especially the tails of the distribution where the statistics are most limited.
+It also produces a modest reduction in the neural network initialization uncertainty, which is directly related to the variance.
+The method bias produced by \Omnifold without the pretraining is likely too large to make a publishable measurement in these particular observables, so the inclusion of the pretraining is a significant advance.
+It was only after including the pretraining step that the method bias produced by the full phase space unfolding was close to the method bias produced by Multifold and IBU.
+See \Cref{sec:zjets-validation}.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Ratio plot of the reweighted truth-level MC to truth pseudodata for the charged hadron multiplicity without pretraining, showing larger method bias and larger network initialization uncertainty band.}]{figures/ch6/no_pretrain_uncert_Ntracks.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Same ratio plot for the charged hadron multiplicity with pretraining, showing smaller method bias and a tighter initialization uncertainty band.}]{figures/ch6/with_pretrain_uncert_Ntracks.pdf}\\
+    \includegraphics[width=0.48\linewidth, alt={Same ratio plot for the sub-leading track-jet mass without pretraining.}]{figures/ch6/no_pretrain_uncert_m_trackj2.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Same ratio plot for the sub-leading track-jet mass with pretraining showing improved method bias and initialization uncertainty.}]{figures/ch6/with_pretrain_uncert_m_trackj2.pdf}
+    \caption{Preliminary results of the pseudodata measurement presented in two observables, $N_{ch}$ (top) and the sub-leading jet mass (bottom), presented both without (left) and with (right) the pretraining step. The figures compare the densities of the reweighted truth-level MC and the truth pseudodata in the top two pads, and plot the MC statistical uncertainty (green), neural network initialization uncertainty (blue), and the method bias (red).}
+    \label{fig:zjets-pretrain-uncert}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Unbinned Background Subtraction}
+\label{sec:zjets-bkg-subtraction}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=\linewidth, alt={Flow diagram showing the background rejection and unfolding procedure in sequence, beginning with reconstructed data and simulated backgrounds, applying an unbinned background rejection step, and then passing the background-subtracted data through the Omnifold unfolding procedure to obtain particle-level results.}]{figures/ch6/br_and_unfolding_flow.pdf}
+    \caption{Schematic illustration of the sequential background rejection and unfolding procedure. The reconstructed data are first reweighted to reject the top-quark background contribution, and the resulting background-subtracted data are then used as the detector-level target for the \Omnifold unfolding.}
+    \label{fig:zjets-br-and-unfolding-flow}
+\end{figure}
+
+
+The $p_T^{\mu\mu} > 200$~GeV fiducial volume contains almost entirely events from $Z$+jets processes.
+Top-quark processes contribute about $0.2\%$ of the observed events, with the remainder split among strong $Z$+jets, diboson, and electroweak $Zjj$ production (all taken as signal).
+In the previous round Multifold analysis, the top contribution was taken as an uncertainty and not subtracted explicitly.
+This uncertainty was sub-leading in all observables and all fiducial volumes considered in the validation of the Multifold analysis.
+The Omnifold measurement adds an unbinned background subtraction.
+This addition is likely invisible in the final results because the top background is so small, but was added because explicit background rejections are expected in ATLAS cross section measurements, and because it serves as an illustration of how backgrounds can be handled in unbinned and high dimensional measurements.
+This is the first unbinned and high dimensional cross section measurement to explicitly subtract a background.
+Existing measurements (summarized in \Cref{tab:unbinned-unfolding-measurements}) have all been performed in phase spaces with negligible backgrounds.
+The procedure for performing the unbinned subtraction and unfolding in sequence is illustrated in \Cref{fig:zjets-br-and-unfolding-flow}.
+First data and detector-level MC simulation are used as inputs to the background rejection procedure, which outputs event weights $w_{\textrm{sub}}(\vec{x}_r)$ which remove the background when applied to the data.
+The data with the event weights are then used as input to the unfolding procedure, along with the detector-level and particle-level MC simulation, which outputs event weights $w_{\textrm{of}}(y)$ that are the final result.
+The data entering the unfolding with non-trivial event weights is analogous to the data entering the unfolding with non-integer bin counts in standard binned analyses.
+
+The reweighting for the data is obtained by training a classifier to perform likelihood ratio estimation in the detector-level phase space.
+The classifier is trained to separate the detector-level data (or pseudodata) from itself but with the detector-level MC estimate for the top background appended with weights turned negative.
+In other words the classifier estimates the likelihood ratio $p_{\mathrm{D-B}}(x) / p_{\mathrm{D}}(x)$, with D being the data (or pseudodata) distribution that is composed of both signal and background events, and B being the detector-level MC estimate for the top background.
+Since B is very subtle, the differences between the densities is very small.
+Specifically B is known to be about 0.2\% of D, so the likelihood ratio should be roughly 0.998 integrated about the whole phase space.
+
+Initially it was attempted to train a ParT classifier to estimate the likelihood ratio directly.
+However the differences between the classes were too subtle and the network failed to provide a meaningful background subtraction.
+It was checked that if the normalization of the top background was artificially increased by a factor of 10 the network was able to pick up on the difference between the signal and background and provide a very accurate subtraction.
+This is an interesting property of this background subtraction technique.
+In standard binned techniques the subtraction accuracy is only lightly dependent on the background normalization.
+Subtraction of subtle backgrounds can be less precise because of statistics, but generally this effect is negligible.
+However unbinned subtraction with likelihood ratio estimation requires training a neural network classifier, and if the background is subtle the signal and background classes can be very similar making the classification task difficult.
+
+To overcome these issues, a two-step procedure is devised.
+First, a ParT classifier with the same input features as the main \Omnifold classifier is trained to discriminate top from $Z$+jets events in the detector level simulation.
+The goal of this training is to provide a maximally expressive observable to separate the top events from the $Z$+jets events, not to provide any reweighting.
+The training set uses all 21~thousand unweighted top events from the \textsc{Sherpa}~2.2.12 sample as the signal class and the pseudodata sample with the top events removed as the background class.
+Histograms of the network output, referred to as the top classifier logit, are provided in \Cref{fig:zjets-toplogit}.
+These histograms show that many of the top events populate the same phase space as the $Z$+jets signal, and so can only be removed statistically.
+The high-logit tail of the distribution is populated almost entirely by top events.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Histogram of the ParT top-versus-Zjets classifier logit on pseudodata constructed with the Sherpa 2.2.12 ttbar sample, showing similar separation between ttbar and Zjets events.}]{figures/ch6/top_class_predictions_sherpa.pdf}
+    \caption{Output logit of the ParT classifier trained to discriminate the top background from the $Z$+jets signal, evaluated on the pseudodata with the top contribution removed (blue), and the \textsc{Sherpa}~2.2.12 top sample (red). The histograms indicate that the classes are not very easily separated, but the top events cluster toward higher logit values. This logit is used as an observable in the subsequent 5D un-binned subtraction.}
+    \label{fig:zjets-toplogit}
+\end{figure}
+
+The top classifier logit is then used as a particularly expressive observable in which to perform the top background subtraction, alongside four event-level observables, $N_{\mathrm{ch}}$, $H_T^{\mathrm{ch}}$, the leading track-jet $p_T$, and the leading track-jet mass.
+The motivation for using these five observables is that the top contribution to the density for each observable is concentrated in the tails rather than being uniformly distributed in phase space.
+This makes the top contribution easier to detect for a neural network classifier than it would be in the full phase space in which the unfolding is derived.
+Neural network classifiers are then trained to estimate the desired likelihood ratio using these five observables as inputs.
+Given this task is fixed dimensional, two-hidden-layer MLPs with 512 nodes per layer and GELU activations are used rather than the transformer networks.
+An additional benefit of performing the background subtraction in the five dimensional space is that the simple MLP networks are very fast to train.
+This allows ensembles of 100 networks to be trained, then their outputs are averaged to produce a more accurate likelihood ratio estimate.
+Additionally the weights produced by each network are clipped to a maximum of 1.0, since the subtraction should only remove density and never add it.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Pre-unfolding detector-level distribution of the leading track-jet pT on pseudodata before top subtraction, compared between pseudodata built from Powheg plus Pythia ttbar and Sherpa 2.2.12 ttbar.}]{figures/ch6/pd-top-subtraction.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Same distribution on real data before and after the un-binned top subtraction is applied, showing minor shape changes in the high track-jet pT tail.}]{figures/ch6/data-top-subtraction.pdf}
+    \caption{The weight distributions produced by the unbinned background subtraction procedure for the pseudodata (left) and data (right) measurements. Histograms are shown for subtractions performed with the nominal \textsc{Powheg}+\textsc{Pythia} top sample (blue) as well as the alternative \textsc{Sherpa}~2.2.12 top sample (red). The weights are generally very close to 1.0 given the subtle background, and all subtractions return weight distributions with a mean of about 0.998, reflecting an overall subtraction of 0.2\% as expected.}
+    \label{fig:zjets-topsubtraction}
+\end{figure}
+
+\Cref{fig:zjets-topsubtraction} shows histograms of the weights produced by the background subtraction procedure for the pseudodata and data measurement.
+Note that the subtraction step of the procedure is applied independently for both pseudodata and data, but the top classifier is trained using the pseudodata since the MC generator channel is needed for class labels.
+The Figure shows the subtraction weights derived with the nominal \textsc{Powheg}+\textsc{Pythia} top sample, as well as the alternative \textsc{Sherpa}~2.2.12 sample used to set the top modeling uncertainty (see \Cref{sec:zjets-uncert-top}).
+For all subtractions the mean of the subtraction weights is approximately 0.998, showing that the subtraction procedure succeeds in removing the correct amount of density integrated over phase space.
+The larger variance of the nominal sample's weights indicates that the top contribution is more distinctive, and can be isolated to a smaller set of events, in the nominal sample compared to the alternative sample.
+The results of the nominal and alternative top background subtractions in several physical observables are shown in \Cref{fig:top-subtraction-obs1,fig:top-subtraction-obs1-data} for pseudodata and data respectively.
+Given the MC generator channel is available in pseudodata the subtractions are compared to the pseudodata with the top contribution removed (signal only).
+In data the subtractions are simply compared to the detector-level data (S+B).
+In general the subtraction is impressively accurate given how subtle the background is, but issues do appear.
+For example subtraction with the nominal top sample produces a significant artifact at very low $N_{ch}$ as can be seen in the upper left panel of both Figures.
+However this artifact does not appear in the alternative subtraction.
+Given the full difference between the nominal and alternative subtraction is taken as the top modeling uncertainty, this artifact is covered by an appropriate uncertainty.
+Generally the difference between the nominal and alternative subtractions is smaller than the difference between the pseudodata and the signal only pseudodata (gray and black) in \Cref{fig:top-subtraction-obs1}, indicating that the top subtraction procedure results in smaller uncertainties than simply taking the overall top background as an uncertainty as is done in the Multifold analysis.
+The benefit would increase if the background were to become more significant.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=3, width=0.48\linewidth, alt={Pseudodata top-subtraction closure in a first representative observable.}]{figures/ch6/pd-top-subtraction.pdf}
+    \includegraphics[page=4, width=0.48\linewidth, alt={Pseudodata top-subtraction closure in a second representative observable.}]{figures/ch6/pd-top-subtraction.pdf}\\
+    \includegraphics[page=5, width=0.48\linewidth, alt={Pseudodata top-subtraction closure in a third representative observable.}]{figures/ch6/pd-top-subtraction.pdf}
+    \includegraphics[page=6, width=0.48\linewidth, alt={Pseudodata top-subtraction closure in a fourth representative observable.}]{figures/ch6/pd-top-subtraction.pdf}\\
+    \includegraphics[page=7, width=0.48\linewidth, alt={Pseudodata top-subtraction closure in a fifth representative observable.}]{figures/ch6/pd-top-subtraction.pdf}
+    \includegraphics[page=8, width=0.48\linewidth, alt={Pseudodata top-subtraction closure in a sixth representative observable.}]{figures/ch6/pd-top-subtraction.pdf}
+    \caption{Results of the top subtraction in pseudodata shown in histograms of several physical observables. Histograms are shown for the detector-level pseudodata (gray), nominal and alternative top subtracted pseudodata (blue and red), and the signal only pseudodata (black). The ratio pads plot the ratio to the signal only pseudodata.}
+    \label{fig:top-subtraction-obs1}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=3, width=0.48\linewidth, alt={Data distribution in a first representative observable before and after top subtraction.}]{figures/ch6/data-top-subtraction.pdf}
+    \includegraphics[page=4, width=0.48\linewidth, alt={Data distribution in a second representative observable before and after top subtraction.}]{figures/ch6/data-top-subtraction.pdf}\\
+    \includegraphics[page=5, width=0.48\linewidth, alt={Data distribution in a third representative observable before and after top subtraction.}]{figures/ch6/data-top-subtraction.pdf}
+    \includegraphics[page=6, width=0.48\linewidth, alt={Data distribution in a fourth representative observable before and after top subtraction.}]{figures/ch6/data-top-subtraction.pdf}\\
+    \includegraphics[page=7, width=0.48\linewidth, alt={Data distribution in a fifth representative observable before and after top subtraction.}]{figures/ch6/data-top-subtraction.pdf}
+    \includegraphics[page=8, width=0.48\linewidth, alt={Data distribution in a sixth representative observable before and after top subtraction.}]{figures/ch6/data-top-subtraction.pdf}
+    \caption{Results of the top subtraction in data shown in histograms of several physical observables. Histograms are shown for the detector-level data (gray), and the nominal and alternative top subtracted data (blue and red). The ratio pads plot the ratio to the detector-level data.}
+    \label{fig:top-subtraction-obs1-data}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Normalization to a Cross Section}
+\label{sec:zjets-method-norm}
+
+The final per-event weights produced by \Omnifold, called $w_{\textrm{of}}(y)$ above but referred to as $\nu(\vec{x})$ in what follows, encode the shape of the unfolded cross section but not its absolute normalization.
+To recover the latter, these weights are re-scaled following the same procedure used in the previous round Multifold analysis~\cite{ATLAS:2024xxl}.
+Each MC event $i$ is assigned a weight $w_i^\mathrm{y}$ by the MC generator.
+It is further normalized to the cross section times the integrated luminosity (provided by an auxiliary measurement) to arrive at
+\begin{equation}
+    \label{eq:mc-norm}
+    w^\mathrm{y}_i = w^\mathrm{MC}_i \frac{\mathcal{L}\,k\,\sigma_\mathrm{MC}\,\varepsilon}{\sum_i w^\mathrm{MC}_i},
+  \end{equation}
+where $\mathcal{L}$ is the integrated luminosity of the data and $k$, $\sigma_\mathrm{MC}$ and $\varepsilon$ are the $k$-factor, MC cross section and filter efficiency, respectively, for the MC sample in question, and the sum in the denominator runs over all generated MC events.
+At detector level, the event weight is further multiplied by several corrections:
+\begin{equation}
+  \label{eq:mc-norm-reco}
+  w^\mathrm{reco}_i = w^\mathrm{y}_i \prod_c\,w^\mathrm{corr}_{ci},
+\end{equation}
+where the product runs over the (five) different corrections, each with index $c$, namely: the pileup reweighing, the trigger efficiency scale factor, and the three muon efficiency scale factors.
+
+The event weights $w^\mathrm{y}_i$ and $w^\mathrm{reco}_i$ produce the MC generator predictions for the particle-level and detector-level events respectively.
+In what follows each detector-level event configuration is represented by $(w^\mathrm{reco},\vec{x}_\mathrm{reco})$ and each particle-level event configuration is represented by $(w^\mathrm{y},\vec{x})$.
+The unfolding procedure corrects the truth-level event weights (keeping the truth-level features $\vec{x}$ the same): $(\nu(\vec{x})\,w^\mathrm{y},\vec{x})$.
+In order to regain the overall normalization which might be altered by the weights produced by \Omnifold, the event weights are scaled by a factor equal to
+\begin{align}
+  \nu(\vec{x}_i)\,w^\mathrm{y}_{i,\text{ norm}}&=\frac{\nu(\vec{x}_i)\,w^\mathrm{y}_{i}}{\sum_i \nu(\vec{x}_i)\,w^\mathrm{y}_{i}}\times\frac{\sum_j w^y_j}{\sum_k w^\text{reco}_k}\times N_\text{data}\,,
+\end{align}
+where the $j$ and $k$ sums run over the truth and reconstructed events in the MC sample, respectively, and $N_\text{data}$ is the number of data events.
+This restores the event yield predicted by the MC based on the input data.
+
+The weights are then finally normalized by:
+\begin{equation}
+  \label{eq:xsec-norm}
+  w_{i} = \frac{\nu(\vec{x}_i)\,w^\mathrm{y}_{i,\text{ norm}}}{\mathcal{L}},
+\end{equation}
+where $\mathcal{L}$ is the integrated luminosity.
+The weights $w_i$ defined according to equation~\ref{eq:xsec-norm} have units of cross section and the sum of the weights over all events that fall in any fiducial region will produce a measurement of the fiducial cross section.
+This can be written as:
+\begin{equation}
+  \label{eq:fid-xsec}
+  \hat{\sigma}_{k} = \sum_{i}^{N_\mathrm{events}}w_{i}\,\mathcal{I}[b(\vec{x}_{i})=k] = \sum_{i\in B_k} w_i,
+\end{equation}
+where $b(\vec{x}_{i})$ returns an index $k\in\{0,1,2,...,n_\text{bins}\}$ corresponding to the fiducial region event $i$ falls in (based on its features $\vec{x}_i$), and $\mathcal{I}[\cdot]$ is the indicator function that is 1 when $\cdot$ is true and zero otherwise.
+The last equality writes the same thing in different notation: the sum runs over all events $i$ that fall in bin $k$, where $B_k$ denote the set of events that fall in the bin (based on their $\vec{x}$).
+
+\FloatBarrier
+
+\section{Uncertainties}
+\label{sec:zjets-uncert}
+
+Systematic uncertainties are assessed on the particle-level cross section measurement by \textit{propagating} them through the unfolding procedure.
+For each source $u$, an appropriate perturbation is introduced to either the simulation or the data, the full \Omnifold procedure is re-run from scratch on the perturbed input, and the difference between the perturbed and nominal unfolded event weights defines an alternative set of event weights $\nu_u(\vec{x})$.
+The uncertainty on any observable $\mathcal{O}$ in any bin $k$ is the signed difference
+\begin{equation}
+    \Delta_{ku} \;=\; \hat{\sigma}_{ku} - \hat{\sigma}_k,
+\end{equation}
+and the total uncertainty on $\hat{\sigma}_k$ is the quadrature sum over the uncorrelated sources $u$.
+
+In this thesis the experimental and theoretical systematic uncertainties will only be mentioned briefly.
+Experimental uncertainties cover possible differences in the detector-level muon and track kinematics used as input to the measurement between data and simulation.
+They do not shift the particle-level quantities, so they can be thought of as uncertainties on the response matrix (or the unbinned equivalent of the response matrix).
+The leading experimental uncertainty in this measurement is the tracking efficiency, where the efficiency with which the ATLAS tracking detector identifies tracks is slightly shifted.
+In total there are 12 experimental uncertainties propagated to the final result.
+Theoretical uncertainties cover uncertainties in the MC simulation used as input.
+Unlike experimental uncertainties, theoretical uncertainties shift both the particle-level and detector-level distributions as opposed to only the detector-level.
+This can be thought of as a shift in the particle-level prior provided to the unfolding rather than a shift in the response matrix.
+The prior shifts can be large, for example altering the QCD factorization scales can result in shifts of up to 10\% in the $p_T^{\mu\mu}$ observable, but unfolding is broadly insensitive to choice of prior so the theory uncertainties are all sub-leading.
+There are 9 theoretical uncertainties propagated to the final result.
+
+Statistical uncertainties are evaluated separately through a procedure known as \textit{bootstrapping}, where the data or MC are fluctuated within their statistical uncertainty and then used to repeat the unfolding.
+To bootstrap an unbinned data sample, the event weights are multiplied by a factor sampled from a Poisson probability distribution with parameter $\lambda = 1$.
+This is equivalent to resampling the data with replacement, so that each given event can appear in the bootstrap zero, one, or multiple times.
+This procedure is repeated 100 times for the data statistical uncertainty (both for the pseudodata and data measurements), and 25 times for the MC training set statistical uncertainty.
+The final uncertainty is then the variance in the result produced by this ensemble of bootstraps.
+
+The remaining uncertainty categories are related to the background subtraction and unfolding methods and are the focus of the rest of this section.
+The unfolding uncertainties in particular make ample use of an alternative reweighting method known as \textit{Omnisequential reweighting}, which is introduced briefly here.
+OmniSequential is a Gaussian Kernel-based reweighing method which iteratively reweights a preset list of observables in one dimension without the use of machine learning.
+First, a sensible binning is determined for each of the input variables. 
+The bin width is chosen based on Scott's rule~\cite{scott1979optimal}, and if the variable has a skewness ($\mu_3=E[(x-\mu)^3]$) that is larger than 2 then log binning is used.
+
+In order to reweight the Monte Carlo to match data, one iteration of the algorithm then proceeds as follows: 
+\begin{itemize}
+  \item The variable with the worst agreement between MC and data is determined as the one with the worst (largest) `chi-squared pull', using binned spectra ($n_\text{dof}=n_\text{bins}$):
+  \begin{align}
+  z_{\chi^2} &= \frac{\chi^2-E[\chi^2]}{\sigma[\chi^2]} = \frac{\chi^2-n_\text{dof}}{\sqrt{2n_\text{dof}}}
+  \end{align}
+  \item A Gaussian Kernel fit is then performed for the identified variable, resulting in a smooth function that quantifies the data/MC ratio
+  \item The MC events are then reweighted based on the result of the fit. Each MC event weight is multiplied by the data/MC ratio given by the Gaussian Kernel fit evaluated at the value of the variable in question
+\end{itemize}
+The iterations continue until a maximum allowed number or closure is reached, where `closure' would mean that all 24 variables have $z_{\chi^2}<2$.
+OmniSequential is an auxiliary reweighting method that does not require estimating a likelihood ratio through machine learned classifiers.
+However like the machine learning approach, the end result is a set of event weights that shift a distribution to match a desired target.
+
+\subsection{Unfolding uncertainties}
+\label{sec:zjets-uncert-unfold}
+
+The unfolding uncertainty prescription follows the standard ATLAS unfolding recommendations~\cite{Armbruster:1694351} but adapted to the un-binned setting.
+There are two sources of uncertainty injected by the unfolding, each of which is covered by one or more dedicated uncertainties taken on the final result.
+The first is the residual bias intrinsic to any unfolding procedure, necessary due to the bias--variance tradeoff discussed in \Cref{sec:binned-unfolding-methods}, which is covered by the data-driven unfolding uncertainty.
+The second is possible hidden-variables, which are quantities that are not constrained by the unfolding procedure but can bias the detector response.
+These hidden-variables are typically quantities that can differ at particle-level but produce the same detector-level distributions when passed through the detector response.
+Since they produce identical detector-level data, the different particle-level distributions cannot be distinguished and the unfolding will simply return the particle-level distribution of the prior.
+Concrete examples of such quantities will be given below.
+Inaccuracies in the unfolding due to these hidden variables are covered by the quadrature sum of the hadron composition and hidden variable unfolding uncertainties.
+
+
+The data driven unfolding uncertainty is assessed by first running OmniSequential to reweight the particle-level \mgpy sample such that its detector-level distributions agree with data in every summary observable.
+This reweighting is unique among all of the reweightings in this analysis in that it is done at particle-level but optimized at detector-level.
+The result of this reweighting is then applied to the detector-level \mgpy sample, and this data is used as pseudodata in the unfolding procedure.
+The difference between the truth distribution predicted by the unfolding and the input truth is taken as the data driven unfolding uncertainty.
+Note this procedure is very similar to the pseudodata measurement itself.
+For this reason the method bias in the pseudodata measurement and data driven unfolding uncertainty are highly correlated.
+Further the data driven unfolding uncertainty is identical for both the pseudodata and data measurements, since for both measurements the data inputs are the reweighted \mgpy sample and the nominal MC.
+
+The hidden variable unfolding uncertainty is also assessed by running OmniSequential, but this time to reweight the particle-level \sherpa samples to match the particle-level \mgpy sample.
+This reweighting is performed in a set of observables that are all functions of the full-phase space explicitly included in the \Omnifold unfolding procedure.
+The result is an alternative MC sample that looks similar to the nominal MC sample, but has possibly different hidden variables.
+Then this alternative MC sample is used as the MC sample in the unfolding routine, and the difference between the result produced with the alternative and nominal MC samples is taken as the uncertainty.
+An assumption of this uncertainty is that all possible hidden variables that might bias the detector response are different between the nominal and alternative MC samples.
+In practice this assumption is likely valid because changing the generator produces a rather large shift in the particle-level spectra and there is no reason to suppose this pattern would not hold for hidden variables.
+
+\begin{figure}[htb]
+    \centering
+    \subfloat{
+        \includegraphics[page=5, width=0.48\linewidth, alt={Hadron-composition comparison from page 5 showing truth-jet pT fractions for charged-hadron species in the signal samples.}]{figures/ch6/hadron_composition_fractions.pdf}
+    }
+    \subfloat{
+        \includegraphics[page=6, width=0.48\linewidth, alt={Hadron-composition comparison from page 6 showing truth-jet pT fractions for charged-hadron species in the signal samples.}]{figures/ch6/hadron_composition_fractions.pdf}
+    } \\
+    \subfloat{
+        \includegraphics[page=7, width=0.48\linewidth, alt={Hadron-composition comparison from page 7 showing truth-jet pT fractions for charged-hadron species in the signal samples.}]{figures/ch6/hadron_composition_fractions.pdf}
+    }
+    \subfloat{
+        \includegraphics[page=8, width=0.48\linewidth, alt={Hadron-composition comparison from page 8 showing truth-jet pT fractions for charged-hadron species in the signal samples.}]{figures/ch6/hadron_composition_fractions.pdf}
+    }
+    \caption{Fraction of truth leading-jet $p_T$ carried by pions, kaons, protons, and ``other'' charged hadrons as a function of truth leading-jet $p_T$, for the \mgpy and \sherpa strong $Z$+jets samples as well as a \textsc{Powheg}+\textsc{Pythia} sample included here for illustration. The panels show the fraction of the $p_T$ within the leading particle-level jet carried by charged pions (top left), charged kaons (top right), protons (bottom left), and other charged hadrons (bottom right).}
+    \label{fig:zjets-hadron-composition}
+\end{figure}
+
+Initial validation of the measurement following the procedures of \Cref{sec:zjets-validation-chi2} showed that the hidden variable uncertainty alone was insufficient to show good statistical agreement with the target in the pseudodata measurement for the leading and sub-leading jet mass observables $m_{j1}$ and $m_{j2}$.
+The reason is a particular class of hidden variables that strongly bias the measurement of the jet masses: the truth-hadron fractions.
+This hidden variable is the fraction of truth hadrons at particle-level that are charged pions, protons, kaons, or other charged hadrons.
+Each generator produces slightly different truth hadron fractions.
+\Cref{fig:zjets-hadron-composition} shows, for three strong $Z$+jets samples including the \mgpy and \sherpa samples, the fraction of truth-jet transverse momentum carried by each hadron species as a function of truth-jet $p_T$.
+At particle-level, charged pions account for about 75\% of the jet $p_T$ for all three generators, but differences emerge in the charged kaon and proton fractions.
+The \mgpy sample predicts roughly 5\% more (fewer) protons (charged kaons) than the \sherpa sample.
+The fraction of $p_T$ carried by the other category, which is mainly composed of the strange baryons $\Omega$, $\psi$, and $\Sigma$, is roughly consistent between the generators.
+Since the fraction of charged kaons versus protons are not constrained at detector level given the pion mass assumption, the unfolding returns the unfolding prior and does not alter the truth hadron fractions at all.
+This is illustrated in \Cref{fig:zjets-unfold-hadron-fractions}, which plots the hadron fractions before and after unfolding, and compares to the truth pseudodata target.
+The unfolding does not shift the hadron fractions at all, leaving this observable completely prior dependent, as expected for a hidden variable.
+However changing this hidden variable also adjusts the jet mass distributions, meaning an unfolding built with the \mgpy sample versus the \sherpa sample will yield slightly different results.
+This effect was important enough that a dedicated uncertainty, the hadron composition uncertainty, was designed to cover it.
+In practice this uncertainty is observed to be small except in the jet mass observables.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.95\linewidth, alt={Four panels showing the event-level pT fraction carried by pions, kaons, protons, and other hadrons as a function of H_T in a pseudodata closure test; the unfolded distribution tracks the MG5 FxFx prior almost exactly and does not approach the Sherpa 2.2.11 truth.}]{figures/ch6/unfold_hadron_fractions.pdf}
+    \caption{Event-level $p_T$ fraction carried by pions, kaons, protons, and ``other'' charged hadrons as a function of the event $H_T^{\mathrm{ch}}$ in the pseudodata measurement. Blue points indicate the unfolding prior, which is provided by the \mgpy sample, green points represent the post-unfolding result with event weights applied, and orange points represent the truth pseudodata provided by the \sherpa sample. The unfolding is clearly unable to distinguish the hadron fractions, as expected since this information is not provided at detector level.}
+    \label{fig:zjets-unfold-hadron-fractions}
+\end{figure}
+
+Before concluding this section, it is worth noting that a possible advantage of a high dimensional unfolding is that it is less sensitive to hidden variables since it is differential in more observables.
+For example if observable B biases the response of observable A, then performing a simultaneous unfolding in both observables should eliminate observable B as a hidden variable.
+However this does not account for hidden variables that are not simply left out of the unfolding but are not constrained by the detector altogether, for example the hadron fractions discussed above.
+These are hidden variables even for a full-phase space unfolding.
+These considerations will be important for comparing the relative accuracy of the IBU and \Omnifold based unfoldings in \Cref{sec:zjets-validation-ibu}.
+
+\FloatBarrier
+
+\subsection{Network-initialization uncertainty}
+\label{sec:zjets-uncert-nninit}
+
+Every step of the \Omnifold procedure involves training a neural network, and the output of that training depends on the random seed used to initialize the network weights and to order the training examples.
+Different seeds produce different reweightings, and the spread across seeds constitutes an uncertainty on the final result.
+This uncertainty can be estimated by running \Omnifold with identical data inputs but different random seeds.
+In this analysis, ten independent runs are performed for the nominal unfolding and each systematic uncertainty.
+The unfolded weights are calculated as the event-by-event mean over these ten runs.
+To calculate the network initialization uncertainty, each of the ten runs is binned and the uncertainty is the standard deviation in the bin counts produced across the ten runs.
+Note binning each of the ten members of the ensemble is only required for the nominal results.
+For the systematic uncertainties only the mean weights are used.
+The previous round Multifold analysis used one hundred run ensembles rather than ten.
+This reduction was possible because the variance was reduced by the pretraining procedure detailed in \Cref{sec:zjets-pretraining}, also producing a large savings in the computational cost of the measurement.
+
+\subsection{Top background subtraction uncertainty}
+\label{sec:zjets-uncert-top}
+
+The top background subtraction described in \Cref{sec:zjets-bkg-subtraction} relies on the choice of $t\bar{t}$ process MC sample to be subtracted from the data before unfolding.
+As shown in \Cref{sec:zjets-bkg-subtraction}, the top subtraction is performed independently with the \textsc{Sherpa}~2.2.12 $t\bar{t}$ sample in place of the nominal \textsc{Powheg}+\textsc{Pythia} sample.
+Only the five-dimensional MLP ensemble of \Cref{sec:zjets-bkg-subtraction} is re-trained with the alternative sample.
+The ParT top-versus-$Z$+jets classifier is not retrained, because it serves only to define a highly expressive observable along which the subsequent subtraction is performed.
+The full \Omnifold procedure is then re-run using the alternative set of top-subtraction weights, and the difference with respect to the nominal unfolded result is taken as the uncertainty.
+Given the top background is small the subtraction uncertainty is also small, but illustrates the procedure for propagating modeling uncertainties through an unbinned background subtraction.
+
+\section{Unfolding validation}
+\label{sec:zjets-validation}
+
+Given the novel nature of this cross section measurement extensive validation of the results is required.
+Three layers of validation are presented in this section.
+First, a set of binned $\chi^2$ goodness of fit tests between the pseudodata measurement and the truth pseudodata target are performed in the twenty four observables measured in the Multifold analysis plus the $N_{ch}$ and $H_T$ observables.
+This provides a first round of validation that crucially can be run alongside future applications of the measurement which are not covered here or in the eventual publication.
+See \Cref{sec:zjets-discussion} for more discussion of this point.
+Second, the measurement is compared to an Iterative Bayesian Unfolding (IBU) based measurement of these 26 observables which use the same data inputs but are only differential in one observable at a time.
+This provides comparison to a well-used baseline unfolding method with much more limited scope than \Omnifold.
+Third, the measurement is compared directly to the previous round Multifold result on the 24 observables common to both.
+This provides a third cross-check of the results against an existing ATLAS measurement performed in the same fiducial volume.
+
+\subsection{Statistical closure tests}
+\label{sec:zjets-validation-chi2}
+
+In the pseudodata measurement the desired truth distribution is known.
+This allows the method bias and uncertainty model to be jointly assessed through a binned $\chi^2$ goodness of fit test between the measurement and the truth pseudodata.
+This test can be run in many different observables to ensure the measurement is accurate in the full phase space as desired.
+The test statistic is
+\begin{equation}
+    \chi^2 \;=\; (\hat{\vec{\sigma}} - \vec{T})^{\top} \Sigma^{-1} (\hat{\vec{\sigma}} - \vec{T}),
+\end{equation}
+where $\hat{\vec{\sigma}}$ is the vector of unfolded cross sections, $\vec{T}$ is the vector of pseudodata truth values, and $\Sigma$ is the covariance matrix of the unfolded cross section built from the uncertainties of \Cref{sec:zjets-uncert} excepting the experimental uncertainties since the nuisance parameters are fixed to their nominal values for the nominal MC and pseudodata.
+The hidden variable uncertainty was observed to show some mild statistical fluctuations after propagation through the unfolding because it is built with an entirely independent sample of particle-level events.
+To eliminate these a Gaussian kernel smoothing is applied to the hidden variable uncertainty before it is used to fill the covariance matrix, except for in the jet mass observables because the uncertainty has a sharp shape that smoothing was found to distort.
+The signed uncertainties and covariance matrix used as input to the $\chi^2$ tests are shown for the $N_{ch}$ and $m_{j1}$ observables in \cref{fig:zjets-closure-uncert-page15,fig:zjets-closure-uncert-page25} respectively.
+For most observables, as with the observables shown here, the unfolding uncertainties are leading, followed by the tracking uncertainties and then the remaining uncertainties are generally negligible.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=15, width=0.48\linewidth, alt={Signed uncertainty contributions used as inputs to the chi-squared closure test for the observable shown on page 15.}]{figures/ch6/uncert_signed_merged.pdf}
+    \includegraphics[page=15, width=0.48\linewidth, alt={Correlation matrix used as input to the chi-squared closure test for the observable shown on page 15.}]{figures/ch6/uncert_corr_matrix_merged.pdf}
+    \caption{Signed uncertainty contributions (left) and covariance-matrix correlations (right) used as inputs to the binned $\chi^2$ closure test, shown for the $m_{j1}$ observable.}
+    \label{fig:zjets-closure-uncert-page15}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=25, width=0.48\linewidth, alt={Signed uncertainty contributions used as inputs to the chi-squared closure test for the observable shown on page 25.}]{figures/ch6/uncert_signed_merged.pdf}
+    \includegraphics[page=25, width=0.48\linewidth, alt={Correlation matrix used as input to the chi-squared closure test for the observable shown on page 25.}]{figures/ch6/uncert_corr_matrix_merged.pdf}
+    \caption{Signed uncertainty contributions (left) and covariance-matrix correlations (right) used as inputs to the binned $\chi^2$ closure test, shown for the $N_{ch}$ observable.}
+    \label{fig:zjets-closure-uncert-page25}
+\end{figure}
+
+Under the null hypothesis that the reweighted particle-level MC is drawn from the same distribution as the target truth pseudodata, this test statistic should follow a $\chi^2$ distribution with degrees of freedom equal to the number of bins used minus one.
+Since running sufficient bootstraps to observe this is computationally infeasible, instead a p-value is calculated for each test.
+The p-value quantifies the probability of observing a test statistic larger than the one actually observed under the null hypothesis.
+A large p-value indicates that the probability of the observed test statistic is large under the null hypothesis and the null hypothesis can be accepted.
+A small p-value indicates the opposite and that the null hypothesis should be rejected.
+A typical threshold for acceptable p-values is $0.05$, indicating that there is a 5\% chance of the observed statistic or greater under the null hypothesis.
+\Cref{tab:zjets-closure-pvalues} shows the resulting p-values for the full phase-space \Omnifold measurement, together with the corresponding values from the previous round Multifold measurement on the 24 common observables.
+For every observable, the \Omnifold p-value exceeds the $0.05$ threshold, indicating no significant tension between the unfolded distribution and the pseudodata truth.
+The smallest \Omnifold p-value is $0.056$ for the sub-leading track-jet mass, and the smallest Multifold $p$-value is $0.17$ for the leading track-jet mass.
+
+\begin{table}[tb]
+    \centering
+    \caption{Binned $\chi^2$ and $p$-value from the pseudodata closure test, for every observable measured in the previous round plus $N_{\mathrm{ch}}$ and $H_T^{\mathrm{ch}}$. Results are shown for the full phase-space \Omnifold measurement and for the previous round Multifold measurement on the 24 common observables. Empty cells correspond to observables not measured by a particular method. The closure test is performed in the fiducial volume restricted to events with sub-leading track-jet $p_T > 5$~GeV, with Gaussian-kernel smoothing applied to the hidden-variable unfolding uncertainty for every observable except the jet-mass observables.}
+    \label{tab:zjets-closure-pvalues}
+    \input{tables/ch6/closure_pvalues.tex}
+\end{table}
+
+These results are highly non-trivial.
+Large differences between the nominal MC and truth pseudodata are present before unfolding, but these closure tests demonstrate that these are recovered by the unfolding such that the pseudodata measurement and the truth pseudodata agree within the quoted uncertainties.
+\Cref{fig:zjets-pd-ue} shows the unfolded $N_{ch}$ and $H_T$ spectra on pseudodata together with the uncertainty budgets.
+The unfolding uncertainties are dominant for $N_{ch}$ and the tracking uncertainties are dominant for $H_T$.
+Equivalent plots can be drawn for any other observable that is a function of the full phase space.
+\Cref{fig:zjets-pd-trackjet} shows the results for two representative track-jet observables, the leading track-jet mass $m_{j1}$ and the leading track-jet transverse momentum $p_T^{j1}$.
+Notably the method bias is larger than the total uncertainty in a few of the bins of the $m_{j1}$ observable, but the uncertainty budget produces an acceptable p-value of about 0.26 in the $\chi^2$ test.
+The unfolding uncertainties, and in particular the hadron composition uncertainty, is dominant in the $m_{j1}$ observable while the tracking uncertainties are dominant in $p_{T,j1}$.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the charged particle multiplicity N_ch, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/Ntracks_pseudodata.pdf}
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the scalar sum H_T of charged track transverse momenta, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/HT_pseudodata.pdf} \\
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the charged particle multiplicity N_ch, showing dominant tracking and unfolding uncertainties and full coverage of the method bias.}]{figures/ch6/Ntracks_pseudodata.pdf}
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the scalar sum H_T of charged track transverse momenta, showing dominant tracking and unfolding uncertainties.}]{figures/ch6/HT_pseudodata.pdf}
+    \caption{Pseudodata measurement of the event-level charged-particle multiplicity $N_{\mathrm{ch}}$ (left) and scalar sum of charged-track transverse momenta $H_T^{\mathrm{ch}}$ (right). The top row shows the unfolded cross sections compared with the pseudodata truth, and the bottom row shows the corresponding uncertainty budgets. Tracking and unfolding uncertainties dominate the budget, and the method bias is covered by the total uncertainty in every bin.}
+    \label{fig:zjets-pd-ue}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the leading track-jet mass, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/pd_disp_m_trackj1.pdf}
+    \includegraphics[page=1, width=0.48\linewidth, alt={Pseudodata measurement of the leading track-jet transverse momentum, showing the unfolded cross section compared with the pseudodata truth.}]{figures/ch6/pd_disp_pT_trackj1.pdf} \\
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the leading track-jet mass, showing that the unfolding uncertainty carries a sharp shape to cover the method bias.}]{figures/ch6/pd_disp_m_trackj1.pdf}
+    \includegraphics[page=2, width=0.48\linewidth, alt={Uncertainty budget for the pseudodata measurement of the leading track-jet transverse momentum.}]{figures/ch6/pd_disp_pT_trackj1.pdf}
+    \caption{Pseudodata measurement of the leading track-jet mass $m_{j1}$ (left) and leading track-jet transverse momentum $p_T^{j1}$ (right). The top row shows the unfolded cross sections compared with the pseudodata truth, and the bottom row shows the corresponding uncertainty budgets. The hidden-variable unfolding uncertainty carries a sharp shape in the leading track-jet mass to cover the method bias at low mass, where hadron-composition effects in the jet interior are most pronounced.}
+    \label{fig:zjets-pd-trackjet}
+\end{figure}
+
+Additional closure tests also verified good agreement between the pseudodata measurement and the truth pseudodata target in restricted phase space regions, where cuts are placed on the unbinned spectra to further reduce the fiducial volume of the measurement.
+Closure tests were also performed for the applications of the measurement presented in \Cref{sec:zjets-results}.
+The usage recommendations for the public spectra (see \Cref{sec:zjets-discussion}) additionally require that these tests be performed to validate re-interpretations of the measurement on new observables.
+
+\FloatBarrier
+
+\subsection{Comparison to Iterative Bayesian Unfolding}
+\label{sec:zjets-validation-ibu}
+
+A second method of validation is to compare the results to independent measurements of the 24 observables measured by the Multifold analysis, plus $N_{ch}$ and $H_T$, performed with IBU~\cite{DAgostini:1994fjx}.
+See \Cref{sec:binned-unfolding-methods} for a review of IBU.
+This comparison was done for both the pseudodata and data measurements, but only the results of the data measurement will be shown here since the pseudodata measurement can be independently validated using the $\chi^2$ tests in \Cref{sec:zjets-validation-chi2}.
+It is important to note that the measurement produced by \Omnifold contains vastly more physical information than any of the one-dimensional IBU measurements presented in this seciton, and further enables entirely new types of observables to be measured as shown in \Cref{sec:zjets-results}.
+Therefore direct comparison between IBU and \Omnifold based measurements can be misleading.
+Even if \Omnifold results in drastically larger uncertainties, the measurement may still be worth performing given the huge potential for downstream applications.
+
+Comparisons of the \Omnifold and IBU based measurements of four observables are shown  in \Cref{fig:zjets-ibu-data-comparison}.
+In general excellent agreement between the \Omnifold and IBU measurements is observed, with differences in the central values always less than a few percent.
+The largest difference occurs in the last bin of the $m_{j1}$ observable which has large uncertainties for both measurements.
+The total uncertainties produced by both measurements are generally similar but have noticeable differences in a few of the bins shown.
+For example the total uncertainty for \Omnifold is smaller than IBU in the bulk of the $m_{j1}$ and $\tau_{3}^{j2}$ distributions but larger in the tail.
+All differences between the uncertainty budgets are due to the unfolding uncertainties.
+Note that it is a non-trivial cross check that the \Omnifold measurement is able to nearly exactly reproduce the experimental, theoretical, and statistical uncertainties of IBU.
+A possible explanation for the larger unfolding uncertainties of \Omnifold in the tails of distributions is that there are limited data statistics in this region.
+IBU avoids this issue by binning over low statistics regions, but the binning in the \Omnifold results is done only after the unfolding is performed.
+The unfolding itself is unbinned and so suffers from the lack of data statistics.
+Practically this corresponds to a limited amount of data events to use in the step one neural network trainings.
+
+\begin{figure}[p]
+    \centering
+    \begin{tabular}{@{}ccc@{}}
+        \textbf{\Omnifold{} vs. IBU} & \textbf{\Omnifold{} uncertainty} & \textbf{IBU uncertainty} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the dimuon transverse momentum observable.}]{figures/ch6/of_data_with_ibu_pT_ll.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the dimuon transverse momentum observable.}]{figures/ch6/data_disp_pT_ll.pdf} &
+        \includegraphics[page=28, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the dimuon transverse momentum observable.}]{figures/ch6/ibu_pseudodata_results.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the leading track-jet mass observable.}]{figures/ch6/of_data_with_ibu_m_trackj1.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the leading track-jet mass observable.}]{figures/ch6/data_disp_m_trackj1.pdf} &
+        \includegraphics[page=343, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the leading track-jet mass observable.}]{figures/ch6/ibu_pseudodata_results.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the sub-leading track-jet rapidity observable.}]{figures/ch6/of_data_with_ibu_y_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/data_disp_y_trackj2.pdf} &
+        \includegraphics[page=488, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/ibu_pseudodata_results.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and IBU for the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/of_data_with_ibu_tau_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/data_disp_tau3_trackj2.pdf} &
+        \includegraphics[page=604, width=0.31\linewidth, alt={Uncertainty budget for the IBU data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/ibu_pseudodata_results.pdf}
+    \end{tabular}
+    \caption{Comparison of the \Omnifold data measurement with the corresponding IBU measurement for four representative observables. The first column compares the unfolded spectra, the second column shows the \Omnifold uncertainty budget, and the third column shows the corresponding IBU uncertainty budget. Rows show $p_T^{\mu\mu}$, $m_{j1}$, $y_{j2}$, and $\tau_3^{j2}$. In the left column, the black (green) markers indicate the \Omnifold (IBU) measurement, and the blue and pink markers indicate the \mgpy and \sherpa generator predictions respectively.}
+    \label{fig:zjets-ibu-data-comparison}
+\end{figure}
+
+Given the unfolding uncertainties are the only noticeable differences between the \Omnifold and IBU based measurements, it is also worth performing a global comparison of these uncertainties across measurements of many different observables.
+This is done by binning the \Omnifold measurement in the same bins measured by IBU in the 24 + 2 observables, calculating the unfolding uncertainties, and using the magnitude of the unfolding uncertainties to fill a histogram.
+Importantly the bin entries all correspond to the same high dimensional measurement for \Omnifold, but to 26 independent single dimensional measurements for IBU.
+The results for the data measurement are shown in \Cref{fig:zjets-ibu-global-hidden-data,fig:zjets-ibu-global-unfold-data}.
+\Cref{fig:zjets-ibu-global-hidden-data} shows the hidden variable and hadron composition uncertainties.
+
+Overall the magnitude of the uncertainties is very similar between the IBU and \Omnifold measurements, with \Omnifold showing slightly larger uncertainties globally.
+This is particularly true in the hidden variable uncertainty for the substructure observables, which correspond to the $\tau_1$, $\tau_2$, and $\tau_3$ observables for the leading and sub-leading track jets.
+From the discussion in \Cref{sec:zjets-uncert-unfold}, naively an \Omnifold based measurement should be \textit{less} sensitive to hidden variables and have smaller hidden variable uncertainties, but this expectation is not born out in this measurement.
+This unexpected behavior is understood as the combination of two factors.
+The first is that \Omnifold is data limited in the tails of distributions given the need to train neural networks.
+This explanation is backed up by the observation that the data driven unfolding uncertainty, which roughly corresponds to the method bias produced by each unfolding method, is also slightly larger for \Omnifold in the substructure observables as seen in \Cref{fig:zjets-ibu-global-unfold-data}.
+\Omnifold simply provides a less accurate unfolding in the tails of these distributions due to the limited data and this results in larger unfolding uncertainties.
+The second factor is that \Omnifold only has an advantage with respect to hidden variables if the dominant hidden variables are constrained at detector-level by some observable used in the unfolding.
+As noted in \Cref{sec:zjets-uncert-unfold}, the most dominant hidden variables in this measurement are the truth hadron fractions, which are not constrained at detector level and so remain hidden variables even for \Omnifold.
+The first factor is a limitation of \Omnifold that is partially addressed by the pretraining procedure.
+The second factor is a feature of the target phase space rather than \Omnifold itself, and could be more or less relevant in other measurements.
+
+Importantly the total unfolding uncertainties shown in the bottom panel of \Cref{fig:zjets-ibu-global-unfold-data} are largely very similar between the two methods.
+As mentioned above, most of the applications of the measurement shown in \Cref{sec:zjets-results} would be either difficult or impossible perform with IBU unfolding.
+The \Omnifold measurement encodes vastly more information and unlocks entirely new types of measurements.
+In this context, the slightly degraded accuracy of the measurement is a very small price to pay.
+
+\begin{figure}[p]
+    \centering
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Hidden-variable unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_HV_data_proj_subfam.pdf}
+        \caption{Hidden-variable unfolding}
+    \end{subfigure}\\
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Hadron-composition hidden-variable unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_HVHad_data_proj_subfam.pdf}
+        \caption{Hadron-composition hidden variable}
+    \end{subfigure}
+    \caption{Histograms of the hidden variable (top) and hadron composition (bottom) unfolding uncertainties, where each entry in the histogram corresponds to a bin in the \Omnifold or IBU based measurements of the 24 observables from the Multifold analysis plus $N_{ch}$ and $H_T$. In each panel, these observables are broken into muon (top left), track-jet (top right), substructure (bottom left), and underlying event (bottom right) groups. The shaded histograms represent the IBU uncertainty and the lines represent the \Omnifold uncertainty.}
+    \label{fig:zjets-ibu-global-hidden-data}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Data-driven unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_DD_data_proj_subfam.pdf}
+        \caption{Data-driven unfolding}
+    \end{subfigure}\\
+    \begin{subfigure}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth, alt={Total unfolding uncertainty comparison between IBU and Omnifold projected onto the observable families for data.}]{figures/ch6/global_uncert_comparison/IBU_vs_Omnifold_Total_data_proj_subfam.pdf}
+        \caption{Total unfolding}
+    \end{subfigure}
+    \caption{Histograms of the data-driven (top) and total (bottom) unfolding uncertainties, where each entry in the histogram corresponds to a bin in the \Omnifold or IBU based measurements of the 24 observables from the Multifold analysis plus $N_{ch}$ and $H_T$. In each panel, these observables are broken into muon (top left), track-jet (top right), substructure (bottom left), and underlying event (bottom right) groups. The shaded histograms represent the IBU uncertainty and the lines represent the \Omnifold uncertainty.}
+    \label{fig:zjets-ibu-global-unfold-data}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Comparison to the previous round Multifold measurement}
+\label{sec:zjets-validation-mf}
+
+The previous round Multifold measurement~\cite{ATLAS:2024xxl} measured the same 24 observables in the same fiducial volume using the same input dataset and MC samples.
+The unbinned spectra from the Multifold measurement are publicly available, allowing the results from the full phase space measurement to be compared to its smaller scale counterpart.
+The principal methodological differences between the measurements are the classifier (MLP operating on a fixed-length input versus ParT operating on variable-length inputs) and the absence of pretraining in the Multifold measurement.
+
+\Cref{fig:zjets-mf-data} shows this comparison for the same four representative observables used in the IBU comparison.
+Unlike the IBU comparison the central values predicted by the full phase space measurement are shifted uniformly up from the Multifold measurement.
+This is because the full run 2 luminosity measurement was revised upward between the Multifold and Omnifold measurements~\cite{ATLAS:2022hro}.
+Beyond this the measurements are very similar in these four observables and the other 20 observables which are not explicitly shown here.
+This is expected given the data inputs and unfolding methodology are very similar.
+These results show that with the methodological improvements discussed in \Cref{sec:zjets-omnifold}, unfolding the full phase space comes with almost no reduction in precision compared with unfolding the more limited 24 dimensional phase space.
+
+\begin{figure}[p]
+    \centering
+    \begin{tabular}{@{}ccc@{}}
+        \textbf{\Omnifold{} vs. Multifold} & \textbf{\Omnifold{} uncertainty} & \textbf{Multifold uncertainty} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the dimuon transverse momentum observable.}]{figures/ch6/multifold/mf_data_pT_ll.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the dimuon transverse momentum observable.}]{figures/ch6/data_disp_pT_ll.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the dimuon transverse momentum observable.}]{figures/ch6/multifold/mf_pT_ll_uncert_budget.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the leading track-jet mass observable.}]{figures/ch6/multifold/mf_data_m_trackj1.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the leading track-jet mass observable.}]{figures/ch6/data_disp_m_trackj1.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the leading track-jet mass observable.}]{figures/ch6/multifold/mf_m_trackj1_uncert_budget.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the sub-leading track-jet rapidity observable.}]{figures/ch6/multifold/mf_data_y_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/data_disp_y_trackj2.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the sub-leading track-jet rapidity observable.}]{figures/ch6/multifold/mf_y_trackj2_uncert_budget.pdf} \\
+        \includegraphics[width=0.31\linewidth, alt={Data measurement comparison between Omnifold and the previous round Multifold measurement for the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/multifold/mf_data_tau3_trackj2.pdf} &
+        \includegraphics[page=2, width=0.31\linewidth, alt={Uncertainty budget for the Omnifold data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/data_disp_tau3_trackj2.pdf} &
+        \includegraphics[width=0.31\linewidth, alt={Uncertainty budget for the previous round Multifold data measurement of the sub-leading track-jet N-subjettiness observable.}]{figures/ch6/multifold/mf_tau3_trackj2_uncert_budget.pdf}
+    \end{tabular}
+    \caption{Comparison of the present \Omnifold data measurement with the previous round Multifold measurement for four representative observables. The first column compares the unfolded spectra, the second column shows the \Omnifold uncertainty budget, and the third column shows the Multifold uncertainty budget. Rows show $p_T^{\mu\mu}$, $m_{j1}$, $y_{j2}$, and $\tau_3^{j2}$.}
+    \label{fig:zjets-mf-data}
+\end{figure}
+
+\FloatBarrier
 
 \section{Results: Four Physics Use Cases}
 \label{sec:zjets-results}
 
-% ---------------------------------------------------------------
-% WRITING NOTES:
-%   These are the four physics use cases developed for the Z+jets
-%   paper.  Fill in each one with the specific observable,
-%   theoretical prediction, and key finding.
-%   [FILL IN: all four use cases from the paper — include figures]
-% ---------------------------------------------------------------
+Unlike standard binned cross section measurements, the unbinned full phase space measurement is best understood as a dataset that can be processed to produce measurements of arbitrary observables.
+This section presents four applications of this dataset to produce measurements of observables that could help the broader community improve our ability to model QCD processes, addressing one of the open problems discussed in \Cref{ch:intro}.
+In each of these applications the \Omnifold spectrum is compared to the truth-level predictions of the \mgpy and \sherpa generators used throughout this analysis.
+The first application, measurements of the underlying event observables $N_{ch}$ and $H_T$, could have equally well been performed using standard binned unfolding methods like IBU.
+The motivation to feature these measurements is their very poor modeling as shown in \Cref{fig:zjets-trackmcdata}.
+The other three applications would either require significant approximations, or be simply impossible to unfolding with binned methods.
 
-\subsection{Use Case 1: [FILL IN Title]}
-\label{sec:zjets-uc1}
+\subsection{Underlying Event Observables}
+\label{sec:zjets-results-ue}
 
-% ---------------------------------------------------------------
-% [FILL IN: description of the first physics use case.
-%  Suggested structure:
-%    - Observable(s) being measured.
-%    - Theoretical predictions compared to: NLL/NNLL resummation?
-%      fixed-order? MC generators?
-%    - Key plot: unfolded data vs. theory.
-%    - Main physics conclusion / takeaway.]
+The simplest applications of the measurement are projections onto conventional event-level observables.
+Unlike standard binned measurements the binning used to measure these observables can be changed on-the-fly, and the observables can be measured in sub-regions of the full fiducial volume.
+Two measurements of standard observables that show particularly poor modeling by the MC generators, $N_{ch}$ and $H_T$, are shown in this section.
+\Cref{fig:zjets-results-ue} shows the measurement of both observables together with the truth-level predictions of the \mgpy and \sherpa samples.
+As already shown in \Cref{fig:zjets-trackmcdata}, the generator predictions are very different for the $N_{ch}$ observable.
+This is understood to be primarily due to the different hadronization models.
+The data measurement is between the two generators, with both generators showing deviations from the data of 30\% or more.
+In the $H_T$ observable, substantial mismodeling of up to 20\% is observed for the \mgpy sample, but the \sherpa sample is able to reproduce the data to within 10\%.
 
-\subsection{Use Case 2: [FILL IN Title]}
-\label{sec:zjets-uc2}
+Explicitly tuning the hadronization models to these measurements should substantially improve the modeling.
+Since the measurement is simultaneous in both observables this can be done while taking correlations into account, which would not be possible with the independent IBU measurements in \Cref{sec:zjets-validation-ibu}.
+Further because this measurement is unbinned, it is possible to use it to tune entirely new types of hadronization models, specifically those built using deep learning techniques.
+There is a growing body of work on this topic, many of which assume that unbinned measurements such as this one exist and are able to furnish training data~\cite{Assi:2025gog,Bierlich:2023fmh,Bierlich:2023zzd,Bierlich:2024xzg,Chan:2023ume,Ghosh:2022zdz,Ilten:2022jfm}.
+As more unbinned measurements are performed in the future, hopefully these new deep learning based approaches will be able to better reproduce the LHC data and provide more accurate measurements and searches in runs 4 and 5 of the LHC.
 
-% [FILL IN]
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Unfolded differential cross section of the charged-particle multiplicity N_ch compared to the IBU measurement and to the MG5 FxFx and Sherpa 2.2.11 truth predictions.}]{figures/ch6/Ntracks_data.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Unfolded differential cross section of the scalar sum H_T of charged-particle transverse momenta compared to the IBU measurement and to the MG5 FxFx and Sherpa 2.2.11 truth predictions.}]{figures/ch6/HT_data.pdf}
+    \caption{Unfolded differential cross section of the charged-particle multiplicity $N_{ch}$ (left) and the scalar sum of charged-particle transverse momenta $H_T$ (right). The \Omnifold measurement (black points) is shown together with the particle-level predictions of the \mgpy (blue) and \sherpa (pink) samples. Error bars on the data show the total uncertainty and shaded boxes on the generator predictions show the theory uncertainty.}
+    \label{fig:zjets-results-ue}
+\end{figure}
 
-\subsection{Use Case 3: [FILL IN Title]}
-\label{sec:zjets-uc3}
+\FloatBarrier
 
-% [FILL IN]
+\subsection{Jet Shape Observables}
+\label{sec:zjets-results-shape}
 
-\subsection{Use Case 4: [FILL IN Title]}
-\label{sec:zjets-uc4}
+Because the un-binned measurement is differential in the kinematics of individual charged particles, jets can be clustered on the fly post-unfolding using any jet clustering algorithm and any radius parameter without the need to repeat the measurement with a different jet definition.
+In a typical jet measurement, each combination of algorithm and radius requires its own dedicated jet energy scale and resolution calibration, making performing a measurement with many different types of jets difficult.
+However in this measurement the jet itself is not a calibrated input to the measurement.
+It is a function constructed on the unfolded charged particles, just like any other event-level observable.
+As an illustration of this ability, this section presents an unfolded measurement of the charged-particle $p_T$ density profile about the jet axis,
+\begin{equation}
+    \langle \rho(r) \rangle \;=\; \frac{1}{N_{\mathrm{jets}}} \sum_{\mathrm{jets}} \frac{p_T(r - \Delta r / 2,\, r + \Delta r / 2)}{A_{\mathrm{annulus}}(r, \Delta r)},
+    \label{eqn:zjets-rho-r}
+\end{equation}
+where $r$ is the angular distance from the jet axis in $(y, \phi)$ space, $\Delta r$ is the width of an annulus centered at $r$, $p_T(r - \Delta r / 2, r + \Delta r / 2)$ is the scalar $p_T$ sum of all charged particles falling in that annulus, and $A_{\mathrm{annulus}}(r, \Delta r) = \pi[(r + \Delta r / 2)^2 - (r - \Delta r / 2)^2]$ is the annulus area.
+Because the sum is averaged over jets, the observable is invariant under overall normalization changes and cannot be interpreted as a cross section.
+Note also that a given jet contributes some $p_T$ density to each bin in the radius $r$.
+Accounting for these correlations is difficult with binned unfolding methods, but they are tracked naturally in the unbinned \Omnifold measurement since a single event weight is applied to the jets contribution to each bin.
+All charged particles in the event are considered, including those that do not fall within the clustered jet.
+The jet selection is $p_T^{\mathrm{jet}} \in [120,\,150]$~GeV and $|y^{\mathrm{jet}}| < 1$, a narrow window just above the peak of the leading-jet $p_T$ spectrum.
 
-% [FILL IN]
+\Cref{fig:zjets-results-shape-akt} shows $\langle \rho(r) \rangle$ for jets clustered with the anti-$k_t$ algorithm~\cite{Cacciari:2008gp} with radius parameter $R = 0.4$, together with its uncertainty budget.
+The \mgpy and \sherpa generators reproduce the overall shape of $\langle \rho(r) \rangle$ reasonably well for all three algorithms, though residual differences at the $5$--$10\%$ level are visible both in the core and in the tails.
+The observed profile is sharply peaked at small $r$ and falls off as radiation is captured further from the jet axis, with a characteristic dip near $r \approx R$ before rising again at the jet boundary.
+This dip is an artifact of the anti-$k_t$ clustering algorithm which centers the jet axis on the highest $p_T$ jet constituent rather than some average over the entire radiation pattern, possibly preventing particles near the jet boundary from being included in the jet.
+The un-binned measurement provides a direct test of this interpretation.
+Because the unfolded charged-particle kinematics are preserved, the same events can be re-clustered with any choice of algorithm and the profile recomputed from scratch.
+\Cref{fig:zjets-results-shape-algos} compares $\langle \rho(r) \rangle$ computed with the anti-$k_t$, $k_t$~\cite{Ellis:1993tq}, and Cambridge--Aachen (C/A)~\cite{Dokshitzer:1997in} algorithms, all at $R = 0.4$.
+The dip at $r \approx R$ is absent for $k_t$ and C/A jets, confirming that the feature is driven by the clustering algorithm rather than by the data.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Measurement of the charged-particle pT density profile rho(r) about the jet axis using the anti-kt R=0.4 algorithm, compared to the MG5 FxFx and Sherpa 2.2.11 truth predictions.}]{figures/ch6/radial_profile_rho.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Uncertainty budget for the charged-particle pT density profile measurement with the anti-kt R=0.4 algorithm.}]{figures/ch6/radial_profile_rho_uncertainties.pdf}
+    \caption{Unfolded charged-particle $p_T$ density profile $\langle \rho(r) \rangle$ about the jet axis, for jets clustered with the anti-$k_t$ algorithm at $R = 0.4$ and satisfying $p_T^{\mathrm{jet}} \in [120, 150]$~GeV and $|y^{\mathrm{jet}}| < 1$. Left: the \Omnifold measurement (black points) compared to the truth-level predictions of the \mgpy (blue) and \sherpa (pink) samples. Right: the uncertainty budget, with the total uncertainty (black dashed line) and the individual uncertainty groups (colored bands). All charged particles in the event are included in the sum over the annulus, not only those assigned to the jet.}
+    \label{fig:zjets-results-shape-akt}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.75\linewidth, alt={Comparison of the unfolded charged-particle pT density profile rho(r) computed with the anti-kt, kt, and Cambridge-Aachen clustering algorithms all at R=0.4, showing the characteristic central dip is specific to anti-kt clustering.}]{figures/ch6/radial_rho_JetAlgos.pdf}
+    \caption{Unfolded charged-particle $p_T$ density profile $\langle \rho(r) \rangle$ for three jet clustering algorithms, all at radius parameter $R = 0.4$: anti-$k_t$, $k_t$, and Cambridge--Aachen. The dip in $\langle \rho(r) \rangle$ at $r \approx R$ is pronounced for anti-$k_t$, absent for Cambridge--Aachen, and intermediate for $k_t$, demonstrating that the feature is driven by the choice of clustering algorithm rather than by the underlying radiation pattern. All three measurements are produced from the same un-binned \Omnifold output.}
+    \label{fig:zjets-results-shape-algos}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Energy Correlator Observables}
+\label{sec:zjets-results-eec}
+
+Energy correlator observables were introduced in \Cref{sec:eec}.
+All existing experimental measurements of the two-point energy correlator, summarized in \Cref{tab:eec-measurements}, use binned unfolding methods to correct for the detector response.
+This is a difficult observable to unfold with binned methods for two reasons.
+First, both the opening angle $\theta_{ij}$ and the energy weight $E_i E_j$ in \Cref{eqn:eec} receive corrections from the unfolding, requiring at least a two-dimensional unfolding to be performed.
+Further many measurements of the EEC are performed in bins of overall jet $p_T$ in order to extract a universal hadronization scale.
+This requires a three-dimensional unfolding, which is at the limit of what can be done with binned methods~\cite{CMS:2024mlf}.
+Second, even if binned methods can be made to work in two or three dimensions they do not account for correlations in the bin counts resulting from each particle in an event entering the histogram many times.
+As with the jet shape observables in \Cref{sec:zjets-results-shape}, the \Omnifold measurement handles this effect naturally since the correlations are preserved by the common event weight.
+
+\Cref{fig:zjets-results-eec} shows the EEC measured in the full charged final state as a function of $z$, with the sum running over all pairs of charged particles in the event.
+This is the first measurement of such an observable at a hadron collider, since all existing measurements measure the EEC only inside jets.
+The measurement achieves $5\%$ accuracy or better across the full range of $z$, which corresponds to opening angles from $0.002$ to $0.64$ radians.
+Three scaling regimes are visible.
+At large $z$ ($z > 10^{-2}$), the EEC scales approximately linearly with $z$, the behavior expected of uncorrelated radiation.
+This is expected at large opening angles since there is no process that produces long range correlations in the radiation pattern.
+At intermediate $z$, between roughly $10^{-4}$ and $10^{-3}$, the EEC flattens into a nearly constant plateau.
+This is the perturbative QCD scaling regime in which the two-point correlation is set by the interactions of quarks and gluons above the confinement scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV.
+In previous measurements of the EEC performed inside jets, this scaling regime was cut off by the jet radius.
+At small $z < 10^{-4}$, the linear scaling is restored, reflecting the non-interacting final-state hadrons which are produced once the partons confine below $\Lambda_{\mathrm{QCD}}$.
+The \mgpy and \sherpa predictions both reproduce the three-regime structure,
+but \sherpa over-predicts the correlation at small $z$.
+A similar effect was observed in Ref.~\cite{CMS:2024mlf}.
+The covariance matrix of the measurement, shown in \cref{fig:zjets-results-eec-cov}, encodes the bin-to-bin correlations of the total uncertainty and is required for any quantitative use of the measurement, such as an extraction of $\alpha_s$.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.65\linewidth, alt={Measurement of the two-point energy-energy correlator EEC as a function of the angular separation observable z, measured across all pairs of charged particles in the event.}]{figures/ch6/data_eec_xsec.pdf}
+    \caption{Unfolded measurement of the two-point energy-energy correlator EEC as a function of the dimensionless angular separation observable $z$, computed from all pairs of charged particles in the event. The \Omnifold measurement (black points) is shown together with the truth-level predictions of the \mgpy (blue) and \sherpa (pink) samples. Error bars on the measurement show the total uncertainty. Shaded boxes on the generator predictions show the theory uncertainty. Three scaling regimes are visible: linear at large $z$ (uncorrelated radiation), plateau at intermediate $z$ (perturbative QCD), and linear at small $z$ (free hadrons below $\Lambda_{\mathrm{QCD}}$).}
+    \label{fig:zjets-results-eec}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.65\linewidth, alt={Covariance matrix for the unfolded EEC measurement, showing the bin-to-bin correlations of the total measurement uncertainty as a function of the angular separation observable z.}]{figures/ch6/data_eec_cov.pdf}
+    \caption{Covariance matrix of the unfolded EEC measurement shown in \cref{fig:zjets-results-eec}. The matrix encodes the bin-to-bin correlations of the total uncertainty as a function of the dimensionless angular separation observable $z$.}
+    \label{fig:zjets-results-eec-cov}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Intrinsic Dimensionality of Jets}
+\label{sec:zjets-results-id}
+
+The concept of intrinsic dimensionality and the NNID estimator was introduced in \Cref{sec:id}.
+Intrinsic dimensionality has never been measured using particle physics data in part because it is a property of a dataset, not a single event or jet, making it impossible to construct the response matrix needed for binned unfolding.
+The un-binned \Omnifold measurement circumvents this obstruction since the result of the measurement is a dataset rather than a histogram.
+This section presents the first measurement of the intrinsic dimensionality of a particle physics dataset using the nearest-neighbor intrinsic dimension estimator (NNID)~\cite{NIPS2004_74934548} evaluated on a sample of jets drawn from the unfolded charged final state.
+
+The procedure for calculating the NNID starts with clustering jets with the anti-$k_T$ algorithm and a radius parameter of 1.0 using the particle-level MC samples needed to build the measurement.
+The choice of jet definition is irrelevant and could be changed at will.
+Jets are then taken from the $p_T$ range $[330, 370]$~GeV, which roughly corresponds to initiating parton $p_T$ in the range $[500, 550]$~GeV when accounting for the missing neutral component.
+Next, jets are pre-processed by applying a rotation about the beam axis and Lorentz boost along the beam axis such that the jet is centered in the rapidity--azimuth plane.
+The jets are then rotated about the jet axis such that the principal component of the radiation pattern points in the positive $\phi$ direction in the $y$--$\phi$ plane.
+These pre-processing steps remove known symmetries of jets.
+Then the EMD (introduced in \Cref{sec:id}) between every pair of jets in the sample must be calculated.
+In practice this step is compute intensive and requires writing an $N \times N$ array of floating point numbers to disk, where $N$ is the number of jets in the dataset.
+To make the calculation manageable, $50,000$ jets are randomly sampled from the set of jets in the $p_T$ selection for each dataset.
+After calculation of the EMDs, the EMD ratios are calculated and used as input to a one-dimensional maximization of the likelihood in \Cref{eqn:likelihood}, given a choice of the unphysical index $i$.
+The result is an estimate of the intrinsic dimensionality $d$, along with the median EMD between all jets in the dataset and their $i$th nearest neighbor, which is a physical scale that can be used for plotting.
+These calculations must be repeated for each weight variation needed to assess the systematic uncertainties.
+
+Unlike the previous three applications of this measurement, the NNID estimator is entirely unbinned.
+It is a point estimate provided by the data given a choice of the unphysical index $i$.
+This makes the $\chi^2$ tests of \Cref{sec:zjets-validation-chi2} reduce to noting that the total uncertainty on the pseudodata measurement covers the method bias.
+It was checked that this test passes.
+
+\Cref{fig:zjets-results-nnid} shows the result in two complementary ranges of the median EMD.
+The left panel shows the NNID versus median EMD curve at low values of the median EMD.
+The generators reproduce the data within uncertainties, but tend to slightly overestimate the NNID.
+The right panel shows the same curve at higher median EMD values.
+The dip in NNID between $20$ and $30$~GeV is less pronounced in the data than in the generators, as is the increase in NNID above $30$~GeV.
+However overall the generators again agree with the data within uncertainties.
+The measurement also verifies that jet data has no more than several intrinsic dimensions, as predicted by the MC generators.
+This is many fewer dimensions than the several tens of dimensions used by the naive representation of jets in terms of the four-momenta of their constituents.
+
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.48\linewidth, alt={Measurement of the nearest-neighbor intrinsic dimension NNID of anti-kt R=1 jets as a function of the median EMD in the low-EMD regime, highlighting the fine-structure differences between data and generator predictions.}]{figures/ch6/data_meas_nnid_low.pdf}
+    \includegraphics[width=0.48\linewidth, alt={Measurement of the nearest-neighbor intrinsic dimension NNID of anti-kt R=1 jets as a function of the median EMD in the high-EMD regime, where the NNID approaches its asymptotic value.}]{figures/ch6/data_meas_nnid_high.pdf}
+    \caption{Unfolded measurement of the nearest-neighbor intrinsic dimension (NNID) of a sample of leading anti-$k_t$ $R = 1.0$ jets with $p_T \in [330, 370]$~GeV and $|\eta| < 2.5$, plotted as a function of the weighted median energy mover's distance between a jet and its $i$-th nearest neighbor. Both the NNID and the median EMD are functions of the un-physical neighbor index $i$, which is scanned logarithmically. The two panels show the same curve in two complementary ranges: (left) the low-median-EMD regime highlighting the fine-structure differences between the measurement and generator predictions, and (right) the high-median-EMD regime in which the NNID approaches its asymptotic value. Shaded bands show the total uncertainty on both the measurement and the generator predictions.}
+    \label{fig:zjets-results-nnid}
+\end{figure}
+
+As mentioned in \Cref{sec:id}, intrinsic dimension observables are of interest here not because of a deep link to the underlying QCD theory but because they establish basic facts about jet data.
+Possible links between this class of observables and the QCD theory are interesting, but have never been explored in the theoretical literature, perhaps in part because measurement of these observables was not possible without unbinned and high dimensional unfolding methods.
+Ideally this measurement also serves as some motivation for the theory community to explore these observables in the future.
 
 \section{Discussion}
 \label{sec:zjets-discussion}
 
-% ---------------------------------------------------------------
-% Sub-topics to cover:
-%
-% 1. Summary of results
-%    - What did we learn about QCD/jet substructure from this
-%      measurement?  Are the generators well-calibrated?
-%    - Are the theory predictions consistent with data?
-%
-% 2. Advantages of the OmniFold approach demonstrated here
-%    - The per-event weights allow all four use cases to be
-%      extracted from a single unfolding — contrast with
-%      IBU which would require four separate unfoldings.
-%    - High-dimensional unfolding captured correlations that
-%      1D unfolding would miss.
-%
-% 3. Limitations and future improvements
-%    - Sensitivity to the choice of training features.
-%    - The generator uncertainty: if both MC generators are
-%      wrong, OmniFold cannot fix that.
-%    - Future: extend to higher pT, more observables,
-%      or full event unfolding.
+This chapter has presented a full phase space measurement of $Z(\to\mu\mu)$+jets production in proton--proton collisions at $\sqrt{s} = 13$~TeV using the full Run~2 ATLAS dataset.
+The measurement is the highest-dimensional cross section measurement ever performed, reaching up to 843 simultaneous dimensions and a mean of 150 dimensions per event.
+It supersedes the previous round Multifold measurement~\cite{ATLAS:2024xxl}, extending from a fixed set of 24 observables to the phase space of all charged particles.
+The result is best understood as a dataset rather than a histogram, which can be projected onto any observable of interest without repeating the measurement.
+Four physics use cases were presented in \Cref{sec:zjets-results}, but these represent only a small fraction of the possible applications.
+
+To support further analyses, the unbinned spectra are planned to be made publicly available alongside a codebase that documents best practices and reproduces the four use cases presented here\footnote{The equivalent documentation for the Multifold analysis is available at \href{https://gitlab.cern.ch/atlas-physics/public/sm-z-jets-omnifold-2024}{https://gitlab.cern.ch/atlas-physics/public/sm-z-jets-omnifold-2024}}.
+The documentation contains a set of usage recommendations, two of which are worth highlighting.
+First, the particle-level MC sample used for unfolding must provide sufficient support in any phase space region of interest.
+In practice this is enforced by requiring that at least 5,000 effective events are contained in each bin of any histogram constructed from the particle-level data.
+Second, users must validate the measurement in their desired binning and phase space by running the pseudodata measurement described in \Cref{sec:zjets-pseudodata} and computing a $\chi^2$ test statistic and p-value as was done for the 26 observables in \Cref{sec:zjets-validation-chi2}.
+This validation step is essential because the unfolded spectra contain truth-level information, such as the truth hadron fractions discussed in \Cref{sec:zjets-uncert-unfold}, that is not constrained at detector level.
+Observables sensitive to such hidden variables will fail this check, indicating that the observables cannot be constrained with this measurement.
+
+There are many applications of this measurement that can and should be pursued in the future.
+A few are worth mentioning here.
+The EEC observable measured in \Cref{sec:zjets-results-eec} provides a direct avenue for extracting the strong coupling $\alpha_s$ from the perturbative QCD scaling regime, and extensions to higher-point energy correlators are straightforward given the unbinned representation of the final state.
+The underlying event results of \Cref{sec:zjets-results-ue} can be used to tune conventional event generators, or to fit machine learning based hadronization models which assume precisely this kind of unbinned measurement~\cite{Assi:2025gog,Bierlich:2023fmh,Bierlich:2023zzd,Bierlich:2024xzg,Chan:2023ume,Ghosh:2022zdz,Ilten:2022jfm}.
+The $Z$ boson kinematic distributions, including the signed $\Delta\phi$ observable, can be used for EFT fits to anomalous couplings.
+Because the measurement is fully differential in the hadronic recoil, it can also constrain backgrounds in other measurements and searches, for example electroweak $Zjj$ production is a significant background in many Higgs boson measurements.
+The Lund jet plane~\cite{Dreyer:2020brq} can be measured directly from the unfolded charged particles, including the second and tertiary jet planes which have never been measured experimentally.
+Finally, quark/gluon tagging applied to the charged particle jets would allow differences in substructure between quark- and gluon-initiated jets to be extracted from data.
+One limitation of the measurement is that all observables are constructed from charged particles only, so direct comparison to perturbative QCD calculations is complicated by the absence of the neutral component.
+Significant theoretical progress has been made in this direction through the track function formalism~\cite{Chang:2013rca,Chang:2013iba}, which provides a systematic framework for performing perturbative calculations on charged-particle observables.
+
+This measurement also demonstrates that full phase space cross section measurements are technically feasible at a hadron collider, so extension of these methods to measurements of other processes is a natural next step.
+Dijet production, top quark pair production, Higgs processes, and multi-lepton final states are all promising targets.
+Measurements of these processes would be very useful for global EFT fits~\cite{CMS:2023xyc,CMS:2025ugn,Heimel:2024drk}, which currently rely on a patchwork of binned measurements that do not capture all available information.
+Two practical limitations of unbinned and high dimensional unfolding methods will need to be overcome to perform these future measurements.
+The acceptance effects in the $Z$+jets phase space discussed in \Cref{sec:zjets-omnifold} are small enough to be negligible, but they become significant when the event selection involves jets, which is necessary in top process measurements.
+Methods for handling acceptance effects in unbinned unfolding have been proposed~\cite{Butter:2025mek,Canelli:2025ybb} but have not yet been applied in a real analysis.
+The computational cost of the measurement is also substantial.
+Fine-tuning roughly 25 thousand transformer networks required approximately 400,000 A100 GPU-hours.
+While this is large in absolute terms, it is a fraction of the resources consumed by frontier language model training, and significant optimizations are possible.
+As GPU resources become more available and methodologies mature, computational cost should become less of a bottleneck.
+
+The HL-LHC era will produce datasets of unprecedented size and quality that will be useful many years into the future.
+A central goal of particle physics over the next two decades should be to allow wide and open access to these data, and preserve them for future use.
+Unbinned and high dimensional cross section measurements are a tool that address many of the challenges, in addition to offering the ability to measure new observables and improve our understanding of LHC data at present.
+They should become standard practice in the HL-LHC physics program.
+
+\FloatBarrier
