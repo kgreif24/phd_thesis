@@ -2,19 +2,112 @@
 \chapter{Conclusion}
 \label{ch:conclusion}
 
-
-\section{Deep learning and LHC physics}
+\section{Machine Learning is Driving LHC Physics Progress}
 \label{sec:conclusion-ml-driving}
 
+This thesis opened with a conjunction: the 2012 discovery of the Higgs boson and the 2012 AlexNet moment.
+The first completed the particle content of the Standard Model.
+The second began a transformation in how scientific data is analyzed that has, in the intervening fourteen years, fundamentally changed what is possible at the LHC.
+The work described in this thesis sits at the intersection of these two events.
 
-\section{Searching for di-Higgs with large scale flavor tagging}
+The three research directions covered in \Cref{ch:tagging,ch:unfolding,ch:zjets} reflect the breadth of that transformation.
+\Cref{ch:tagging} presented a study of top-quark jet tagging using low-level constituent inputs, establishing that neural networks trained directly on jet kinematics outperform those trained on hand-engineered expert features.
+This mirrors the original AlexNet result and represents the particle physics community's own AlexNet moment in the jet tagging domain~\cite{Cogan:2014oua,Baldi:2014kfa}.
+The study also provided a systematic uncertainty quantification framework that exposed a fundamental tension: larger, more expressive taggers extract more information from simulation, including information that is imperfectly modeled, so raw performance gains in simulation do not translate one-to-one into performance gains on data.
+This tension is visible in the most recent ATLAS and CMS flavor tagging results~\cite{ATLAS:2025dkv,Sarkar:2024vjz}, and managing it will be a core challenge at the HL-LHC.
+
+\Cref{ch:unfolding} surveyed the new generation of unbinned unfolding methods, from diffusion and flow-matching based generative approaches to the \Omnifold algorithm, which recasts unfolding as an iterative likelihood ratio estimation problem.
+\Cref{ch:zjets} then demonstrated \Omnifold in practice, producing the highest-dimensional cross section measurement ever performed at a hadron collider.
+The result is a reweighted particle-level dataset encoding the full differential cross section of $Z(\to\mu\mu)$+jets production in up to 843 simultaneous dimensions.
+This is not an incremental improvement on binned methods.
+It is a qualitatively different kind of measurement, one whose output is a dataset rather than a set of histograms, and whose downstream applications include observables that could not have been unfolded by any other means.
+
+Progress in these two directions, tagging and unfolding, will both be critical to the HL-LHC program.
+As pileup reaches 200 simultaneous interactions per crossing, many analyses will depend on machine learning simply to keep the signal events above trigger thresholds at all.
+In that regime, ML is not a tool for improving physics, it is the prerequisite for doing physics.
+
+\section{Di-Higgs: The Next Milestone}
 \label{sec:conclusion-dihiggs}
 
+The discovery of the Higgs boson in 2012 completed the particle content of the Standard Model, but it left the shape of the Higgs potential unmeasured.
+The self-coupling $\lambda$ determines the potential's shape and is the quantity that governs whether the electroweak vacuum is stable, whether the electroweak phase transition was first-order (a necessary condition for electroweak baryogenesis), and whether the Higgs sector is consistent with the minimal Standard Model or some extension of it.
+Measuring $\lambda$ requires observing di-Higgs production, a process with a cross section so small that it was considered unobservable when the LHC was first conceived.
+The HL-LHC is projected to reach the sensitivity needed for a $5\sigma$ observation with $3000~\mathrm{fb}^{-1}$ of data~\cite{Cepeda:2019klc,ATLAS:2025eii}, and that projection depends critically on advances in $b$-jet identification.
+Given that $H \to b\bar{b}$ accounts for roughly 58\% of Higgs decays, flavor tagging is the single most important ingredient in di-Higgs searches.
+The order-of-magnitude gains in $b$-jet rejection achieved by the current generation of transformer-based taggers~\cite{ATLAS:2025dkv,Sarkar:2024vjz}, and the further gains projected from scaling these models to larger architectures trained on billions of jets~\cite{ATLAS:2026vyw,Vigl:2026ppx}, make an HL-LHC observation genuinely realistic.
 
-\section{Automated data analysis with agentic AI}
+The result of a di-Higgs observation could go one of two ways.
+If the measured self-coupling is consistent with the Standard Model prediction, it will be an extraordinary confirmation of a theory we already know to be incomplete, and the open problems listed in \Cref{sec:open_problems} will remain exactly as open as they are today.
+The roadmap forward in that case is unclear: we would have a complete and precisely validated electroweak sector with no clear experimental pointer toward what lies beyond it.
+If the self-coupling deviates from the Standard Model prediction, we will have the first direct evidence that the Higgs sector is non-minimal.
+This would be one of the most significant results in the history of particle physics, pointing toward explanations of the hierarchy problem, the matter-antimatter asymmetry, or both.
+In either case, a di-Higgs observation will be an enormous achievement.
+Machine learning, including the flavor tagging results of \Cref{ch:tagging}, will be one of the many innovations that make it possible.
+
+\section{Agentic AI and the Transformation of Physics Research}
 \label{sec:conclusion-agentic}
 
+Beyond specific ML tools for analysis tasks, the emergence of agentic AI systems represents a qualitative shift in the relationship between artificial intelligence and scientific research.
+Agentic systems are not classifiers or generative models deployed in a fixed pipeline.
+They are general-purpose reasoning and software engineering agents that can plan multi-step analyses, execute code, search literature, and iterate on their own outputs.
+As of 2026, such systems can already reproduce existing particle physics analyses with high fidelity~\cite{Birk:2026zpd} and produce reasonable, if imperfect, results on open-ended data analysis tasks~\cite{Moreno:2026mqk}.
+If progress stopped today, this would already be transformative.
 
-\section{Will AI deliver the next discovery?}
+The resource that has always constrained particle physics is not computing time or accelerator luminosity, it is human expertise.
+The ATLAS collaboration is an organization of several thousand scientists, but the number of people competent to pursue any given analysis is a small fraction of that, and the number who are willing to spend months on the necessary but unglamorous tasks (systematic uncertainty propagation, software maintenance, documentation) is smaller still.
+Agentic AI changes this equation.
+Every experiment stands to become dramatically more productive if the tasks that scientists do not want to do are handled autonomously, and the tasks that scientists do want to do are accelerated by an AI collaborator that can write, debug, and iterate on analysis code in minutes rather than days.
+
+More significantly, the LHC datasets already contain more physics than human researchers have been able to extract from them.
+There are large regions of unexplored two-body resonance parameter space~\cite{Craig:2016rqv,Kim:2019rhy}, many jet substructure observables that have never been measured, and EFT fits that have never been performed for lack of the appropriate analysis inputs.
+The methods for pursuing these analyses are well understood.
+The bottleneck is person power.
+Agentic AI can fill these gaps, not by replacing human judgment about what is interesting, but by executing on that judgment far more efficiently.
+
+We are currently in what might be called the centaur science era: AI has automated most of the software development and numerical analysis workload, but the ideation, experimental design, and communication of results remain human tasks.
+This is, frankly, the ideal moment to be a human researcher.
+The bottleneck has shifted from implementation to creativity.
+The question that matters is not how to run the analysis but what analysis to run.
+
+My expectation is that this equilibrium will not persist for long.
+Reasoning about complex physical systems and designing experiments to probe them are, at their core, software engineering and logical inference problems, both areas in which AI agents have shown rapid and compounding improvement.
+It has now been more than a decade since betting against aggressive predictions of AI capability was consistently the losing bet; I see no particular reason to expect this to change.
+The natural end state is an AI system that can take a physics question, identify the relevant dataset, design and execute the analysis, interpret the result in the context of the existing literature, and propose the next step.
+Such a system is within the foreseeable future.
+
+\section{Will AI Deliver the Next Discovery?}
 \label{sec:conclusion-discovery}
 
+My prediction is that the combination of HL-LHC data and AI-powered analysis will allow us to essentially exhaust the statistical potential of the available dataset within the next decade.
+That has never been true of any previous particle physics experiment.
+The painstaking accumulation of results from the LHC Run 1 and Run 2 has brought us closer to that limit than at any previous point, and this thesis has been a small contribution to that effort.
+The remaining gap between what the data contains and what we have extracted from it will close much faster than it would have without these tools.
+
+This convergence will produce one of two outcomes.
+The first is that the Standard Model is confirmed to extraordinary precision across the full electroweak scale, including a measurement of the Higgs self-coupling consistent with the SM prediction.
+This would be a remarkable scientific achievement, a precise validation of a quantum field theory covering fifteen orders of magnitude in energy.
+It would also be deeply unsatisfying, because the Standard Model is demonstrably incomplete.
+Dark matter exists.
+The matter-antimatter asymmetry exists.
+Gravity is not in the Standard Model.
+Confirming the Standard Model with unprecedented precision would sharpen the paradox rather than resolve it, and the field would be forced to look elsewhere, toward cosmological observables, astroparticle experiments, or a next-generation collider.
+
+The second outcome is that AI-powered analysis of the HL-LHC data surfaces a statistically significant deviation from Standard Model predictions.
+This could come from a di-Higgs self-coupling measurement, from a precision observable in an unbinned measurement of the kind demonstrated in \Cref{ch:zjets}, from an anomaly detection pipeline applied to a high-dimensional dataset, or from some combination of the above.
+If this happens, AI will have done what no previous generation of analysis tools was able to accomplish: delivered a genuine discovery that reorients the field.
+I do not think a superintelligent AI system will produce the Lagrangian of the universe.
+The bottleneck is experimental data, not reasoning capability.
+But a discovery, even a partial one that points rather than answers, would set in motion a sequence of subsequent experiments, calculations, and measurements that could eventually address some of the open problems that have stood unchanged since 2012.
+
+Both outcomes are realistic and worth working toward.
+The work described in this thesis, tagging, unfolding, and the full phase space measurement of \Cref{ch:zjets}, will be among the inputs to whichever of these outcomes the HL-LHC delivers.
+The unbinned spectra produced in \Cref{ch:zjets} will be available for analysis for decades, and the methods developed to produce them will be refined and applied to other processes.
+The flavor tagging framework of \Cref{ch:tagging} will inform how future taggers are deployed in a data environment where the gap between simulation and reality must be continuously monitored.
+
+The agentic AI systems now emerging will accelerate all of this.
+The HL-LHC data-taking period will coincide with a period of extraordinary progress in AI capability.
+That coincidence strikes me as one of the most interesting features of the moment we are in.
+Particle physics has always been defined by the interplay between the machines that produce collisions and the tools that extract meaning from them.
+The tools are now changing faster than at any previous point in the history of the field.
+My hope is that we learn something new.
+\FloatBarrier
