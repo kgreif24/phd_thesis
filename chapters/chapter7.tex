@@ -2,24 +2,20 @@
 \chapter{Conclusion}
 \label{ch:conclusion}
 
-\section{Machine Learning is Driving LHC Physics Progress}
-\label{sec:conclusion-ml-driving}
+\section{Deep learning and LHC physics}
+\label{sec:conclusion-dl-lhc}
 
-This thesis opened with a conjunction: the 2012 discovery of the Higgs boson and the 2012 AlexNet moment.
-The first completed the particle content of the Standard Model.
-The second began a transformation in how scientific data is analyzed that has, in the intervening fourteen years, fundamentally changed what is possible at the LHC.
-The work described in this thesis sits at the intersection of these two events.
-
-The three research directions covered in \Cref{ch:tagging,ch:unfolding,ch:zjets} reflect the breadth of that transformation.
-\Cref{ch:tagging} presented a study of top-quark jet tagging using low-level constituent inputs, establishing that neural networks trained directly on jet kinematics outperform those trained on hand-engineered expert features.
-This mirrors the original AlexNet result and represents the particle physics community's own AlexNet moment in the jet tagging domain~\cite{Cogan:2014oua,Baldi:2014kfa}.
-The study also provided a systematic uncertainty quantification framework that exposed a fundamental tension: larger, more expressive taggers extract more information from simulation, including information that is imperfectly modeled, so raw performance gains in simulation do not translate one-to-one into performance gains on data.
-This tension is visible in the most recent ATLAS and CMS flavor tagging results~\cite{ATLAS:2025dkv,Sarkar:2024vjz}, and managing it will be a core challenge at the HL-LHC.
+Machine learning is nothing new to LHC physics, but the deep learning revolution kicked off by AlexNet has produced a large suite of new tools that have transformed how LHC data is processed into physics results.
+The research covered in this thesis has been a small part of this transformation.
+\Cref{ch:tagging} presented a study of top-quark jet tagging using low-level constituent inputs, which established that neural networks trained directly on jet constituent kinematic outperform those trained on hand-engineered expert features, mirroring the lesson of AlexNet in the computer vision field.
+The study also provided a systematic uncertainty quantification framework which showed that larger, more expressive taggers extract more information from simulation, including information that is imperfectly modeled, so raw performance gains in simulation do not trivially translate into performance gains on data.
+This effect is visible in the most recent ATLAS and CMS flavor tagging results~\cite{ATLAS:2025dkv,Sarkar:2024vjz}, and managing it will be a challenge as jet tagging models continue to scale.
 
 \Cref{ch:unfolding} surveyed the new generation of unbinned unfolding methods, from diffusion and flow-matching based generative approaches to the \Omnifold algorithm, which recasts unfolding as an iterative likelihood ratio estimation problem.
 \Cref{ch:zjets} then demonstrated \Omnifold in practice, producing the highest-dimensional cross section measurement ever performed at a hadron collider.
 The result is a reweighted particle-level dataset encoding the full differential cross section of $Z(\to\mu\mu)$+jets production in up to 843 simultaneous dimensions.
 Unlike a binned measurement, whose output is a fixed set of histograms tied to the observables chosen at analysis time, this result is a dataset that can be projected onto any observable of interest, including observables that could not have been unfolded by any other means.
+Four physics use cases of this dataset were presented, three of which would be very difficult or impossible to perform with traditional binned unfolding techniques, proving that deep learning based unfolding methods enable entirely new kinds of measurements.
 
 Progress in these two directions, tagging and unfolding, will both be critical to the HL-LHC program.
 As pileup reaches 200 simultaneous interactions per crossing, many analyses will rely on machine learning to maintain signal efficiency at trigger level and to manage the increased combinatorial complexity of every reconstructed object.
