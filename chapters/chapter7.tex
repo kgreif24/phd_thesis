@@ -17,6 +17,16 @@ The result is a reweighted particle-level dataset encoding the full differential
 Unlike a binned measurement, whose output is a fixed set of histograms tied to the observables chosen at analysis time, this result is a dataset that can be projected onto any observable of interest, including observables that could not have been unfolded by any other means.
 Four physics use cases of this dataset were presented, three of which would be very difficult or impossible to perform with traditional binned unfolding techniques, proving that deep learning based unfolding methods enable entirely new kinds of measurements.
 
+Jet tagging and unfolding are far from the only areas where deep learning has taken hold.
+Anomaly detection, simulation-based inference, fast detector simulation, and event reconstruction have all seen substantial activity, and there are few parts of LHC physics that deep learning does not touch in some way.
+Yet for all of this progress, no major experimental discovery, for example new particles or dynamics beyond the Standard Model, has resulted from the use of deep learning.
+LHC physics is in many ways still organized around the same measurement and search strategies it used before the deep learning era.
+Individual pieces of the data analysis chain have been replaced or substantially improved by neural networks, but the overall structure of how physics results are produced has not yet changed.
+
+I believe that the unbinned and high-dimensional measurements described in \Cref{ch:unfolding,ch:zjets} represent genuine progress in how particle physics measurements are performed, and that the order-of-magnitude improvements in jet classification documented in \Cref{ch:tagging} are producing real gains in the sensitivity of searches for rare processes.
+At minimum, these improvements will help with the primary physics goals of the HL-LHC program, most notably the search for di-Higgs production and the determination of the Higgs self-coupling.
+In the best case, a real discovery through these methods is imminent.
+The sections that follow discuss the two directions I find most promising for delivering on this best case.
 
 \section{Di-Higgs: The Next Milestone}
 \label{sec:conclusion-dihiggs}
