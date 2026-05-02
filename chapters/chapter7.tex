@@ -19,18 +19,17 @@ This tension is visible in the most recent ATLAS and CMS flavor tagging results~
 \Cref{ch:unfolding} surveyed the new generation of unbinned unfolding methods, from diffusion and flow-matching based generative approaches to the \Omnifold algorithm, which recasts unfolding as an iterative likelihood ratio estimation problem.
 \Cref{ch:zjets} then demonstrated \Omnifold in practice, producing the highest-dimensional cross section measurement ever performed at a hadron collider.
 The result is a reweighted particle-level dataset encoding the full differential cross section of $Z(\to\mu\mu)$+jets production in up to 843 simultaneous dimensions.
-This is not an incremental improvement on binned methods.
-It is a qualitatively different kind of measurement, one whose output is a dataset rather than a set of histograms, and whose downstream applications include observables that could not have been unfolded by any other means.
+Unlike a binned measurement, whose output is a fixed set of histograms tied to the observables chosen at analysis time, this result is a dataset that can be projected onto any observable of interest, including observables that could not have been unfolded by any other means.
 
 Progress in these two directions, tagging and unfolding, will both be critical to the HL-LHC program.
-As pileup reaches 200 simultaneous interactions per crossing, many analyses will depend on machine learning simply to keep the signal events above trigger thresholds at all.
-In that regime, ML is not a tool for improving physics, it is the prerequisite for doing physics.
+As pileup reaches 200 simultaneous interactions per crossing, many analyses will rely on machine learning to maintain signal efficiency at trigger level and to manage the increased combinatorial complexity of every reconstructed object.
+The physics return of the HL-LHC will depend substantially on how far these tools can be pushed.
 
 \section{Di-Higgs: The Next Milestone}
 \label{sec:conclusion-dihiggs}
 
 The discovery of the Higgs boson in 2012 completed the particle content of the Standard Model, but it left the shape of the Higgs potential unmeasured.
-The self-coupling $\lambda$ determines the potential's shape and is the quantity that governs whether the electroweak vacuum is stable, whether the electroweak phase transition was first-order (a necessary condition for electroweak baryogenesis), and whether the Higgs sector is consistent with the minimal Standard Model or some extension of it.
+The self-coupling $\lambda$ determines the shape of the Higgs potential, and any departure from the Standard Model prediction would shift that shape in ways that have significant consequences for many of the open problems listed in \Cref{sec:open_problems}, including the hierarchy problem and the matter-antimatter asymmetry.
 Measuring $\lambda$ requires observing di-Higgs production, a process with a cross section so small that it was considered unobservable when the LHC was first conceived.
 The HL-LHC is projected to reach the sensitivity needed for a $5\sigma$ observation with $3000~\mathrm{fb}^{-1}$ of data~\cite{Cepeda:2019klc,ATLAS:2025eii}, and that projection depends critically on advances in $b$-jet identification.
 Given that $H \to b\bar{b}$ accounts for roughly 58\% of Higgs decays, flavor tagging is the single most important ingredient in di-Higgs searches.
@@ -39,22 +38,22 @@ The order-of-magnitude gains in $b$-jet rejection achieved by the current genera
 The result of a di-Higgs observation could go one of two ways.
 If the measured self-coupling is consistent with the Standard Model prediction, it will be an extraordinary confirmation of a theory we already know to be incomplete, and the open problems listed in \Cref{sec:open_problems} will remain exactly as open as they are today.
 The roadmap forward in that case is unclear: we would have a complete and precisely validated electroweak sector with no clear experimental pointer toward what lies beyond it.
-If the self-coupling deviates from the Standard Model prediction, we will have the first direct evidence that the Higgs sector is non-minimal.
-This would be one of the most significant results in the history of particle physics, pointing toward explanations of the hierarchy problem, the matter-antimatter asymmetry, or both.
+If the self-coupling deviates from the Standard Model prediction, we will have the first direct evidence that the Higgs sector is non-minimal, pointing toward explanations of the hierarchy problem, the matter-antimatter asymmetry, or both.
 In either case, a di-Higgs observation will be an enormous achievement.
 Machine learning, including the flavor tagging results of \Cref{ch:tagging}, will be one of the many innovations that make it possible.
 
 \section{Agentic AI and the Transformation of Physics Research}
 \label{sec:conclusion-agentic}
 
-Beyond specific ML tools for analysis tasks, the emergence of agentic AI systems represents a qualitative shift in the relationship between artificial intelligence and scientific research.
+Beyond specific ML tools for analysis tasks, the emergence of agentic AI systems marks a new phase in the relationship between artificial intelligence and scientific research.
 Agentic systems are not classifiers or generative models deployed in a fixed pipeline.
 They are general-purpose reasoning and software engineering agents that can plan multi-step analyses, execute code, search literature, and iterate on their own outputs.
 As of 2026, such systems can already reproduce existing particle physics analyses with high fidelity~\cite{Birk:2026zpd} and produce reasonable, if imperfect, results on open-ended data analysis tasks~\cite{Moreno:2026mqk}.
 If progress stopped today, this would already be transformative.
 
-The resource that has always constrained particle physics is not computing time or accelerator luminosity, it is human expertise.
-The ATLAS collaboration is an organization of several thousand scientists, but the number of people competent to pursue any given analysis is a small fraction of that, and the number who are willing to spend months on the necessary but unglamorous tasks (systematic uncertainty propagation, software maintenance, documentation) is smaller still.
+Within the context of data analysis, the single most constrained resource in a large experimental collaboration is human time.
+The ATLAS collaboration is an organization of several thousand scientists, but the number of people competent to pursue any given analysis is a small fraction of that, and the number willing to spend months on necessary but unglamorous tasks is smaller still.
+These tasks include not only systematic uncertainty propagation, software maintenance, and documentation, but also the continuous operation and calibration of the detector itself, which consumes enormous amounts of expert time that could otherwise go toward physics analysis.
 Agentic AI changes this equation.
 Every experiment stands to become dramatically more productive if the tasks that scientists do not want to do are handled autonomously, and the tasks that scientists do want to do are accelerated by an AI collaborator that can write, debug, and iterate on analysis code in minutes rather than days.
 
@@ -64,7 +63,7 @@ The methods for pursuing these analyses are well understood.
 The bottleneck is person power.
 Agentic AI can fill these gaps, not by replacing human judgment about what is interesting, but by executing on that judgment far more efficiently.
 
-We are currently in what might be called the centaur science era: AI has automated most of the software development and numerical analysis workload, but the ideation, experimental design, and communication of results remain human tasks.
+The current period is sometimes described as ``centaur science'', a term in broad use in the AI community: AI has automated most of the software development and numerical analysis workload, but the ideation, experimental design, and communication of results remain human tasks.
 This is, frankly, the ideal moment to be a human researcher.
 The bottleneck has shifted from implementation to creativity.
 The question that matters is not how to run the analysis but what analysis to run.
