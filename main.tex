@@ -104,6 +104,20 @@
 \input{vita}
 
 % ----------------------------------------------------------
+% Inject the "Statement on the use of AI tools" preliminary
+% page between the Vita and the Abstract by extending
+% \curriculumvitaepage. The page itself (\aiusestatementpage)
+% is defined in preliminaries.tex.
+% ----------------------------------------------------------
+\let\origcurriculumvitaepage\curriculumvitaepage
+\renewcommand{\curriculumvitaepage}{%
+  \origcurriculumvitaepage
+  \phantomsection
+  \addcontentsline{toc}{chapter}{STATEMENT ON THE USE OF AI TOOLS}
+  \aiusestatementpage
+}
+
+% ----------------------------------------------------------
 % PDF document metadata
 % ----------------------------------------------------------
 \hypersetup{
