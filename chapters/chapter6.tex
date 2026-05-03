@@ -654,7 +654,7 @@ The iterations continue until a maximum allowed number or closure is reached, wh
 OmniSequential is an auxiliary reweighting method that does not require estimating a likelihood ratio through machine learned classifiers.
 However like the machine learning approach, the end result is a set of event weights that shift a distribution to match a desired target.
 
-\subsection{Unfolding uncertainties}
+\subsection{Unfolding Uncertainties}
 \label{sec:zjets-uncert-unfold}
 
 The unfolding uncertainty prescription follows the standard ATLAS unfolding recommendations~\cite{Armbruster:1694351} but adapted to the un-binned setting.
@@ -730,7 +730,7 @@ These considerations will be important for comparing the relative accuracy of th
 
 \FloatBarrier
 
-\subsection{Network-initialization uncertainty}
+\subsection{Network Initialization Uncertainty}
 \label{sec:zjets-uncert-nninit}
 
 Every step of the \Omnifold procedure involves training a neural network, and the output of that training depends on the random seed used to initialize the network weights and to order the training examples.
@@ -744,7 +744,7 @@ For the systematic uncertainties only the mean weights are used.
 The previous round Multifold analysis used one hundred run ensembles rather than ten.
 This reduction was possible because the variance was reduced by the pretraining procedure detailed in \Cref{sec:zjets-pretraining}, also producing a large savings in the computational cost of the measurement.
 
-\subsection{Top background subtraction uncertainty}
+\subsection{Top Background Subtraction Uncertainty}
 \label{sec:zjets-uncert-top}
 
 The top background subtraction described in \Cref{sec:zjets-bkg-subtraction} relies on the choice of $t\bar{t}$ process MC sample to be subtracted from the data before unfolding.
@@ -754,7 +754,7 @@ The ParT top-versus-$Z$+jets classifier is not retrained, because it serves only
 The full \Omnifold procedure is then re-run using the alternative set of top-subtraction weights, and the difference with respect to the nominal unfolded result is taken as the uncertainty.
 Given the top background is small the subtraction uncertainty is also small, but illustrates the procedure for propagating modeling uncertainties through an unbinned background subtraction.
 
-\section{Unfolding validation}
+\section{Unfolding Validation}
 \label{sec:zjets-validation}
 
 Given the novel nature of this cross section measurement extensive validation of the results is required.
@@ -767,7 +767,7 @@ This provides comparison to a well-used baseline unfolding method with much more
 Third, the measurement is compared directly to the previous round Multifold result on the 24 observables common to both.
 This provides a third cross-check of the results against an existing ATLAS measurement performed in the same fiducial volume.
 
-\subsection{Statistical closure tests}
+\subsection{Statistical Closure Tests}
 \label{sec:zjets-validation-chi2}
 
 In the pseudodata measurement the desired truth distribution is known.
@@ -951,7 +951,7 @@ In this context, the slightly degraded accuracy of the measurement is a very sma
 
 \FloatBarrier
 
-\subsection{Comparison to the previous round Multifold measurement}
+\subsection{Comparison to the Multifold Measurement}
 \label{sec:zjets-validation-mf}
 
 The previous round Multifold measurement~\cite{ATLAS:2024xxl} measured the same 24 observables in the same fiducial volume using the same input dataset and MC samples.

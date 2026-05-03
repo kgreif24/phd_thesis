@@ -41,29 +41,97 @@
 % The dedication page is optional
 % (comment out to exclude).
 \dedications
-{
-  (Optional dedication page)
-  
-  To Dario Amodei mostly I guess?
+{  
+  To my parents, Douglas and Anne Greif
 }
 
 \acknowledgments
 {
-  I would like to thank...
+  I have many, many people to thank. I'll fill this out soon!
   
-  (You must acknowledge grants and other funding assistance. 
+  % (You must acknowledge grants and other funding assistance. 
   
-  You may also acknowledge the contributions of professors and
-  friends.
+  % You may also acknowledge the contributions of professors and
+  % friends.
   
-  You also need to acknowledge any publishers of your previous
-  work who have given you permission to incorporate that work
-  into your dissertation. See Section 3.2 of the UCI Thesis and
-  Dissertation Manual.)
+  % You also need to acknowledge any publishers of your previous
+  % work who have given you permission to incorporate that work
+  % into your dissertation. See Section 3.2 of the UCI Thesis and
+  % Dissertation Manual.)
 }
 
 
 % Curriculum vitae is in vita.tex, which is \input into main.tex.
+
+% ============================================================
+% Statement on the use of AI tools
+%
+% Rendered as a preliminary page right after the Vita and just
+% before the Abstract. The injection point is configured in
+% main.tex via a small patch to \curriculumvitaepage, so this
+% page appears inside the standard \preliminarypages flow and
+% gets a TOC entry.
+%
+% Fill in the introductory paragraph and table rows below.
+% Each AI-use cell should keep just one of {Low, Medium, High}
+% (delete the others). Add or remove rows as appropriate.
+% ============================================================
+\newcommand{\aiusestatementpage}{%
+  \begin{center}
+    \textbf{\Large STATEMENT ON THE USE OF AI TOOLS}
+  \end{center}
+  \parskip 12pt
+  \parindent 0pt
+
+  % TODO: short paragraph naming the AI tools used (e.g. ChatGPT,
+  % Claude, GitHub Copilot, Cursor) and the overall philosophy
+  % governing their use in this dissertation.
+  AI tools were used frequently in the underlying research and the drafting of this thesis.
+  In regards to the thesis particularly, they were used to accelerate my process for writing technical documents rather than automating it entirely.
+  Unless otherwise attributed, every word and figure in this thesis was either created by me, or was prompted by me and was subject to my review, editing, and final approval.
+  All mistakes and inaccuracies are my own.
+
+  A brief overview of how tools were used in writing this thesis is provided in the table below.
+  Models used were Claude Sonnet 4.6, Opus 4.6 and 4.7, and GPT 5.4 and 5.5.
+  Agentic tools used were Claude Code, Cursor, and OpenClaw.
+
+  \vspace{0.5em}
+  \begin{singlespace}
+  \noindent\begin{tabularx}{\textwidth}{@{}
+      >{\raggedright\arraybackslash}p{0.24\textwidth}
+      >{\centering\arraybackslash}p{0.13\textwidth}
+      X@{}}
+    \toprule
+    \textbf{Task} & \textbf{AI use} & \textbf{Example workflow} \\
+    \midrule
+    Drafting prose
+      & Med
+      & Hand write section as a bullet point outline, prompt AI to expand outline into paragraphs, and edit results \\
+    \addlinespace
+    Copy editing
+      & High
+      & Prompt AI to read a recently written section and fix any spelling and grammar issues \\
+    \addlinespace
+    Diagram design
+      & High
+      & Prompt AI to write code for producing diagrams with Matplotlib or TikZ \\
+    \addlinespace
+    Literature search
+      & Low
+      & Prompt AI to search for relevant citations from the InspireHEP database \\
+    \addlinespace
+    Concept review
+      & Med
+      & Prompt AI for explaining and clarifying QCD concepts \\
+    \addlinespace
+    \LaTeX{} formatting
+      & High
+      & Promt AI to debug compilation issues, add Figures to documents, format tables, etc. \\
+    \bottomrule
+  \end{tabularx}
+  \end{singlespace}
+  \clearpage
+}
 
 % The abstract was previously limited to a maximum of 350 words, 
 % but the UCI manual at https://etd.lib.uci.edu/electronic/td2e#2.2.1.
