@@ -65,7 +65,7 @@ The remainder of this chapter is organized as follows.
 \Cref{sec:zjets-omnifold} details the \Omnifold implementation, including the neural network classifiers, the pretraining procedure, and the un-binned background subtraction.
 \Cref{sec:zjets-uncert} describes the uncertainty propagation, and \Cref{sec:zjets-validation} presents the statistical validation including comparisons to alternative measurements, in particular IBU based measurements and the previous round Multifold result.
 \Cref{sec:zjets-results} then presents measurements of four classes of observables obtained from the full phase space measurement.
-In order, these are simple event-level observables that a poorly modeled by MC generators, jet-shape observables, the energy-energy correlator (EEC), and the nearest-neighbor intrinsic dimension (NNID) of jets.
+In order, these are simple event-level observables that are poorly modeled by MC generators, jet-shape observables, the energy-energy correlator (EEC), and the nearest-neighbor intrinsic dimension (NNID) of jets.
 \Cref{sec:zjets-discussion} closes with a discussion of future extensions.
 
 \FloatBarrier
@@ -578,7 +578,7 @@ At detector level, the event weight is further multiplied by several corrections
   \label{eq:mc-norm-reco}
   w^\mathrm{reco}_i = w^\mathrm{y}_i \prod_c\,w^\mathrm{corr}_{ci},
 \end{equation}
-where the product runs over the (five) different corrections, each with index $c$, namely: the pileup reweighing, the trigger efficiency scale factor, and the three muon efficiency scale factors.
+where the product runs over the (five) different corrections, each with index $c$, namely: the pileup reweighting, the trigger efficiency scale factor, and the three muon efficiency scale factors.
 
 The event weights $w^\mathrm{y}_i$ and $w^\mathrm{reco}_i$ produce the MC generator predictions for the particle-level and detector-level events respectively.
 In what follows each detector-level event configuration is represented by $(w^\mathrm{reco},\vec{x}_\mathrm{reco})$ and each particle-level event configuration is represented by $(w^\mathrm{y},\vec{x})$.
@@ -637,7 +637,7 @@ The final uncertainty is then the variance in the result produced by this ensemb
 
 The remaining uncertainty categories are related to the background subtraction and unfolding methods and are the focus of the rest of this section.
 The unfolding uncertainties in particular make ample use of an alternative reweighting method known as \textit{Omnisequential reweighting}, which is introduced briefly here.
-OmniSequential is a Gaussian Kernel-based reweighing method which iteratively reweights a preset list of observables in one dimension without the use of machine learning.
+OmniSequential is a Gaussian Kernel-based reweighting method which iteratively reweights a preset list of observables in one dimension without the use of machine learning.
 First, a sensible binning is determined for each of the input variables. 
 The bin width is chosen based on Scott's rule~\cite{scott1979optimal}, and if the variable has a skewness ($\mu_3=E[(x-\mu)^3]$) that is larger than 2 then log binning is used.
 
@@ -998,7 +998,7 @@ In some cases the measurements are immediately applicable to this goal since lar
 In other cases the observables are of interest because they are highly novel, and measurement of them will hopefully spur more development of theoretical tools.
 In each of these applications the \Omnifold spectrum is compared to the truth-level predictions of the \mgpy and \sherpa generators used throughout this analysis.
 The first application, measurements of the underlying event observables $N_{ch}$ and $H_T$, could have equally well been performed using standard binned unfolding methods like IBU, but it is important to note the results presented here are simultaenous and can be re-binned on the fly.
-The other three applications would either require significant approximations, or be simply impossible to unfolding with binned methods.
+The other three applications would either require significant approximations, or be simply impossible to unfold with binned methods.
 
 \subsection{Underlying Event Observables}
 \label{sec:zjets-results-ue}
