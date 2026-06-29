@@ -65,7 +65,7 @@ The remainder of this chapter is organized as follows.
 \Cref{sec:zjets-omnifold} details the \Omnifold implementation, including the neural network classifiers, the pretraining procedure, and the un-binned background subtraction.
 \Cref{sec:zjets-uncert} describes the uncertainty propagation, and \Cref{sec:zjets-validation} presents the statistical validation including comparisons to alternative measurements, in particular IBU based measurements and the previous round Multifold result.
 \Cref{sec:zjets-results} then presents measurements of four classes of observables obtained from the full phase space measurement.
-In order, these are simple event-level observables that a poorly modeled by MC generators, jet-shape observables, the energy-energy correlator (EEC), and the nearest-neighbor intrinsic dimension (NNID) of jets.
+In order, these are simple event-level observables that are poorly modeled by MC generators, jet-shape observables, the energy-energy correlator (EEC), and the nearest-neighbor intrinsic dimension (NNID) of jets.
 \Cref{sec:zjets-discussion} closes with a discussion of future extensions.
 
 \FloatBarrier
@@ -578,7 +578,7 @@ At detector level, the event weight is further multiplied by several corrections
   \label{eq:mc-norm-reco}
   w^\mathrm{reco}_i = w^\mathrm{y}_i \prod_c\,w^\mathrm{corr}_{ci},
 \end{equation}
-where the product runs over the (five) different corrections, each with index $c$, namely: the pileup reweighing, the trigger efficiency scale factor, and the three muon efficiency scale factors.
+where the product runs over the (five) different corrections, each with index $c$, namely: the pileup reweighting, the trigger efficiency scale factor, and the three muon efficiency scale factors.
 
 The event weights $w^\mathrm{y}_i$ and $w^\mathrm{reco}_i$ produce the MC generator predictions for the particle-level and detector-level events respectively.
 In what follows each detector-level event configuration is represented by $(w^\mathrm{reco},\vec{x}_\mathrm{reco})$ and each particle-level event configuration is represented by $(w^\mathrm{y},\vec{x})$.
@@ -637,7 +637,7 @@ The final uncertainty is then the variance in the result produced by this ensemb
 
 The remaining uncertainty categories are related to the background subtraction and unfolding methods and are the focus of the rest of this section.
 The unfolding uncertainties in particular make ample use of an alternative reweighting method known as \textit{Omnisequential reweighting}, which is introduced briefly here.
-OmniSequential is a Gaussian Kernel-based reweighing method which iteratively reweights a preset list of observables in one dimension without the use of machine learning.
+OmniSequential is a Gaussian Kernel-based reweighting method which iteratively reweights a preset list of observables in one dimension without the use of machine learning.
 First, a sensible binning is determined for each of the input variables. 
 The bin width is chosen based on Scott's rule~\cite{scott1979optimal}, and if the variable has a skewness ($\mu_3=E[(x-\mu)^3]$) that is larger than 2 then log binning is used.
 
@@ -992,29 +992,34 @@ These results show that with the methodological improvements discussed in \Cref{
 \label{sec:zjets-results}
 
 Unlike standard binned cross section measurements, the unbinned full phase space measurement is best understood as a dataset that can be processed to produce measurements of arbitrary observables.
-This section presents four applications of this dataset to produce measurements of observables that could help the broader community improve our ability to model QCD processes, addressing one of the open problems discussed in \Cref{ch:intro}.
+This section presents applications of this dataset to produce measurements of four observables.
+The broad goal of each application is to provide measurements that can be used to improve the theoretical modeling of QCD processes, addressing one of the open problems discussed in \Cref{ch:intro}.
+In some cases the measurements are immediately applicable to this goal since large deviations between the data and current theoretical models are observed.
+In other cases the observables are of interest because they are highly novel, and measurement of them will hopefully spur more development of theoretical tools.
 In each of these applications the \Omnifold spectrum is compared to the truth-level predictions of the \mgpy and \sherpa generators used throughout this analysis.
-The first application, measurements of the underlying event observables $N_{ch}$ and $H_T$, could have equally well been performed using standard binned unfolding methods like IBU.
-The motivation to feature these measurements is their very poor modeling as shown in \Cref{fig:zjets-trackmcdata}.
-The other three applications would either require significant approximations, or be simply impossible to unfolding with binned methods.
+The first application, measurements of the underlying event observables $N_{ch}$ and $H_T$, could have equally well been performed using standard binned unfolding methods like IBU, but it is important to note the results presented here are simultaenous and can be re-binned on the fly.
+The other three applications would either require significant approximations, or be simply impossible to unfold with binned methods.
 
 \subsection{Underlying Event Observables}
 \label{sec:zjets-results-ue}
 
 The simplest applications of the measurement are projections onto conventional event-level observables.
-Unlike standard binned measurements the binning used to measure these observables can be changed on-the-fly, and the observables can be measured in sub-regions of the full fiducial volume.
+The resulting plots are very similar to IBU based measurements of the same observables as can be seen in \Cref{sec:zjets-validation-ibu}, but the underlying unbinned measurement is far more flexible.
+For example, correlations between event-level observables are preserved and can be used in down-stream applications, the binning applied to each observable can be modified without the need to re-run the unfolding, and the observables can be measured in sub-regions of the full fiducial volume.
 Two measurements of standard observables that show particularly poor modeling by the MC generators, $N_{ch}$ and $H_T$, are shown in this section.
 \Cref{fig:zjets-results-ue} shows the measurement of both observables together with the truth-level predictions of the \mgpy and \sherpa samples.
 As already shown in \Cref{fig:zjets-trackmcdata}, the generator predictions are very different for the $N_{ch}$ observable.
-This is understood to be primarily due to the different hadronization models.
-The data measurement is between the two generators, with both generators showing deviations from the data of 30\% or more.
+This is understood to be primarily due to the different hadronization models between the \mgpy and \sherpa samples.
+The data points sit roughly between the precitions of the two generators, with both generators showing deviations from the data of 30\% or more in either direction.
 In the $H_T$ observable, substantial mismodeling of up to 20\% is observed for the \mgpy sample, but the \sherpa sample is able to reproduce the data to within 10\%.
 
-Explicitly tuning the hadronization models to these measurements should substantially improve the modeling.
+Explicitly tuning the hadronization models to these measurements could substantially improve the theoretical modeling of these observables.
 Since the measurement is simultaneous in both observables this can be done while taking correlations into account, which would not be possible with the independent IBU measurements in \Cref{sec:zjets-validation-ibu}.
-Further because this measurement is unbinned, it is possible to use it to tune entirely new types of hadronization models, specifically those built using deep learning techniques.
+The public release of the unbinned spectra (see \Cref{sec:zjets-discussion}) will also allow theorists from outsode of the collaboration to adjust the binning of these observables as they see fit.
+Further because this measurement itself is unbinned, it is possible to use it to tune entirely new types of hadronization models, specifically those built using deep learning techniques.
 There is a growing body of work on this topic, many of which assume that unbinned measurements such as this one exist and are able to furnish training data~\cite{Assi:2025gog,Bierlich:2023fmh,Bierlich:2023zzd,Bierlich:2024xzg,Chan:2023ume,Ghosh:2022zdz,Ilten:2022jfm}.
-As more unbinned measurements are performed in the future, hopefully these new deep learning based approaches will be able to better reproduce the LHC data and provide more accurate measurements and searches in runs 4 and 5 of the LHC.
+These methods are beyond the scope of this thesis, but have to potential to produce much more accurate hadronization models which could broadly improve the accuracy of measurements and sensitivity of searches using the HL-LHC datasets.
+As more unbinned measurements are performed in the future, more data will become available for training these models and hopefully these more accurate theoretical models will produce a broad impact on LHC physics.
 
 \begin{figure}[tb]
     \centering
@@ -1030,10 +1035,19 @@ As more unbinned measurements are performed in the future, hopefully these new d
 \label{sec:zjets-results-shape}
 
 Because the un-binned measurement is differential in the kinematics of individual charged particles, jets can be clustered on the fly post-unfolding using any jet clustering algorithm and any radius parameter without the need to repeat the measurement with a different jet definition.
-In a typical jet measurement, each combination of algorithm and radius requires its own dedicated jet energy scale and resolution calibration, making performing a measurement with many different types of jets difficult.
-However in this measurement the jet itself is not a calibrated input to the measurement.
+In a typical jet measurement, each combination of algorithm and radius requires its own dedicated jet energy scale and resolution calibration.
+These calibrations are performed by dedicated performance groups working within the ATLAS and CMS calibrations, and are quite elaborate and time consuming~\cite{ATLAS:2023tyv}.
+The limited time that human researchers have to produce these calibrations implies that each experiment's jet performance group can only support calibrations for a few types of jets.
+Measurements utilizing jet definitions beyond these few supported types of jets are difficult, and few such measurements have been performed~\cite{ATLAS:2013uet}.
+The result is that questions of how different jet definitions affect jet substructure are largely unexplored.
+
+However in the full phase space measurement, the jet itself is not a calibrated input to the measurement.
 It is a function constructed on the unfolded charged particles, just like any other event-level observable.
-As an illustration of this ability, this section presents an unfolded measurement of the charged-particle $p_T$ density profile about the jet axis,
+These charged particles can be clustered using an arbitrary jet definitions, and then these jets can be used to measure arbitrary substructure observables.
+This allows questions about the interplay of jet substructure and jet definition, previously difficult and time consuming to pursue, to be answered very quickly, even without the need to conduct an additional measurement.
+
+As an illustration of this ability, this section presents an unfolded measurement of the charged-particle $p_T$ density profile using three different jet clustering algorithms.
+The \pt density profile is given by,
 \begin{equation}
     \langle \rho(r) \rangle \;=\; \frac{1}{N_{\mathrm{jets}}} \sum_{\mathrm{jets}} \frac{p_T(r - \Delta r / 2,\, r + \Delta r / 2)}{A_{\mathrm{annulus}}(r, \Delta r)},
     \label{eqn:zjets-rho-r}
@@ -1042,17 +1056,22 @@ where $r$ is the angular distance from the jet axis in $(y, \phi)$ space, $\Delt
 Because the sum is averaged over jets, the observable is invariant under overall normalization changes and cannot be interpreted as a cross section.
 Note also that a given jet contributes some $p_T$ density to each bin in the radius $r$.
 Accounting for these correlations is difficult with binned unfolding methods, but they are tracked naturally in the unbinned \Omnifold measurement since a single event weight is applied to the jets contribution to each bin.
-All charged particles in the event are considered, including those that do not fall within the clustered jet.
-The jet selection is $p_T^{\mathrm{jet}} \in [120,\,150]$~GeV and $|y^{\mathrm{jet}}| < 1$, a narrow window just above the peak of the leading-jet $p_T$ spectrum.
+This makes this observable doubly difficult to measure without a full phase space measurement.
+First each jet definition would need to be calibrated independently as mentioned above, and second the correlations between bins would need to be understood and characterized.
+The full phase space measurement elegantly avoids both of these issues.
 
+The \pt density is calculated using all charged particles, even those that are not clustered in the jets, allowing the density to be non-zero outside of the jet radius.
+The jet selection is $p_T^{\mathrm{jet}} \in [120,\,150]$~GeV and $|y^{\mathrm{jet}}| < 1$, a narrow window just above the peak of the leading-jet $p_T$ spectrum.
 \Cref{fig:zjets-results-shape-akt} shows $\langle \rho(r) \rangle$ for jets clustered with the anti-$k_t$ algorithm~\cite{Cacciari:2008gp} with radius parameter $R = 0.4$, together with its uncertainty budget.
-The \mgpy and \sherpa generators reproduce the overall shape of $\langle \rho(r) \rangle$ reasonably well for all three algorithms, though residual differences at the $5$--$10\%$ level are visible both in the core and in the tails.
+The \mgpy and \sherpa generators reproduce the overall shape of $\langle \rho(r) \rangle$ reasonably well, though residual differences at the $5$--$10\%$ level are visible both in the core and in the tails.
 The observed profile is sharply peaked at small $r$ and falls off as radiation is captured further from the jet axis, with a characteristic dip near $r \approx R$ before rising again at the jet boundary.
 This dip is an artifact of the anti-$k_t$ clustering algorithm which centers the jet axis on the highest $p_T$ jet constituent rather than some average over the entire radiation pattern, possibly preventing particles near the jet boundary from being included in the jet.
-The un-binned measurement provides a direct test of this interpretation.
-Because the unfolded charged-particle kinematics are preserved, the same events can be re-clustered with any choice of algorithm and the profile recomputed from scratch.
-\Cref{fig:zjets-results-shape-algos} compares $\langle \rho(r) \rangle$ computed with the anti-$k_t$, $k_t$~\cite{Ellis:1993tq}, and Cambridge--Aachen (C/A)~\cite{Dokshitzer:1997in} algorithms, all at $R = 0.4$.
-The dip at $r \approx R$ is absent for $k_t$ and C/A jets, confirming that the feature is driven by the clustering algorithm rather than by the data.
+
+The un-binned measurement can provide a test of this interpretation by repeating the measurement with different jet clustering algorithms.
+\Cref{fig:zjets-results-shape-algos} compares $\langle \rho(r) \rangle$ computed with the anti-$k_t$, $k_t$~\cite{Ellis:1993tq}, and Cambridge--Aachen (C/A)~\cite{Dokshitzer:1997in} algorithms, all with a radius parameter $R = 0.4$.
+The dip at $r \approx R$ is much less pronounced for $k_t$ and C/A jets, confirming that the feature is driven by the clustering algorithm rather than by the data.
+Producing the measurements in \Cref{fig:zjets-results-shape-algos} would be very difficult with conventional unfolding methods, but requires only a light data analysis built on top of the unbinned spectra given this full phase space measurement.
+Further exploration of jet shape observables, including many exotic observables that have never been measured in data, should be explored with these data in the future~\cite{Ba:2023hix,Gambhir:2024ndc}.
 
 \begin{figure}[tb]
     \centering
@@ -1077,26 +1096,38 @@ The dip at $r \approx R$ is absent for $k_t$ and C/A jets, confirming that the f
 Energy correlator observables were introduced in \Cref{sec:eec}.
 All existing experimental measurements of the two-point energy correlator, summarized in \Cref{tab:eec-measurements}, use binned unfolding methods to correct for the detector response.
 This is a difficult observable to unfold with binned methods for two reasons.
-First, both the opening angle $\theta_{ij}$ and the energy weight $E_i E_j$ in \Cref{eqn:eec} receive corrections from the unfolding, requiring at least a two-dimensional unfolding to be performed.
-Further many measurements of the EEC are performed in bins of overall jet $p_T$ in order to extract a universal hadronization scale.
+First, both the opening angle $\theta_{ij}$ and the energy weight $E_i E_j$ in \Cref{eqn:eec} are subject to detector effects and receive corrections from the unfolding.
+This means that at least a two-dimensional unfolding in both of these quantities must be performed.
+Further many measurements of the EEC are performed in bins of overall jet \pt in order to extract a universal hadronization scale.
 This requires a three-dimensional unfolding, which is at the limit of what can be done with binned methods~\cite{CMS:2024mlf}.
 Second, even if binned methods can be made to work in two or three dimensions they do not account for correlations in the bin counts resulting from each particle in an event entering the histogram many times.
 As with the jet shape observables in \Cref{sec:zjets-results-shape}, the \Omnifold measurement handles this effect naturally since the correlations are preserved by the common event weight.
 
-\Cref{fig:zjets-results-eec} shows the EEC measured in the full charged final state as a function of $z$, with the sum running over all pairs of charged particles in the event.
-This is the first measurement of such an observable at a hadron collider, since all existing measurements measure the EEC only inside jets.
-The measurement achieves $5\%$ accuracy or better across the full range of $z$, which corresponds to opening angles from $0.002$ to $0.64$ radians.
+\Cref{fig:zjets-results-eec} shows the EEC measured using the full phase space measurement, with the sum running over all pairs of charged particles in the event.
+This is the first measurement of this observable in proton--proton collisions, since all existing measurements either use jets as input objects rather than individual particles, or measure the EEC within individual jets rather than on the event as a whole.
+The practical distinction between measuring the EEC with all particles rather than within jets is that the measurement is not truncated when the angular distance between charged particle pairs grows larger than the jet radius.
+The measurement achieves $5\%$ accuracy or better across the full range of $z$ shown in the figure, which corresponds to opening angles from $0.002$ to $0.64$ radians.
 Three scaling regimes are visible.
-At large $z$ ($z > 10^{-2}$), the EEC scales approximately linearly with $z$, the behavior expected of uncorrelated radiation.
-This is expected at large opening angles since there is no process that produces long range correlations in the radiation pattern.
-At intermediate $z$, between roughly $10^{-4}$ and $10^{-3}$, the EEC flattens into a nearly constant plateau.
+At large $z$ ($z > 10^{-2}$), the EEC scales approximately linearly with $z$.
+This implies uncorrelated and roughly evenly distributed radiation, which is expected at opening angles outside of the collinear parton shower.
+At intermediate $z$, between roughly $10^{-4}$ and $3 \times 10^{-3}$, the EEC flattens into a nearly constant plateau.
 This is the perturbative QCD scaling regime in which the two-point correlation is set by the interactions of quarks and gluons above the confinement scale $\Lambda_{\mathrm{QCD}} \sim 200$~MeV.
 In previous measurements of the EEC performed inside jets, this scaling regime was cut off by the jet radius.
+The presence of this scaling regime is direct evidence for the existence of parton showers in proton--proton collisions.
 At small $z < 10^{-4}$, the linear scaling is restored, reflecting the non-interacting final-state hadrons which are produced once the partons confine below $\Lambda_{\mathrm{QCD}}$.
-The \mgpy and \sherpa predictions both reproduce the three-regime structure,
-but \sherpa over-predicts the correlation at small $z$.
+
+The crossover region between $z \sim 10^{-5}$ and $z \sim 10^{-4}$ is a purely non-perturbative effect which is clearly present in the data but is very difficult to understand within the framework of QCD.
+The \mgpy and \sherpa predictions are generally able to reproduce the three-regime structure and show percent level accuracy above $z \sim 10^{-4}$.
+Below the hadronization regime at $z < 10^{-4}$, the \sherpa generator substantially over-predicts the correlation.
 A similar effect was observed in Ref.~\cite{CMS:2024mlf}.
+The \mgpy generator describes this regime to within several percent.
 The covariance matrix of the measurement, shown in \cref{fig:zjets-results-eec-cov}, encodes the bin-to-bin correlations of the total uncertainty and is required for any quantitative use of the measurement, such as an extraction of $\alpha_s$.
+This matrix would be difficult to extract from a measurement of this observable relying on binned unfolding methods, but is easily available from the full phase space measurement.
+
+A further benefit of the full phase space measurement is that higher order ($N > 2$) energy correlator observables are also measured.
+Though these applications are not shown here, this would be a relatively straightfoward extension.
+In particular the ratio of the E3C to the E2C is very sensitive to $\alpha_s$ and could be used for to extract this parameter from jet substructure.
+The public data release should support this, and other more advanced explorations of energy-correlator observables in LHC data.
 
 \begin{figure}[tb]
     \centering
@@ -1118,12 +1149,17 @@ The covariance matrix of the measurement, shown in \cref{fig:zjets-results-eec-c
 \label{sec:zjets-results-id}
 
 The concept of intrinsic dimensionality and the NNID estimator was introduced in \Cref{sec:id}.
-Intrinsic dimensionality has never been measured using particle physics data in part because it is a property of a dataset, not a single event or jet, making it impossible to construct the response matrix needed for binned unfolding.
-The un-binned \Omnifold measurement circumvents this obstruction since the result of the measurement is a dataset rather than a histogram.
+Given intrinsic dimensionality is a property of a dataset as a whole rather than a single event or jet, it is impossible to construct a response matrix that can be used to run binned unfolding methods.
+This is part of the reason this class of observables have never been measured in particle physics data.
+However unbinned measurements circumvent this problem since the result is a dataset rather than a histogram, and this dataset can be used as input to any intrinsic dimension estimator.
+In principle this could have been done using the 24 dimensional cross section produced by the Multifold measurement, but this dimensionality would be unphysical since the inputs would be summary observables of the underlying data rather than the data themselves.
+Calculating a physical intrinsic dimensionality requires that the data are used as input, and this requires that the four-momenta of individual particles are unfolded.
+This is exactly the setup delivered by the full phase space measurement.
 This section presents the first measurement of the intrinsic dimensionality of a particle physics dataset using the nearest-neighbor intrinsic dimension estimator (NNID)~\cite{NIPS2004_74934548} evaluated on a sample of jets drawn from the unfolded charged final state.
 
 The procedure for calculating the NNID starts with clustering jets with the anti-$k_T$ algorithm and a radius parameter of 1.0 using the particle-level MC samples needed to build the measurement.
 The choice of jet definition is irrelevant and could be changed at will.
+It would also be possible to calculate the NNID using the entire event as input rather than the leading jet, but careful consideration would need to be put into the correct equivalent to the pre-processing steps described below.
 Jets are then taken from the $p_T$ range $[330, 370]$~GeV, which roughly corresponds to initiating parton $p_T$ in the range $[500, 550]$~GeV when accounting for the missing neutral component.
 Next, jets are pre-processed by applying a rotation about the beam axis and Lorentz boost along the beam axis such that the jet is centered in the rapidity--azimuth plane.
 The jets are then rotated about the jet axis such that the principal component of the radiation pattern points in the positive $\phi$ direction in the $y$--$\phi$ plane.
@@ -1137,7 +1173,7 @@ These calculations must be repeated for each weight variation needed to assess t
 
 Unlike the previous three applications of this measurement, the NNID estimator is entirely unbinned.
 It is a point estimate provided by the data given a choice of the unphysical index $i$.
-This makes the $\chi^2$ tests of \Cref{sec:zjets-validation-chi2} reduce to noting that the total uncertainty on the pseudodata measurement covers the method bias.
+This makes the $\chi^2$ tests of \Cref{sec:zjets-validation-chi2} reduce to noting that the total uncertainty on the pseudodata measurement covers the method bias for each choice of $i$.
 It was checked that this test passes.
 
 \Cref{fig:zjets-results-nnid} shows the result in two complementary ranges of the median EMD.
@@ -1146,8 +1182,13 @@ The generators reproduce the data within uncertainties, but tend to slightly ove
 The right panel shows the same curve at higher median EMD values.
 The dip in NNID between $20$ and $30$~GeV is less pronounced in the data than in the generators, as is the increase in NNID above $30$~GeV.
 However overall the generators again agree with the data within uncertainties.
-The measurement also verifies that jet data has no more than several intrinsic dimensions, as predicted by the MC generators.
-This is many fewer dimensions than the several tens of dimensions used by the naive representation of jets in terms of the four-momenta of their constituents.
+
+The most interesting take-away from this application of the full phase space measurement is that jet data, both provided by MC generators and measured in nature, have no more than several intrinsic dimensions.
+Naive representations of jets in terms of the four-momenta of the jet constituents typically require many tens of observables.
+\Cref{fig:zjets-results-nnid} demonstrates that this representation is highly redundant.
+Even at very small distance scales which resolve fine differences in the substructure between jets, the intrinsic dimensionality is still below 10.
+This is evidence that there are many constraints on the kinematics of jet constituents imposed by symmetries, conservation laws, and QCD dynamics.
+This well-understood from many years of particle physics research, but it is interesting to see this explicitly born out in the dimensionality of the data.
 
 \begin{figure}[tb]
     \centering
@@ -1190,10 +1231,11 @@ One limitation of the measurement is that all observables are constructed from c
 Significant theoretical progress has been made in this direction through the track function formalism~\cite{Chang:2013rca,Chang:2013iba}, which provides a systematic framework for performing perturbative calculations on charged-particle observables.
 
 This measurement also demonstrates that full phase space cross section measurements are technically feasible at a hadron collider, so extension of these methods to measurements of other processes is a natural next step.
-Dijet production, top quark pair production, Higgs processes, and multi-lepton final states are all promising targets.
-Measurements of these processes would be very useful for global EFT fits~\cite{CMS:2023xyc,CMS:2025ugn,Heimel:2024drk}, which currently rely on a patchwork of binned measurements that do not capture all available information.
+Dijet production, diboson production, top quark pair production, Higgs processes, and multi-lepton final states are all promising targets.
+Measurements of these processes would be very useful for global EFT fits~\cite{CMS:2023xyc,CMS:2025ugn,Heimel:2024drk}, which currently rely on a patchwork of binned measurements that are typically single or double differential at best.
+Highly differential cross section measurements are useful for breaking degeneracies between EFT operators in likelihood fits, so highly differential measurements produced through unbinned and high dimensional unfolding would be ideal inputs for EFT fits performed by phenomenologists.
 Two practical limitations of unbinned and high dimensional unfolding methods will need to be overcome to perform these future measurements.
-The acceptance effects in the $Z$+jets phase space discussed in \Cref{sec:zjets-omnifold} are small enough to be negligible, but they become significant when the event selection involves jets, which is necessary in top process measurements.
+The acceptance effects in the $Z$+jets phase space discussed in \Cref{sec:zjets-omnifold} are small enough to be negligible, but they become significant when the event selection involves jets, which is typically done for studying many of the processes mentioned above.
 Methods for handling acceptance effects in unbinned unfolding have been proposed~\cite{Butter:2025mek,Canelli:2025ybb} but have not yet been applied in a real analysis.
 The computational cost of the measurement is also substantial.
 Fine-tuning roughly 25 thousand transformer networks required approximately 400,000 A100 GPU-hours.

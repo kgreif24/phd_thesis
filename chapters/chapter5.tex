@@ -378,7 +378,7 @@ Following Ref.~\cite{kingma2021variational} the noise schedule is learned throug
 where $\gamma_n(t)$ is a monotonic neural network with learned parameters $\eta$.
 The variance-preserving diffusion process is used, so the schedule parameters map to the DDPM notation of \Cref{sec:ddpm} via
 \begin{equation}
-    \alpha_t^2 = 1 - \sigma_t^2
+    \alpha_t = \sqrt{1 - \sigma_t^2}
     \qquad \beta_t = 1 - \alpha_t .
     \label{eq:vld-schedule}
 \end{equation}
