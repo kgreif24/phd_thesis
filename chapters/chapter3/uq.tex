@@ -34,7 +34,7 @@ Given aleatoric uncertainty is a feature of the question rather than the method,
 \label{sec:epistemic}
 
 Epistemic uncertainty arises from limitations of the machine learning model itself.
-Sources include finite training data, limited model capacity, and optimization failures.
+This can include failures due to finite training data, undertrained models, or optimization failures.
 An example of epistemic uncertainty is the inability of a model to generalize outside of the support of its training data, as shown in the center panel of \cref{fig:uncertainty_types}.
 Epistemic uncertainty is in principle reducible by collecting more data, using a more expressive architecture, or improving training.
 In HEP, the relevance of epistemic uncertainty depends heavily on the task.
@@ -48,16 +48,16 @@ A few methods are used to estimate epistemic uncertainty in practice, but given 
 In HEP applications where epistemic uncertainty is important, auxiliary cross checks are typically needed to ensure the epistemic uncertainty is small or captured by appropriate systematics, as will be the case in \Cref{ch:zjets}.
 
 \paragraph{Ensembling:}
-The simplest and most widely used method is to train multiple independent models and treat the spread of their outputs as an estimate of the model uncertainty.
+The simplest method is to train many independent but identical models and treat the variance over their outputs as an estimate of the epistemic uncertainty.
 The models are independent in that they have different weight initializations and different mini-batch sampling in the optimization process.
-This approach has been applied in ATLAS measurements, for example in Refs.~\cite{ATLAS:2024xxl, ATLAS:2025clx}.
-Ensembling provides a practical uncertainty estimate with relatively little overhead, but it is important to note that it captures only a subset of the full epistemic uncertainty.
+This approach has been previously applied in ATLAS measurements, for example in Refs.~\cite{ATLAS:2024xxl, ATLAS:2025clx}.
+Ensembling is an easy and generally applicable method, but it does not capture the full epistemic uncertainty.
 For example if the models lack sufficient capacity to capture the true optimum function, this will not be reflected by the ensemble.
 
 \paragraph{Bayesian neural networks.}
-Another approach is to place a prior distribution over the model weights and compute the posterior given the training data.
+Another approach is to assume prior distribution over the model weights and frame the optimization problem as computing the posterior given the training data.
 The posterior encodes a specific type of epistemic uncertainty due to limited training data.
-Bayesian neural networks have seen limited use in HEP~\cite{Bollweg:2019skg} relative to ensembling, in part because the approximations involved can be difficult to validate and the computational cost is higher.
+Bayesian neural networks have seen limited use in HEP~\cite{Bollweg:2019skg} relative to ensembling, partly because the epistemic uncertainty due to limited training data is typically a small consideration in HEP tasks where simulated training data is plentiful.
 
 % -------------------------------------------------------------------
 \subsection{Domain Shift}
@@ -73,8 +73,8 @@ Many other domain shift uncertainties will be handled in \Cref{ch:zjets}.
 Several strategies for estimating or reducing domain shift exist.
 
 \paragraph{Propagating uncertainties.}
-The simplest strategy is to propagate the systematic uncertainty on the input $x$ through the trained model to obtain an uncertainty on $f(x)$.
-This accounts for the effect of the domain shift on the model output, but ignores any effect the shift may have had on the training process itself.
+The simplest strategy is to propagate possible domain shifts on the input $x$ through the trained model to obtain an uncertainty on the model output $f(x)$.
+This accounts for the effect of the domain shift on the model output, but does not account for how a domain shift would adjust the training process, sometimes resulting in a sub-optimal model.
 It also assumes that correct systematic uncertainties on the model inputs are available which is not always the case.
 However in many applications this is easiest and most correct approach, and is used in both \Cref{ch:tagging,ch:zjets}.
 
@@ -82,14 +82,13 @@ However in many applications this is easiest and most correct approach, and is u
 An alternative is to train the model to be robust to known sources of domain shift.
 This can be done by including data with known domain shifts applied in the training set.
 An additional step that can be taken to reduce the domain shift uncertainty is to explicitly decorrelate the model output against these shifts.
-This is often done in HEP so that systematic variations do not affect the model output.
-This has been studied in the context of jet taggers and other classifiers~\cite{Kasieczka:2020yyl,ATLAS:2025dkv,Ghosh:2021hrh}.
+This is often done in HEP so that systematic variations do not affect the model output~\cite{Kasieczka:2020yyl,ATLAS:2025dkv,Ghosh:2021hrh}.
 Decorrelation results in smaller domain shift uncertainties but typically at the cost of performance.
 This may still be a desirable tradeoff, for example jet taggers are typically decorrelated against the jet mass observable to avoid artificial sculpting of mass distributions.
 
 
 \paragraph{Parametrized models.}
 Typically the optimal approach is to incorporate the domain shift directly into the model by conditioning on the nuisance parameter or systematic variation as an additional input~\cite{Louppe:2016ylz,Baldi:2016fzo,Ghosh:2021roe}.
-A model trained this way can in principle learn the correct function across the full range of systematic variations, and the uncertainty on the output can be assessed simply by varying the conditioning parameter.
-This is the optimal strategy when the form of the domain shift is known and can be parametrized.
-It is not always applicable even when this is the case, for example there is no well-established method for parametrizing the iterative unfolding methods discussed in \Cref{ch:unfolding}.
+A model trained this way can learn the correct function across the full range of systematic variations, and the uncertainty on the output can be assessed by varying the conditioning parameter passed into the model.
+This techinque is powerful, but at a minimum requires detailed knowledge of the types of domain shifts that will be observed to be known beforehand, and may not be applicable even if this is the case.
+For example there is no well-established method for parametrizing the iterative unfolding methods discussed in \Cref{ch:unfolding}, even if all systematic uncertainties are known and understood beforehand.

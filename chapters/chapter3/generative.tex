@@ -2,11 +2,11 @@
 \section{Generative Models}
 \label{sec:generative}
 
-The previous section introduced several neural network architectures using binary cross-entropy as the representative loss function.
-Neural networks are, however, universal function approximators, and the choice of loss function determines what they learn to compute.
+The previous section introduced several neural network architectures and used classification as a representative task.
+However neural networks are universal function approximators and can be trained to perform many different tasks.
 This section covers generative modeling, which falls under the umbrella of unsupervised learning.
 The goal is to model the probability density $p_\text{data}(x)$ from which a training dataset is drawn.
-A well-trained generative model can be used to draw new samples from this distribution, evaluate the likelihood of unseen data points, or learn a compressed latent representation of the data.
+Generative models can be used to draw new samples from the data generating distribution, estimate the density of a given point under the learned distribution, or learn a compressed latent representation of the data.
 Additionally generative models can be \textit{conditional} on additional information, such as a set of labels or a text prompt.
 These models seek to learn the joint distribution $p_\text{data}(x, y)$ of the data and the additional information.
 
@@ -19,15 +19,14 @@ In what follows I will cover three specific generative models of the post-AlexNe
 
 Generative Adversarial Networks (GANs)~\cite{Goodfellow:2014gan} were introduced in 2014.
 GANs are unique since they do not try to explicitly model a likelihood of the training data.
-Instead they set up an adversarial game between two networks: a \textit{generator} $G_\phi(z)$ that maps a noise vector $z \sim p(z)$ (typically a standard Gaussian) to a sample in data space, and a \textit{discriminator} $D_\psi(x) \in (0,1)$ that outputs the probability that its input is a real data point rather than a generator sample.
-
+Instead training a GAN involves setting up an adversarial game in which a \textit{generator} $G_\phi(z)$ that maps a noise vector $z \sim p(z)$ (typically a standard Gaussian) to a sample in data space, is trained to fool a \textit{discriminator} $D_\psi(x) \in (0,1)$ that acts as a judge determining whether a given data sample is a true draw from the training data.
 The two networks are trained simultaneously according to the minimax objective
 \begin{equation}
     \min_\phi \max_\psi \; \mathbb{E}_{x \sim p_\text{data}}\!\left[\log D_\psi(x)\right]
     + \mathbb{E}_{z \sim p(z)}\!\left[\log\!\left(1 - D_\psi(G_\phi(z))\right)\right].
     \label{eqn:gan}
 \end{equation}
-The discriminator is trained to distinguish real from generated samples, while the generator is trained to produce samples that fool the discriminator.
+This loss function can be interpreted as training the discriminator to distinguish real from generated samples, and the generator to produce samples that fool the discriminator.
 Assuming the game is ``well balanced'' and the generator has sufficient capacity, the generator distribution will eventually match $p_\text{data}$ and the discriminator can do no better than random guessing.
 There is no explicit likelihood in \Cref{eqn:gan}.
 The generator is never required to assign a density to the data, only to produce samples that are indistinguishable from it, so GANs are not capable of density estimation for example.
@@ -35,7 +34,8 @@ GANs are conceptually simple and capable of producing high-quality samples, but 
 Common issues include mode collapse, where the generator learns to produce only a limited subset of the data distribution, and non-convergence, where the generator and discriminator cycle but never converge to a stable equilibrium.
 
 GANs were among the first generative architectures applied to HEP data.
-Early work demonstrated that they could generate realistic jets and calorimeter showers~\cite{Paganini:2017hrr,Paganini:2017dwg,deOliveira:2017pjk,Butter:2020qhk,Buhmann:2023pmh}, perform unfolding~\cite{Bellagente:2019uyp}, and GAN-based fast calorimeter simulation tools are still in active use within ATLAS today~\cite{ATLAS:2021pzo}.
+They were the first generative models to produce realistic jets and calorimeter showers~\cite{Paganini:2017hrr,Paganini:2017dwg,deOliveira:2017pjk,Butter:2020qhk,Buhmann:2023pmh} or perform unfolding~\cite{Bellagente:2019uyp}. 
+GAN-based fast calorimeter simulation tools are still in active use by the ATLAS experiment~\cite{ATLAS:2021pzo}.
 
 % -------------------------------------------------------------------
 \subsection{Variational Autoencoders}
@@ -43,8 +43,7 @@ Early work demonstrated that they could generate realistic jets and calorimeter 
 
 In contrast to GANs, Variational Autoencoders (VAEs)~\cite{Kingma:2013vae} attempt to explicitly model the likelihood of the training data.
 Given this approach is important to the unfolding work in \Cref{ch:unfolding}, it is worth reviewing the basics of VAEs here.
-The starting point is a \textit{latent variable model}.
-The assumption is that the generation of each data point $x$ is governed by a latent variable $z \sim p(z)$ from a prior (typically a Gaussian) and a conditional likelihood $p(x | z)$\footnote{The choice to introduce a latent vector $z$ relates to the manifold hypothesis discussed in \cref{sec:id}. This latent vector is typically much lower dimensional than the data representation, implying that the manifold the data cluster on can be modeled using these latent variables.}.
+VAEs are \textit{latent variable models}, in which generation of each data point $x$ is governed by a latent variable $z \sim p(z)$ from a prior (typically a Gaussian) and a conditional likelihood $p(x | z)$\footnote{The choice to introduce a latent vector $z$ relates to the manifold hypothesis discussed in \cref{sec:id}. This latent vector is typically much lower dimensional than the data representation, implying that the manifold the data cluster on can be modeled using these latent variables.}.
 The complicated object is the conditional likelihood, which we attempt to model with a generative model, $p_{\theta}(x | z)$ with parameters $\theta$.
 The marginal likelihood is
 \begin{equation}
@@ -53,11 +52,13 @@ The marginal likelihood is
 \end{equation}
 Direct maximum likelihood training would require evaluating this integral using an MCMC estimator for every mini-batch of data, which is intractable for high-dimensional $z$.
 Attempting to model the posterior instead would produce the same issue, since by Bayes rule the posterior is inversely proportional to $p(x)$ which is the exact density we seek to model to begin with.
-The VAE sidesteps this intractable posterior by introducing an \textit{encoder} network $q_\phi(z | x)$ that approximates the true posterior $p_\theta(z | x)$, and then optimizing a lower bound on the log-likelihood.
+The VAE sidesteps these problems by using an \textit{encoder} network $q_\phi(z | x)$ to approximate the true posterior $p_\theta(z | x)$, and then optimizing a lower bound on the log-likelihood.
+This lower bound is derived in the next section.
 
 \subsubsection{Derivation of the ELBO}
 
-Starting from the log-marginal-likelihood of a single data point $x$, we introduce $q_\phi(z|x)$ by multiplying and dividing inside the expectation:
+The goal is to maximize the log-likelihood of a single data point $x$.
+The first step is to introduce $q_\phi(z|x)$ by multiplying and dividing inside the expectation:
 \begin{align}
     \log p_\theta(x)
     &= \log \int p_\theta(x|z)\,p(z)\,dz \notag \\
@@ -65,7 +66,7 @@ Starting from the log-marginal-likelihood of a single data point $x$, we introdu
     &= \log \mathbb{E}_{z \sim q_\phi(z|x)}\!\left[\frac{p_\theta(x|z)\,p(z)}{q_\phi(z|x)}\right].
     \label{eqn:elbo_step1}
 \end{align}
-Applying Jensen's inequality (the log function is concave, so $\log \mathbb{E}[Y] \geq \mathbb{E}[\log Y]$) gives
+Applying Jensen's inequality ($\log \mathbb{E}[Y] \geq \mathbb{E}[\log Y]$) to move the log through the expectation gives
 \begin{align}
     \log p_\theta(x)
     &\geq \mathbb{E}_{z \sim q_\phi(z|x)}\!\left[\log \frac{p_\theta(x|z)\,p(z)}{q_\phi(z|x)}\right] \notag \\
@@ -75,64 +76,67 @@ Applying Jensen's inequality (the log function is concave, so $\log \mathbb{E}[Y
        - \underbrace{D_\text{KL}\!\left(q_\phi(z|x) \,\|\, p(z)\right)}_{\text{regularization}}.
     \label{eqn:elbo}
 \end{align}
-This lower bound is called the \textit{Evidence Lower Bound} (ELBO).
+The right side of the expression is a lower bound on the object we want to maximize, and is called the \textit{Evidence Lower Bound} (ELBO).
 The ELBO can be maximized with respect to both $\theta$ and $\phi$, pushing the density provided by the decoder $p_{\theta}(x | z)$ toward the true log-likelihood.
-The gap between the ELBO and $\log p_\theta(x)$ is exactly the KL divergence between the approximate posterior $q_\phi(z|x)$ and the true posterior $p_\theta(z|x)$, so the ELBO is tight when the encoder perfectly recovers the true posterior.
+If the approximate posterior $q_\phi(z|x)$ exactly equals the true posterior $p_\theta(z|x)$, then the expression reduces to an equality and the loss function equates to directly maximizing the log-likelihood of the data as desired.
 
-The ELBO has a natural two-term interpretation.
-The \textit{reconstruction term} $\mathbb{E}_{z \sim q_\phi}[\log p_\theta(x|z)]$ encourages the decoder to accurately reconstruct $x$ from samples from the latent distribution.
-The \textit{regularization term} $D_\text{KL}(q_\phi(z|x) \| p(z))$ penalizes the encoder for producing a posterior that deviates from the prior, encouraging the latent space to remain well-structured and preventing the model from simply memorizing the training data.
-Dropping the KL term reduces the VAE to a standard autoencoder, which can reconstruct training data but whose latent space lacks a statistical interpretation, making sampling difficult.
+Each term of the ELBO has a natural interpretation.
+The \textit{reconstruction term} $\mathbb{E}_{z \sim q_\phi}[\log p_\theta(x|z)]$ ensures the decoder accurately reconstructs the data point $x$ given a sample from the latent distribution.
+The \textit{regularization term} $D_\text{KL}(q_\phi(z|x) \| p(z))$ constains the approximate posterior to be close to the prior.
+This constraint term imparts some structure on the latent space and prevents the model from overfitting to the training data.
+Without the regularization term the VAE reduces to a standard autoencoder.
+Standard autoencoders can reconstruct the training data, but given their latent space is not constrained to follow any known distribution sampling is difficult, making them difficult to use as generative models.
 
-In the standard VAE, both the prior $p(z) = \mathcal{N}(0, I)$ and the approximate posterior $q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \text{diag}(\sigma^2_\phi(x)))$ are chosen to be Gaussian.
-Under this choice the KL divergence has a closed form.
-For a $d$-dimensional latent space,
+In a standard VAE model, the prior $p(z) = \mathcal{N}(0, I)$ and the approximate posterior $q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \text{diag}(\sigma^2_\phi(x)))$ are taken to be Gaussian.
+Note that the mean and variance of the approximate posterior are predicted by the encoder network with parameters $\phi$.
+Under this choice the KL divergence has a closed form:
 \begin{equation}
     D_\text{KL}\!\left(\mathcal{N}(\mu, \sigma^2 I) \,\|\, \mathcal{N}(0, I)\right)
     = \frac{1}{2} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log \sigma_j^2 - 1\right),
     \label{eqn:kl_gaussian}
 \end{equation}
-where $\mu_j$ and $\sigma_j$ are the $j$-th components of the encoder's predicted mean and standard deviation.
+where $d$ is the dimensionality of the latent space, and $\mu_j$ and $\sigma_j$ are the mean and standard deviation of the $j$th component predicted by the encoder.
 This term can be computed analytically and differentiated without any Monte Carlo estimation.
 
 \subsubsection{The Reparameterization Trick}
 
-The reconstruction term in \Cref{eqn:elbo} requires differentiating through a sampling operation $z \sim q_\phi(z|x)$, which is not directly differentiable with respect to $\phi$.
-The \textit{reparameterization trick} resolves this by rewriting the sample as a deterministic function of the encoder output and a fixed noise variable:
+Taking the derivative of the reconstruction term in \Cref{eqn:elbo} requires back-propagating through the operations that sample from the approximate posterior $z \sim q_\phi(z|x)$.
+This is not possible given the sampling procedure is stochastic.
+The \textit{reparameterization trick} solves this issue by rewriting the sample as a deterministic function of the encoder output and some sampled noise:
 \begin{equation}
     z = \mu_\phi(x) + \sigma_\phi(x) \odot \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, I).
     \label{eqn:reparam}
 \end{equation}
-The randomness is now isolated in $\varepsilon$, which does not depend on $\phi$, so gradients flow through $\mu_\phi$ and $\sigma_\phi$ to the encoder parameters without difficulty.
+The random variable in this equation is $\varepsilon$, which does not depend on $\phi$, while the predictions of the encoder have completely deterministic effects on the sampled $z$.
+This trick allows gradients to flow through $\mu_\phi$ and $\sigma_\phi$ to the encoder parameters without difficulty.
 
 \subsubsection{Reconstruction Loss and Limitations}
 
-For continuous data, the decoder likelihood $p_\theta(x|z)$ is typically chosen to be a Gaussian, $p_\theta(x|z) = \mathcal{N}(x; \mu_\theta(z), \sigma^2 I)$, where all neural network parameters serve only to calculate the mean $\mu_{\theta}(z)$.
+For continuous data, standard practice is to choose the decoder likelihood as a Gaussian $p_\theta(x|z) = \mathcal{N}(x; \mu_\theta(z), \sigma^2 I)$, where all neural network parameters serve only to calculate the mean $\mu_{\theta}(z)$.
 This choice reduces the reconstruction term to a mean squared error (MSE) loss between the input and the decoder's predicted mean $\mu_\theta(z)$.
 The full ELBO training objective is then
 \begin{equation}
     \mathcal{L}_\text{VAE}(\theta, \phi; x) = \frac{1}{2\sigma^2}\left\|x - \mu_\theta(z)\right\|^2
-    + D_\text{KL}\!\left(q_\phi(z|x)\,\|\,p(z)\right),
+    + D_\text{KL}\!\left(q_\phi(z|x)\,\|\,p(z)\right).
     \label{eqn:vae_loss}
 \end{equation}
-minimized by gradient descent over mini-batches of training examples, with $z$ computed via the reparameterization trick at each step.
-The overall encoder-decoder structure is illustrated in \Cref{fig:vae}.
+Just like with \Cref{eq:bce,eq:gan}, this loss function can be minimized or maximized by gradient descent over mini-batches of training examples.
+A diagram of the overall encoder-decoder structure is illustrated in \Cref{fig:vae}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.85\linewidth, alt={Schematic of a variational autoencoder. An input x is fed into an encoder network that outputs the mean and variance of a Gaussian distribution over a latent variable z. A latent sample z is drawn via the reparameterization trick and passed to a decoder network that reconstructs x. Arrows indicate the forward pass, and a dashed arrow from the prior distribution to the KL divergence term indicates the regularization loss.}]{figures/ch3/vae_diagram.pdf}
-    \caption{Schematic of the variational autoencoder architecture. The encoder $q_\phi(z|x)$ maps an input $x$ to a distribution over latent codes $z$. A sample is drawn via the reparameterization trick and passed to the decoder $p_\theta(x|z)$, which reconstructs $x$. Training maximizes the ELBO, balancing reconstruction quality against regularization of the latent space toward the prior $p(z)$.}
+    \caption{Schematic of the variational autoencoder. The encoder $q_\phi(z|x)$ maps an input $x$ to a distribution over latent codes $z$. A sample is drawn via the reparameterization trick and passed to the decoder $p_\theta(x|z)$, which reconstructs $x$. Generation of new samples is done by sampling from the latent space prior $p(z)$, and then passing the samples through the decoder network.}
     \label{fig:vae}
 \end{figure}
 
-One consequence of the assumed Gaussian likelihood is worth noting explicitly.
-The MSE reconstruction loss trains the decoder to predict the mean of $p_\theta(x|z)$, which is the optimal prediction under squared error.
-If $p_\text{data}(x|z)$ is multimodal, the decoder's predicted mean will be a weighted average across modes rather than a sample from any of them.
+One possible failure mode of the VAE stemming from the assumed Gaussian likelihood is worth noting explicitly.
+Under the MSE loss, the encoder learns to predict the mean of the distribution $p_{\text{data}}(x|z)$.
+If $p_\text{data}(x|z)$ is multimodal, the decoder will learn to predict an average across all modes, which could be a location with low likelihood.
 In practice this can result in poor sample quality.
-More broadly, any observable that depends on the shape of $p(x|z)$ rather than its mean will be poorly captured.
-This limitation becomes particularly relevant for the unfolding application in \Cref{ch:unfolding}.
+This limitation will be relevant for the unfolding application in \Cref{ch:unfolding}.
 
-Despite these limitations, VAEs are substantially easier to train than GANs and were adopted within HEP for generative tasks including fast simulation and anomaly detection~\cite{Howard:2021pos,Tsan:2021brw,Cheng:2020dal}.
+Despite this limitation, the easy training of the VAEs compared to GANs meant they were quickly adapted within HEP for generative tasks such as fast calorimeter simulation, unfolding, and density estimation~\cite{Howard:2021pos,Tsan:2021brw,Cheng:2020dal}.
 
 % -------------------------------------------------------------------
 \subsection{Normalizing Flows}
@@ -140,49 +144,52 @@ Despite these limitations, VAEs are substantially easier to train than GANs and 
 
 In contrast to VAEs, normalizing flows model the likelihood of the data directly, rather than using an auxiliary network to approximate the posterior.
 They handle the intractable integral in \Cref{eqn:marginal} by insisting that the modeled likelihood is \textit{invertible}, making the integral over $z$ trivial to compute because only one $z$ maps to a particular $x$.
-More specifically, define a \textit{bijective} mapping $f_\theta: \mathcal{X} \to \mathcal{Z}$ between data space $\mathcal{X}$ and a latent space $\mathcal{Z}$ of equal dimension, such that the mapping and its inverse are both computable in closed form.
-Given a simple prior $p(z)$ (again typically a standard Gaussian) and this bijective mapping, the change-of-variables formula gives an \textit{exact} expression for the data likelihood:
+Normalizing flows define a \textit{bijective} mapping $f_\theta: \mathcal{X} \to \mathcal{Z}$ between the data space $\mathcal{X}$ and a latent space $\mathcal{Z}$ of equal dimension.
+Given a prior $p(z)$, typically taken to be Gaussian, and this bijective mapping, an exact expression for the data likelihood can be written using the change of variables formula:
 \begin{equation}
     \log p_\theta(x) = \log p(f_\theta(x)) + \log\left|\det J_{f_\theta}(x)\right|,
     \label{eqn:flow_likelihood}
 \end{equation}
 where $J_{f_\theta}(x) = \partial f_\theta / \partial x$ is the Jacobian of the transformation.
-Training maximizes this log-likelihood over the training data, with no approximation and no auxiliary network.
-A key consequence is that once trained, the flow model supports not just sampling (by drawing $z \sim p(z)$ and computing $f_\theta^{-1}(z)$) but also exact density evaluation of any point $x$.
-This ability to evaluate $p_\theta(x)$ without sampling is a unique ability of flow models.
+As with VAEs, the training objective is to maximize the log-likelihood of the model over the training data.
+Unlike VAEs, there is no approximate posterior and the quantity of interest is optimized directly.
+Given the exact loss function, once trained flow model support sampling (by drawing $z \sim p(z)$ and computing $f_\theta^{-1}(z)$) and density estimation of any point $x$.
+This ability to evaluate $p_\theta(x)$ without MCMC sampling or other tricks is a unique ability of flow models.
 
-The central engineering challenge is constructing a bijective $f_\theta$ whose Jacobian determinant is tractable to compute.
-For a general MLP layer the Jacobian is an $n \times n$ matrix and its determinant costs $\mathcal{O}(n^3)$, which is prohibitive for high-dimensional $x$.
-\textit{Coupling layers}~\cite{dinh2016density} address this by constraining their Jacobian to be triangular, making the determinant simply the product of the diagonal entries which is cheap to compute.
-
-In a coupling layer the input $x$ is split into two halves, $x_{1:k}$ and $x_{k+1:n}$.
-The first half passes through unchanged, while the second half undergoes an elementwise transformation whose parameters are determined by the first half.
-For example the \textit{affine coupling layer}~\cite{dinh2016density} applies the transformation
+In order to evaluate \Cref{eqn:flow_likelihood}, a bijective-mapping $f_\theta$ whose Jacobian is practical to compute is needed.
+For an MLP layer the Jacobian is a generic $n \times n$ whose determinant costs $\mathcal{O}(n^3)$ to compute, which is prohibitive for high-dimensional $x$.
+Coupling layers~\cite{dinh2016density} avoid this issue by requiring a lower triangular Jacobian by construction, making the determinant the product of the diagonal entries of the Jacobian.
+The lower triangular Jacobian is achieved by splitting the input $x$ two halves, $x_{1:k}$ and $x_{k+1:n}$.
+The first half passes through the coupling layer unchanged.
+An elementwise transformation is applied to the second half whose parameters are determined by the first half.
+The \textit{affine coupling layer} applies the transformation
 \begin{align}
     z_{1:k} &= x_{1:k}, \label{eqn:coupling_id} \\
     z_{k+1:n} &= x_{k+1:n} \odot \exp\!\left(s_\theta(x_{1:k})\right) + t_\theta(x_{1:k}),
     \label{eqn:coupling_affine}
 \end{align}
-where $s_\theta$ and $t_\theta$ are arbitrary neural networks (typically MLPs) that act only on the unchanged half.
-Because $z_{k+1:n}$ is an elementwise function of $x_{k+1:n}$ given $x_{1:k}$, the Jacobian is lower triangular and its log-determinant is simply $\sum_i s_\theta(x_{1:k})_i$.
-By alternating the partition between layers so that $x_{1:k}$ is transformed in the next layer, the full input can be transformed after a few coupling layers.
-This construction is illustrated in \Cref{fig:coupling_flow}.
+where $s_\theta$ and $t_\theta$ are arbitrary neural networks (typically MLPs) that act only on the unchanged half of the input.
+The outputs of the coupling layer $z_{k+1:n}$ are elementwise functions of $x_{k+1:n}$, so the Jacobian of the transformation is lower triangular.
+It's log-determinant is the sum along the diagonal $\sum_i s_\theta(x_{1:k})_i$.
+This operation leaves the other half of the inputs unchaged, so the conditioning and transformed halves are swapped in the next coupling layer allowing the full input to be transformed after two layers.
+This construction of two consecutive coupling layers is illustrated in \Cref{fig:coupling_flow}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.75\linewidth, alt={Diagram of a normalizing flow composed of coupling layers. The input vector is split into two halves shown as separate channels. In each coupling layer, one half passes through unchanged while the other is transformed by a function conditioned on the first half. The roles of the two halves alternate between layers, ensuring all dimensions are eventually transformed. The final output is the mapped latent variable z.}]{figures/ch3/coupling_flow_diagram.png}
-    \caption{Illustration of a normalizing flow built from coupling layers. At each layer the input is split into two halves; one half determines the transformation applied to the other. Alternating the partition across layers ensures all dimensions are transformed. Figure from~\cite{Albergo:2021bna} under Creative Commons license.}
+    \caption{Illustration of two coupling layers in a normalizing flow. At each layer the input is split into two halves. The conditioning half determines the transformation applied to the other. Switching the roles of the halves across layers ensures all dimensions are transformed. Figure from~\cite{Albergo:2021bna} reprocued under a CC~BY~4.0 license.}
     \label{fig:coupling_flow}
 \end{figure}
 
-The affine transformation in \Cref{eqn:coupling_affine} is simple and computationally efficient but relatively limited in expressiveness.
-State-of-the-art flow models replace the affine map with a monotone \textit{rational-quadratic spline} (RQS)~\cite{Durkan:2019nsf}, which parameterizes a piecewise rational function whose knot positions and derivatives are output by $s_\theta$ and $t_\theta$.
-RQS coupling layers are the current standard in most flow-based models applied to HEP data.
+The affine transformation in \Cref{eqn:coupling_affine} is simple, computationally efficient, and elegant, but has limited expresivity compared to modern alternatives.
+State-of-the-art flow models replace the affine map with a monotone \textit{rational-quadratic spline} (RQS)~\cite{Durkan:2019nsf}, where the neural networks applied to the conditioning half of the inputs parameterize a piecewise rational function that is applied to the other half.
+RQS coupling layers are the current standard in most flow-based models being applied in HEP.
 
-Normalizing flows are a niche topic in the broader deep learning community.
-The requirement that $f_\theta$ be bijective forces the latent and data spaces to have the same dimension, preventing the dimensionality reduction that makes VAEs and other latent variable models useful for representation learning.
+Despite their elegance, flow based models are something of a niche topic in the broader deep learning community.
+For many applications in computer vision and natural language, the requirement that the latent and data spaces have the same dimensionality is highly restrictive.
+Flow models do not provide the dimensionality reduction that makes VAEs and other latent variable models useful in such domains, and they do not scale to very high-dimensional data.
 This architectural constraint also limits scalability to very high-dimensional data.
-However, HEP data are relatively low-dimensional.
+However, HEP data are relatively low-dimensional compared to other AI application domains.
 Jet and event data typically involve tens to a few hundred dimensions rather than the millions of pixels in natural images, and flow models perform very well on these medium dimensional tasks.
 Normalizing flows have been applied across a broad range of HEP tasks, including fast detector simulation~\cite{Krause:2021ilc}, unfolding~\cite{Bellagente:2020piv}, and anomaly detection~\cite{Hallin:2021wme}.
-They have only recently been displaced as the go-to generative model for HEP applications by diffusion and flow-matching models, which I'll turn to next.
+They have only recently been displaced as the default generative model for HEP applications by diffusion and flow-matching models, which I'll turn to next.
