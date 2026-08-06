@@ -112,7 +112,7 @@ This is one of the theoretical explanations for why large neural networks are ea
     \label{fig:gradient_descent}
 \end{figure}
 
-In \Cref{eq:gd}, the loss is computed over the full dataset before gradients are computed.
+In \Cref{eqn:gd}, the loss is computed over the full dataset before gradients are computed.
 This requires running a forward and backward pass over the network for each data point in the training set before making a single parameter update, which is computationally inefficient and intractable for large datasets.
 \textit{Stochastic gradient descent} (SGD) replaces the losses and gradient calculation over the full dataset with the same calculation over a randomly sampled \textit{mini-batch} of $B$ examples.
 This procedure dramatically reduces the per-parameter-update computational cost, but introduces variance into the gradient estimates.

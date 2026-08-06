@@ -120,7 +120,7 @@ The full ELBO training objective is then
     + D_\text{KL}\!\left(q_\phi(z|x)\,\|\,p(z)\right).
     \label{eqn:vae_loss}
 \end{equation}
-Just like with \Cref{eq:bce,eq:gan}, this loss function can be minimized or maximized by gradient descent over mini-batches of training examples.
+Just like with \Cref{eqn:bce,eqn:gan}, this loss function can be minimized or maximized by gradient descent over mini-batches of training examples.
 A diagram of the overall encoder-decoder structure is illustrated in \Cref{fig:vae}.
 
 \begin{figure}[ht]
