@@ -160,10 +160,10 @@ It can be shown that as $n \to \infty$ the truth-level histogram estimates produ
 The EM algorithm structure can be read off from these equations.
 First, in \Cref{eq:ibu2} the current prior $\Pr^{(n)}(t_i)$ is held fixed and the posterior probability $\Pr(t_i | d_j)$ that a detector-level event in bin $j$ originated from truth-level bin $i$ is calculated using Bayes' theorem.
 The response matrix elements $R_{ji}$ are interpreted as the likelihood $\Pr(d_j|t_i)$.
-This is the expectation step, since the method is calculating the expectation value of latent observables (how the events in bin $j$ of the detector-level histogram split across the truth-level bin $i$) given the current parameters $t_i^{(0)}$ and observations $d_j$.
-The maximization step corresponds to the sum over $j$ and multiplication of the posterior probability by the detector-level bin counts $d_j$.
-Intuitively, the posterior probabilities are used to distribute the detector-level bin counts into truth-level bins, which produces an updated estimate $t_i^{(n)}$.
-This estimate serves as a new prior and the process repeats.
+This posterior probability is then multiplied by the observed data $d_j$, producing an estimate of the joint probability density $\Pr(d_j, t_i)$.
+This is the expectation step, since the method is calculating the expectation value of latent observables (how the events in bin $j$ of the detector-level histogram split across the truth-level bin $i$, or the joint density) given the current parameters $t_i^{(0)}$ and observations $d_j$.
+The maximization step is then simply the sum over $j$, which aggregates the contribution to the truth-level bin $i$ over all detector-level bins $j$.
+The estimate produced by the M-step then serves as a new prior and the process repeats.
 The number of iterations controls how far the estimate departs from the prior taken from simulation.
 Few iterations keep the result close to the prior corresponding to high regularization (high bias, low variance), while many iterations approach the maximum likelihood solution and zero regularization (low bias, high variance).
 With infinite iterations, the procedure converges to the maximum likelihood estimate and the solution is prior independent, but not useful due to the large variance.
@@ -244,14 +244,15 @@ The binned IBU estimates the true distribution through iterative expectation and
 The continuous analogs of \Cref{eq:ibu2,eq:ibu3} are
 \begin{align}
 \label{eq:ibu-continuous-estep}
-p^{(n)}(z \mid x) = \frac{p(x \mid z)\, p^{(n)}(z)}{\int p(x \mid z')\, p^{(n)}(z')\, dz'}, \quad \text{(E-step)}
+p^{(n+1)}(z, \, x) = p^{(n)}(z \mid x)\, p_{\mathrm{data}}(x) = \frac{p(x \mid z)\, p^{(n)}(z)}{\int p(x \mid z')\, p^{(n)}(z')\, dz'}\, p_{\mathrm{data}}(x), \quad \text{(E-step)}
 \end{align}
 \begin{align}
 \label{eq:ibu-continuous-mstep}
-p^{(n+1)}(z) = \int p^{(n)}(z \mid x)\, p_{\mathrm{data}}(x)\, dx. \quad \text{(M-step)}
+p^{(n+1)}(z) = \int p^{(n+1)}(z, \, x) \, dx. \quad \text{(M-step)}
 \end{align}
-The E-step applies Bayes' theorem to compute the posterior $p^{(n)}(z \mid x)$ using the current prior $p^{(n)}(z)$ and the detector response (likelihood) $p(x \mid z)$.
-The M-step updates the truth-level distribution by marginalizing over $x$ in the posterior computed in the E-step, using samples from the data distribution.
+The E-step involves using Bayes' theorem to compute the posterior $p^{(n)}(z \mid x)$ using the current prior $p^{(n)}(z)$ and the detector response (likelihood) $p(x \mid z)$.
+This posterior is then used to calculate an estimate of the joint density $p^{(n+1)}(z, \, x)$.
+The M-step updates the truth-level distribution by marginalizing over $x$ in the estimate of the joint density.
 As in the binned case, the prior is initialized using the (now unbinned) output of an event generator and the regularization is provided by truncating the procedure at finite iterations.
 
 The ML-based unfolding methods discussed either solve the integral equation in \Cref{eq:folding-continuous} directly, or use the EM procedure described above.
@@ -308,7 +309,7 @@ Despite these issues applications of methods that replace parts of the EM proced
 
 The final class of methods uses the EM procedure but uses classifiers to estimate density ratios rather then generative models to estimate densities.
 \Omnifold~\cite{Andreassen:2019cjw} and its variants~\cite{Chan:2023tbf, Zhu:2024drd} are the prime example of these techniques.
-Given \Omnifold is central to the $Z$+jets measurement detailed in \Cref{ch:zjets}, a full discussion is reserved for a dedicated section of that chapter.
+Given \Omnifold is central to the $Z$+jets measurement detailed in \Cref{ch:zjets}, a full discussion is provided in \Cref{sec:omnifold}.
 
 \section{Unfolding with Diffusion and Flow Matching}
 \label{sec:diffusion-unfolding}
@@ -859,12 +860,20 @@ Given this is the first method that has been used to solve a variable-dimensiona
 
 \paragraph{Derived Observables: Top Quark Kinematics.}
 
-A key motivation for full-event unfolding is the ability to measure arbitrary derived observables without repeating the analysis.
-\Cref{fig:vl_vld_top_kinematics} shows the kinematic distributions of the hadronically- and leptonically-decaying top quark candidates and the $t\bar{t}$ system, reconstructed from the unfolded jets and leptons using the pseudo-top algorithm.
-Closure is noticeably worse here than for the individual jet and lepton kinematics, which is not surprising since the network is not directly optimized to predict these quantities.
-In particular, the sharp mass peaks at the top quark mass are not well reproduced after unfolding.
-As mentioned before, modeling sharp features is a known difficulty for generative models.
-This mis-modeling of derived observables involving complex inter-object correlations is an important limitation of the current approach, and motivates further developments discussed in \cref{sec:cfm-jets}.
+The motivation for developing a variable-dimensional estimate of the posterior was to allow full-event unfolding with generative models.
+Full event unfolding requires that all \textit{derived observables}, or observables that are functions of the object kinematics directly predicted by the neural network, be accurately modeled in the posterior.
+In the case of particle-level unfolding of semi-leptonic $t\bar{t}$ production, key derived observables are the kinematics of the top quarks and $t\bar{t}$ system.
+These observables were directly optimized in the previous section's parton-level task, but here they are functions of the object kinematics which are not directly optimized.
+\Cref{fig:vl_vld_top_kinematics} shows kinematic distributions for the hadronically and leptonically decaying top quark candidates and the $t\bar{t}$ system.
+Note that assigning jets and leptons to the hadronic top and leptonic top is not necessarily trivial.
+In these results the pseudo-top algorithm is used to assign jets and leptons to these partons, but a key feature of the full-event posterior is that choosing a different algorithm would not require retraining the model.
+The agreement between the truth particle-level distributions and the model predictions is considerably worse in these observables than for the directly-optimized observables discussed above.
+In particular the mass peaks of the hadronic and leptonic top quarks are not well modeled.
+The posterior samples follow essentially the same distribution as the detector-level samples, indicating that the model has learned essentially the identity function in this observable.
+As mentioned above, the modeling of sharply peaked distributions is a known difficulty for generative models.
+Here the difficulty is exacerbated by the fact that these distributions can not be optimized directly, or constrained through use of a physics-informed loss function as was done in the previous section.
+Other derived observables, such as the \pt of the top quarks and the mass of the $t\bar{t}$ system, are better modeled but still have significant disagreements with the particle-level truth.
+These issues with derived observables is a significant limitation of the current approach, and motivates the additional methodological developments in the next section.
 
 \begin{figure}[htb]
   \centering
@@ -915,18 +924,21 @@ This mis-modeling of derived observables involving complex inter-object correlat
     \includegraphics[width=\linewidth, alt={ttbar invariant mass comparing truth, unfolded, and detector levels.}]{figures/ch5/vl_vld/assignment/ttbar_mass}
     \caption{}
   \end{subfigure}
-  \caption{Kinematic distributions of reconstructed top quark candidates and the $t\bar{t}$ system in the SM $t\bar{t}$ test dataset.
-  Shown are the true particle-level distribution (dashed blue), the VL-VLD unfolded distribution (solid red), and the detector-level distribution (dotted green).
-  Uncertainty bands are estimated by sampling each event 128 times.
-  Closure is worse here than for the individual jet and lepton kinematics, most notably for the mass distributions where the sharply peaked truth-level distributions are not well reproduced.}
+  \caption{Distributions of the kinematics of top quark candidates, assuming the pseudo-top jet parton assignment algorithm.
+  All results are built using the test dataset.
+  Shown are the true particle-level distribution (dashed blue), the distribution obtained by sampling the learned posterior (solid red), and the detector-level distribution (dotted green).
+  Uncertainty bands on the unfolded distributions are estimated by sampling each event 128 times.}
   \label{fig:vl_vld_top_kinematics}
 \end{figure}
 
 \paragraph{Two-Dimensional Correlations.}
 
-While the marginal distributions of the top quark kinematics show imperfect closure, it is important to check whether the two-dimensional correlations among these observables are faithfully captured.
-\Cref{fig:vl_vld_corner} shows corner plots of the hadronic top quark kinematic observables for the truth-level test set and for the VL-VLD model predictions.
-The agreement between the truth and unfolded two-dimensional distributions is quite good across all pairs of observables, demonstrating that the model correctly captures the inter-observable correlations even when the marginal mass distribution is poorly reproduced.
+In addition to inspecting the one-dimensional marginal distributions of the top quark kinematics, it is also useful to inspect two-dimensional distributions.
+This ensures that the correlations between different observables are properly captured in the modeled posterior.
+\Cref{fig:vl_vld_corner} shows corner plots of the hadronic top quark kinematic observables for both the truth particle-level distributions and for the VL-VLD model predictions.
+The correlations are visibly very similar, indicating that the VL-VLD model is correctly capturing the correlations between these observables and not only reproducing the corerct marginal distributions.
+The VL-VLD model is able to capture the overall structure of the ground truth posterior, but the precision of the learned model is lacking.
+Greater precision often boils down to finding the correct parametrization for the generative task, as will be shown in the next section.
 
 \begin{figure}[tb]
   \centering
@@ -940,24 +952,24 @@ The agreement between the truth and unfolded two-dimensional distributions is qu
     \includegraphics[width=\linewidth, alt={Corner plot of hadronic top quark kinematic variables from the VL-VLD model predictions, showing the two-dimensional distributions and marginals for pt, eta, and mass.}]{figures/ch5/vl_vld/corner/pred_had}
     \caption{Unfolded}
   \end{subfigure}
-  \caption{Corner plots of hadronic top quark kinematic observables for (a) the truth particle-level test set and (b) the VL-VLD unfolded predictions.
-  The two-dimensional correlations are well reproduced by the model, demonstrating that VL-VLD captures the joint structure of the multi-observable distribution even for derived quantities not directly included in the training objective.}
+  \caption{Corner plots of the hadronic top quark kinematic observables, shown for the truth particle-level distribution (top) and the distribution obtained by sampling from the learned posterior (bottom).
+  The two-dimensional joint distributions between each kinematic observable are visualized with contour plots.}
   \label{fig:vl_vld_corner}
 \end{figure}
 
 \paragraph{Performance on a BSM Prior.}
 
-Modeling of the posterior with a generative model is only the first step in the iterative EM procedure needed to produce a proper unfolding.
-The maximization step and subsequent iterations exist to remove the prior dependence from the learned posterior and arrive at the maximum likelihood solution.
-While this paper did not perform the iterative procedure explicitly, it did explore this direction by examining the prior dependence of the learned posterior.
+Modeling of the posterior is only the first step in the EM algorithm needed to produce a proper unfolding.
+The M-step and subsequent iterations exist to remove the prior dependence from the learned posterior and arrive at the maximum likelihood solution.
+While we did not perform the iterative procedure explicitly in Ref.~\cite{Shmakov:2024gkd}, we did explore this direction by examining the prior dependence of the learned posterior.
 Specifically the VL-VLD network trained on Standard Model $t\bar{t}$ events is evaluated on an alternative test sample containing BSM physics injected through a non-zero EFT coefficient in the top-gluon vertex ($c_{tg} = 25$).
 This is a large coefficient and is rather unphysical, but it produces a sizeable shift in the kinematic distributions of the top quarks and $t\bar{t}$ system that is useful for assessing the prior dependence.
 
-\Cref{fig:vl_vld_eft} shows the reconstructed top quark and $t\bar{t}$ kinematics in the EFT test dataset alongside the corresponding SM distributions.
-The unfolded EFT distributions track the EFT truth closely and are clearly distinguishable from the SM distributions, demonstrating that VL-VLD is not simply reproducing the SM prior.
-The same mis-modeling of the top mass distributions observed in the SM case is present here as well, which is expected since this is a limitation of the model architecture rather than a prior-dependence effect.
-These results indicate that the posterior learned by VL-VLD carries limited prior bias, at least for the level of prior shift tested here.
-Performing the full EM routine would still be necessary to apply such an unfolding method to data, but this preliminary check shows that the prior dependence is at least under some control.
+\Cref{fig:vl_vld_eft} shows the distributions of various top quark and $t\bar{t}$ system kinematic observables in the EFT test dataset, in addition to the SM distributions previously presented in \Cref{fig:vl_vld_top_kinematics}.
+While there are visible disagreements between the EFT particle-level truth and the learned posterior sampled using the EFT test set, these disagreements are in general no worse than the disagreements between the truth and modeled distributions in the SM test set.
+Generally there is a very low level of prior dependence visible in these observables, despite the large prior-shift produced by the non-zero EFT operator which can be visualized as the difference between the EFT and SM truth distributions.
+This is strong evidence that the EM algorithm should be capable of removing any residual prior dependence and producing a proper unfolding.
+Applying the EM algorithm would still be necessary in an application of this method to data, but this preliminary check shows that the prior dependence is at least under control.
 
 \begin{figure}[htb]
   \centering
@@ -1008,38 +1020,44 @@ Performing the full EM routine would still be necessary to apply such an unfoldi
     \includegraphics[width=\linewidth, alt={ttbar invariant mass in the EFT dataset.}]{figures/ch5/vl_vld/eft_assignment/ttbar_mass}
     \caption{}
   \end{subfigure}
-  \caption{Kinematic distributions of reconstructed top quark candidates and the $t\bar{t}$ system in the EFT test dataset.
-  Shown are the EFT truth (dashed purple), the VL-VLD unfolded EFT (solid orange), and for reference the corresponding SM truth (dashed blue) and unfolded SM (solid red) distributions.
-  The model successfully tracks the EFT truth distributions and clearly distinguishes them from the SM, demonstrating that the learned posterior is not strongly biased by the SM training prior.}
+  \caption{Distributions of selected kinematic observables relating to the top quark candidates and $t\bar{t}$ system, analogous to those shown in \Cref{fig:vl_vld_top_kinematics}. Shown are the EFT particle-level truth distribution (dashed purple), the distribution obtained by sampling the learned posterior with the EFT test set (solid orange), and the EFT detector-level distribution (dotted green). The SM particle-level truth distribution (dashed blue) and the SM modeled distribution (solid red) are also provided for visual comparison.
+  Uncertainty bands on the modeled distributions are estimated by sampling each event 128 times.}
   \label{fig:vl_vld_eft}
 \end{figure}
 
 \subsubsection{Summary}
 
-Ref.~\cite{Shmakov:2024gkd} presented the first application of generative machine learning to a variable dimensional unfolding task.
-By extending VLD with transformer-based encoders and decoders, a multiplicity predictor, and per-position noise schedules, the model successfully unfolds the complete set of jets and leptons in semi-leptonic $t\bar{t}$ events to particle level, correctly reproducing the variable number of reconstructed jets across events.
-Excellent closure is observed for the directly predicted jet and lepton kinematics, while larger mis-modeling is seen in derived observables such as the reconstructed top quark mass, which require the network to correctly model subtle correlations among multiple objects.
-This limitation, which traces back to the fact that the loss function does not directly constrain derived quantities, motivates the work discussed in the following section.
-The results on the EFT test sample further indicate that the method is not strongly biased by the SM training prior, suggesting that only few iterations of the reweighting procedure discussed in \cref{sec:omnifold} would be needed in practice.
+Ref.~\cite{Shmakov:2024gkd} presents the first method for modeling a variable dimensional posterior in the context of unfolding.
+The VLD model of Ref.~\cite{Shmakov:2023kjj} is extended with transformer-based neural networks to handle postion equivariant set data types, per-position noise schedules, and a multiplicity predictor network to ensure variable-length generation.
+The VL-VLD model is applied to model the posterior for particle-level event configutations conditioned on the detector-level data for semi-leptonic $t\bar{t}$ events.
+Unlike the posterior modeling task in the previous section, this task is inherently variable dimensional and the VL-VLD model is able to accurately reproduce observables relating to this variable dimensionality such as the jet multiplicity.
+Other kinematic observables that are directly optimized show excellent agreement with the particle-level truth, while derived observables such as those relating to the kinematics of candidate top quarks are not captured as accurately.
+This short-coming motivates the work in the next section which investigates how clever parametrizations of the generative task can improve accuracy.
+Finally the prior dependence of the learned posterior is assessed by sampling the posterior trained on an SM sample using a sample that has been adjusted by a large non-zero EFT operator.
+Despite the sizeable shift in the truth-level distributions, the VL-VLD model is able to adjust its predictions based on the condition provided by the detector-level data.
+This is strong evidence that the EM algorithm could be applied to build a complete unfolding method using the VL-VLD model.
 
 \FloatBarrier
 
 \subsection{Unfolding Jet Substructure with Flow Matching}
 \label{sec:cfm-jets}
 
-Both the VLD~\cite{Shmakov:2023kjj} and VL-VLD~\cite{Shmakov:2024gkd} models demonstrated that generative methods can perform accurate unfolding in up to several tens of dimensions.
-However the VL-VLD model was inaccurate when unfolding derived observables rather than those directly included in the loss.
-Ref.~\cite{Petitjean:2025tgk} sought to address this shortcoming for a very particular unfolding task: unfolding jet substructure.
-In this context the inputs to the unfolding are the four-vectors of several tens of individual particles, involving $\mathcal{O}(100)$ dimensions.
-This is approaching a true full-phase space unfolding in which the four-momenta of every particle in the events are unfolded.
-Accurate unfolding of the entire jet substructure is achieved with a three-stage conditional flow matching (CFM) framework that sequentially predicts the constituent multiplicity, the jet kinematics, and the full constituent kinematics.
-Both standard permutation-equivariant transformers and the Lorentz-equivariant L-GATr architecture~\cite{Brehmer:2024yqw} are evaluated as the underlying velocity network.
+The results discussed in the previous two sections demonstrated that generative models can be used to model rather complicated posterior distributions in up to several tens of dimensions.
+However accuracy gaps remained, most notably in the derived observables calculated using the variable dimensional particle-level posterior in the previous section.
+Ref.~\cite{Petitjean:2025tgk} addresses these gaps within the particular task of modeling the particle-level posterior describing the substructure of a single large-radius jet, and is the fourth original research contribution of this thesis.
+While the results in the previous section clustered hadronic particles into jets and modeled the posterior as a function of these jets, the present results instead model the posterior as a function of all particles within a single jet.
+As in \Cref{ch:tagging}, jets at the LHC contain several tens of constituent particles each described by a four-vector.
+Therefore the target particle-level phase space has $\mathcal{O}(100)$ dimensions.
+Extension of the methods presented here from single jets to entire event should be possible, but is left to future work.
+% Accurate unfolding of the entire jet substructure is achieved with a three-stage conditional flow matching (CFM) framework that sequentially predicts the constituent multiplicity, the jet kinematics, and the full constituent kinematics.
+% Both standard permutation equivariant transformer neural networks and the Lorentz equivariant L-GATr architecture~\cite{Brehmer:2024yqw} are used to predict the needed velocity fields.
 
 \subsubsection{Three-Stage Unfolding Framework}
 
-Unfolding the full substructure of a jet requires predicting the kinematics of every constituent at particle level, conditioned on those quantities at detector level.
-As in \Cref{sec:vl-vld}, this is a set-to-set generation problem in which the target and conditioning sets can have different cardinalities.
-Ref.~\cite{Petitjean:2025tgk} addresses it with an autoregressive factorization of the joint particle-level distribution:
+The goal of this section is to model the posterior of the kinematics of each constituent particle of a particle-level jet, conditioned on the same quantities at detector level.
+As in the previous section this is a set-conditional set generation task, and the conditioning and target sets need not have the same cardinality.
+The previous section developed an effective machine learning model that could learn variable-dimensional posteriors, but used a somewhat basic representation of the data at detector and particle-level.
+In Ref.~\cite{Petitjean:2025tgk}, we sought to improve on the accuracy by developing a physics-inspired autoregressive factorization of the desired posterior:
 \begin{align}
   p_{\theta,\phi,\psi}(x_\text{part}, J_\text{part}, N_\text{part} \,|\, x_\text{reco}) &=
   p_\theta(N_\text{part} \,|\, x_\text{reco}) \nonumber \\
@@ -1048,23 +1066,28 @@ Ref.~\cite{Petitjean:2025tgk} addresses it with an autoregressive factorization 
   \label{eq:cfm_factorization}
 \end{align}
 where $N_\text{part}$ is the particle-level constituent multiplicity and $J_\text{part}$ the particle-level jet kinematics.
-The corresponding log-likelihood loss decomposes into three independent terms, one for each factor, allowing the three networks to be trained separately.
-The three stages, illustrated in \cref{fig:cfm_model}, are:
+Each of the factors is modeled by an independent neural network with trainable parameters $\theta$, $\phi$, and $psi$ respecitvely.
+The network that models $p_\theta(N_\text{part} \,|\, x_\text{reco})$ serves the same role as the multiplicity predictor network in the previous section.
+The novel contribution of this section is therefore the factorization of the second two terms: the posterior of the jet kinematics and the posterior of the constituent kinematics conditional on the jet kinematics.
+The overall framework is illustrated in \Cref{fig:cfm_model} and each neural network is implemented as follows:
 \begin{enumerate}
-  \item \textbf{Multiplicity unfolding}: A transformer encoder processes the detector-level constituents and predicts $N_\text{part}$ as a mixture of five Gaussians with learned means, widths, and weights conditioned on $x_\text{reco}$.
-  Predictions are obtained by sampling from this mixture and rounding to the nearest integer.
-  This is essentially the same as the multiplicity predictor in Ref.~\cite{Shmakov:2024gkd}, but with a Gaussian mixture as opposed to a Gamma distribution.
-  \item \textbf{Jet unfolding}: A CFM network with a transformer encoder-decoder predicts the particle-level jet four-momentum $J_\text{part} = (\log p_{T,J},\, \phi_J,\, \eta_J,\, \log m_J^2)$, conditioned on the detector-level jet kinematics and $N_\text{part}$.
-  $J_\text{part}$ is not the final output of the unfolding.
-  It is only used to define a physically motivated relative coordinate system for the constituent kinematics.
-  \item \textbf{Constituent unfolding}: A second, larger CFM network generates the full set of particle-level constituents, expressed in the relative frame
+  \item \textbf{Multiplicity predictor}: Similar to the previous section, the multiplicity predictor is implemented as a transformer encoder that processes the detector-level condition.
+  However instead of parametrizing a Gamma distribution, the outputs of the network parametrize a Gaussian mixture model, composed of five Gaussians with learnable means, variances, and weights.
+  The multiplicity prediction is obtained by sampling from the distribution and rounding to the nearest integer.
+  \item \textbf{Jet predictor}: A CFM model is used to model the posterior of the jet kinematics, conditioned on the detector-level jet kinematics and $N_\text{part}$.
+  The jet four-momentum are represented as $J_\text{part} = (\log p_{T,J},\, \phi_J,\, \eta_J,\, \log m_J^2)$.
+  Note that give we wish to unfold the jet substructure, $J_\text{part}$ is not the final product of the model.
+  Instead it is used autoregressively to define a physically motivated parametrization of the constituent posterior.
+  \item \textbf{Constituent predictor}: A second, larger CFM network models the posterior of the jet constituents, conditional on the detector-level jet kinematics, $N_\text{part}$, and $J_\text{part}$.
+  The particle-level jet kinematics are additionally used to define relative coordinates in which all jet kinematics are represented\footnote{The detector-level jet kinematics are represented in the equivalent coordinates, but using the detector-level jet kinematics}:
   \begin{equation}
-    (\delta_{\log p_T},\, \delta_\phi,\, \delta_\eta) = (\log p_T - \log p_{T,J},\, \phi - \phi_J,\, \eta - \eta_J),
+    (\delta_{\log p_T},\, \delta_\phi,\, \delta_\eta) = (\log p_T - \log p_{T,J},\, \phi - \phi_J,\, \eta - \eta_J).
     \label{eq:cfm_relative}
   \end{equation}
-  conditioned on $x_\text{reco}$, $N_\text{part}$, and $J_\text{part}$.
-  Expressing the constituent kinematics relative to the (unfolded) jet axis concentrates the distributions sharply around zero and is found to substantially improve the accuracy of the unfolding.
-  The predicted constituent kinematics are the final output of the procedure.
+  There are two benefits to this coordinate system.
+  First, the distributions of the jet kinematics are close to normally distributed, in that they have close to zero mean and unit standard deviation, which is known to be useful for generative modeling.
+  Second, the invariance of jet configurations to boosts and rotations of the collision system is used to factorize the generation process so the constituent predictor must only learn jet substructure and not more global distribution such as the jet rapidity.
+  The constituents predicted by this network are the final output of the model.
 \end{enumerate}
 
 \begin{figure}[tb]
@@ -1078,35 +1101,41 @@ The three stages, illustrated in \cref{fig:cfm_model}, are:
   \def\Jdet{J_\text{reco}}%
   \scalebox{0.82}{\input{figures/ch5/cfm_jets/model.tex}}
   \endgroup
-  \caption{Three-stage generative substructure unfolding framework of Ref.~\cite{Petitjean:2025tgk}.
-  Given a detector-level event $x_\text{reco}$, the multiplicity network (Mult.) first predicts the particle-level constituent count $N_\text{part}$.
-  The jet-level CFM network (Jet) then samples the particle-level jet kinematics $J_\text{part}$ conditioned on $x_\text{reco}$ and $N_\text{part}$.
-  Finally, the constituent CFM network (Const.) generates the full set of $N_\text{part}$ particle-level constituents $x_\text{part}$ conditioned on $x_\text{reco}$, $N_\text{part}$, and $J_\text{part}$.
+  \caption{A diagram of the three-stage posterior decomposition developing in Ref.~\cite{Petitjean:2025tgk}.
+  The posterior is conditional in only the detector-level jet represented by $x_\text{reco}$.
+  This is used to condition the multiplicity predictor (Mult) which provides the particle-level constituent count $N_\text{part}$.
+  All available information then conditions the jet predictor (Jet) which produces the particle-level jet kinematics $J_\text{part}$.
+  Finally the constituent predictor (Const) uses all available information to predict the particle-level jet constituents, in the parametrization provided by $J_\text{part}$.
   The orange squares represent the jet four-momentum components, and the yellow squares represent the constituent three-momenta $(\delta_{\log p_T}, \delta_\phi, \delta_\eta)$.}
   \label{fig:cfm_model}
 \end{figure}
 
-The decomposition provides two distinct benefits.
-First, independently trained multiplicity and jet networks allow those sub-problems to be solved with high precision without being overwhelmed by the high dimensionality of the full constituent phase space.
-Second, expressing the constituent kinematics in the relative frame of \cref{eq:cfm_relative} decouples the bulk jet kinematics from the substructure, allowing the constituent flow matching network to focus entirely on the internal structure of the jet.
-
 \subsubsection{Application to \texorpdfstring{$Z$}{Z}+Jets}
 
-The first experiment is performed with the benchmark unfolding dataset of Ref.~\cite{Andreassen:2019cjw}.
+The posterior modeling framework is applied to two different example datasets.
+The first is the well known unfolding benchmark dataset of Ref.~\cite{Andreassen:2019cjw}.
 It consists of light-flavor jets produced in association with a $Z$ boson in proton-proton collisions at $\sqrt{s} = 14$~TeV.
-The process $pp \to Z + \text{jets}$ with $p_T^Z > 150$~GeV is simulated using \textsc{Pythia}~8.243~\cite{Sjostrand:2014zea}, with detector response modeled by \textsc{Delphes}~3.4.2~\cite{deFavereau:2013fsa} using the default CMS card.
-Detector- and particle-level constituents are clustered into jets using the anti-$k_T$ algorithm~\cite{Cacciari:2008gp} with $R = 0.4$.
-The dataset contains 1.6 million jets, with 80\% used for training and the rest for evaluation.
+Strong $Z$ boson production via $pp \to Z + \text{jets}$ is simulated using \textsc{Pythia}~8.243~\cite{Sjostrand:2014zea}, with detector response modeled by \textsc{Delphes}~3.4.2~\cite{deFavereau:2013fsa} using the default CMS card.
+The $Z$ boson is required to satisfy $p_T^Z > 150$~GeV to ensure a sufficient hadronic recoil.
+Detector-level and particle-level jets are clustered with the anti-$k_T$ algorithm~\cite{Cacciari:2008gp} with $R = 0.4$.
+In total 1.6 million events are saved, with 80\% are used for training and 20\% for evaluation in what follows.
+CFM models are trained using both a standard position equivariant transformer and a Lorentz equivariant L-GATr as the underlying neural networks.
 
-The multiplicity and jet kinematics networks are trained first.
-Both converge to accurate predictions, with the multiplicity network reproducing the particle-level constituent count distribution to percent-level accuracy.
-The predicted $p_T$ and mass of the particle-level jet from the jet unfolding stage also agree with truth at the percent level.
-
-The first panel of \cref{fig:cfm_z_constituents1} shows the unfolded distributions for the jet $p_T$, $\eta$, and mass.
-Note that these quantities are computed from the unfolded constituent kinematics instead of output directly by the jet unfolding network.
-The closure is excellent and at the few-percent level throughout.
-The second row of \cref{fig:cfm_z_constituents1} shows three other derived substructure observables: the groomed momentum fraction $z_g$~\cite{Larkoski:2014wba}, the logarithm of the soft drop mass $\log\rho$, and the two-point energy-energy correlator (EEC)~\cite{Moult:2025nhu}.
-Accurate unfolding of these observables had previously only been achieved with generative models by targeting them directly. Here they are unfolded to within 10\% accuracy.
+Both the multiplicity predictor and jet predictor networks, once trained, are able to reproduce the particle-level distributions at percent-level accuracy.
+This is expected since both of these modeling tasks are low dimesional and the CFM models are more than capable of high precision in this setting.
+The difficult task is training the constituent predictor network, and in particular producing accurate distributions for derived observables, which were not accurately modeled in the previous section.
+The top row of \cref{fig:cfm_z_constituents1} compares the particle-level truth and modeled distributions for the jet \pt, $\eta$, and mass observables computed from the constituent kinematics rather than as-modeled by the jet predictor network.
+This is a non-trivial check because the constituent predictor network must ensure that the constituent kinematics produce a jet that has the correct properties when they are clustered together.
+The particle-level truth is reproduced with percent level accuracy for each of these observables by both the transformer and L-GATr based models.
+The bottom row of \cref{fig:cfm_z_constituents1} shows equivalent plots for three other derived observables relating to the jet substructure.
+These are the groomed momentum fraction $z_g$~\cite{Larkoski:2014wba}, the logarithm of the soft drop mass $\log\rho$, and the two-point energy correlator (EEC)~\cite{Moult:2025nhu}.
+The EEC in particular is an observable of current interest to the QCD community.
+See \Cref{sec:eec}.
+The $z_g$ and EEC observables are predicted with percent accuracy, while the $\log\rho$ observable shows deviations up to 10\%.
+These deviations are common to the transformer and L-GATr based models.
+% Overall the performance is much better than was shown in the previous section.
+% Again there are no comparable methods to compare these results against.
+% As of the writing of this thesis this is state-of-the-art performance for modeling posteriors with generative models in the context of unfolding.
 
 \begin{figure}[phtb]
   \centering
@@ -1116,50 +1145,63 @@ Accurate unfolding of these observables had previously only been achieved with g
   \includegraphics[width=0.325\linewidth, alt={Groomed momentum fraction z_g for Z+jets, showing percent-level agreement between truth and unfolded.}, page=30]{figures/ch5/cfm_jets/plots_z}
   \includegraphics[width=0.325\linewidth, alt={Soft drop mass log rho for Z+jets.}, page=29]{figures/ch5/cfm_jets/plots_z}
   \includegraphics[width=0.325\linewidth, alt={Two-point energy-energy correlator EEC for Z+jets.}, page=46]{figures/ch5/cfm_jets/plots_z}
-  \caption{Unfolded distributions for $Z$+jets events computed from the full set of unfolded constituent kinematics.
-  Top row: jet-level observables (transverse momentum, pseudorapidity, mass).
-  Bottom row: jet substructure observables (groomed momentum fraction $z_g$, soft drop mass $\log\rho$, and two-point EEC).
-  Both transformer (blue) and L-GATr (green) predictions are shown alongside the truth particle-level distribution (red).
-  Closure is within 10\% throughout the top row, and the bottom-row substructure observables are unfolded at the percent level in the bulk, with deviations appearing only in low-statistics tails.}
+  \caption{Comparisons between the particle-level distribution (black) and the distribution obtained by sampling the modeled prior for a set of six jet-level observables.
+  Predictions are shown for the transformer based (dotten orange) and L-GATr based (dashed green) models.
+  The detector-level distributions (blue) are also provided for visual comparison.
+  All observables are calculated from the jet constituents, rather than predicted by the jet predictor network.
+  The top row shows jet kinematics observables: the \pt, $\eta$, and mass.
+  The bottom row shows jet substructure observables: groomed momentum fraction $z_g$, soft drop mass $\log\rho$, and two-point energy correlator.
+  See \Cref{sec:eec} for a discussion of the EEC.}
   \label{fig:cfm_z_constituents1}
 \end{figure}
 
-\Cref{fig:cfm_z_constituents2} shows three more challenging substructure observables: the jet width $w \equiv \tau_1^{\beta=1}$, the 2-subjettiness $\tau_2^{\beta=1}$, and the 21-subjettiness ratio $\tau_{21}^{\beta=1}$~\cite{Thaler:2010tr}.
-The jet width is unfolded with percent level accuracy.
-The 2-subjettiness $\tau_2$ proves more challenging, and $\tau_{21}$ is the toughest observable with large deviations across the distribution.
-No difference in performance between L-GATr and the standard transformer is observed for these light-jet results.
+Plots illustrating the agreement of the sampled posterior with the particle-level truth in a few $n$-subjettiness observables~\cite{Thaler:2010tr} are provided in \Cref{fig:cfm_z_constituents2}.
+The $1$-subjettiness is modeled with percent-level precision, while the $2$-subjettiness shows a deviation between the modeled and truth distributions in the tail.
+$\tau_{21}$, or the ratio os the $2$-subjettiness to the $1$-subjettines shows deviations between the modeled distributions and the ground truth upwards of 10\%.
+As of this writing this performance is state-of-the-art for high and variable dimensional posterior modeling in the context of unfolding, but there is still room for improvement in these methods.
+As with previous observables, no differences between the transformer based and L-GATr based models is visible, indicating that the equivariant prior is not useful but also not harmful for this particular task.
 
 \begin{figure}[tb]
   \centering
   \includegraphics[width=0.325\linewidth, alt={Jet width (tau_1) for Z+jets.}, page=22]{figures/ch5/cfm_jets/plots_z}
   \includegraphics[width=0.325\linewidth, alt={2-subjettiness (tau_2) for Z+jets.}, page=23]{figures/ch5/cfm_jets/plots_z}
   \includegraphics[width=0.325\linewidth, alt={21-subjettiness ratio (tau_21) for Z+jets, showing the most challenging observable with 5-10 percent deviations.}, page=26]{figures/ch5/cfm_jets/plots_z}
-  \caption{Challenging substructure observables for $Z$+jets events computed from the unfolded constituents: jet width $w = \tau_1^{\beta=1}$, 2-subjettiness $\tau_2^{\beta=1}$, and the 21-subjettiness ratio $\tau_{21}^{\beta=1}$~\cite{Thaler:2010tr}.
-  The jet width is reproduced at percent level. The 2-subjettiness is more challenging, and $\tau_{21}$ shows 5--10\% deviations in the bulk, representing the current frontier for high-dimensional generative unfolding.}
+  \caption{Comparisons between the particle-level distribution (black) and the distribution obtained by sampling the modeled posteriors for three $n$-subjettiness observables: $1$-subjettiness ($\tau_1$), $2$-subjettiness ($\tau_2$), and the ratio of the $2$-subjettiness to the $1$-subjettiness ($\tau_{21}$).
+  Predictions are shown for the transformer based (dotten orange) and L-GATr based (dashed green) models.
+  The detector-level distributions (blue) are also provided for visual comparison.}
   \label{fig:cfm_z_constituents2}
 \end{figure}
 
 \subsubsection{Application to Boosted Top Jets}
 
-The method is also applied to the more demanding task of unfolding the full substructure of boosted top jets taken from semi-leptonic $t\bar{t}$ events~\cite{Favaro:2025psi}.
-The hard process $pp \to t\bar{t} \to (bq\bar{q}') (\bar{b}\ell\bar{\nu}) + \text{c.c.}$ is generated with \textsc{MadGraph}~5~\cite{Alwall:2011uj} assuming $m_t = 173$~GeV, parton showering and hadronization with \textsc{Pythia}~8.313~\cite{Sjostrand:2014zea}, and detector response with \textsc{Delphes}~3.5.0~\cite{deFavereau:2013fsa} using the default CMS card.
-Jets are clustered with the anti-$k_T$ algorithm~\cite{Cacciari:2008gp} with a large radius $R = 1.2$ to capture the full three-body hadronic decay of the boosted top.
-Events are required to have exactly one lepton with $p_T > 60$~GeV and $|\eta| < 2.4$, and the jet with the largest angular distance to the lepton is selected as the top jet candidate, required to satisfy $p_T > 400$~GeV and $|\eta| < 2.4$.
-After all selections, there are 6 million top jets in the dataset, with 90\% used for training and the rest for evaluation.
+As a second test of the method, we also consider modeling the posterior of all particle-level jet constituents in top quark initiated jets~\cite{Favaro:2025psi}.
+The process $pp \to t\bar{t} \to (bq\bar{q}') (\bar{b}\ell\bar{\nu}) + \text{c.c.}$ is simulated.
+Unlike in the previous section, the goal is to gather a sample of boosted top jets (see \Cref{ch:tagging}) produced by the hadronic decay of a high \pt top quark.
+Matrix elements are calculated with \textsc{MadGraph}~5~\cite{Alwall:2011uj} assuming $m_t = 173$~GeV, parton showering and hadronization are modeled with \textsc{Pythia}~8.313~\cite{Sjostrand:2014zea}, and the detector response is simulated with \textsc{Delphes}~3.5.0~\cite{deFavereau:2013fsa} using the default CMS card.
+Detector and particle level jets are clustered with the anti-$k_T$ algorithm~\cite{Cacciari:2008gp} with a large radius $R = 1.2$ so that all products of the hadronic top decay are included in a single jet.
+Events are required to have exactly one lepton with $p_T > 60$~GeV and $|\eta| < 2.4$.
+The jet with the largest angular distance to this lepton is taken to be the boosted top jet, and this jet is required to have $p_T > 400$~GeV and $|\eta| < 2.4$ to enter the dataset.
+In total 6 million simulated top jets are collected, with 90\% used for training and the rest for evaluation in what follows.
 
-Top jets present a more challenging unfolding task than $Z$+jets for three reasons.
-First, the constituent multiplicity is substantially higher due to the three-body hadronic decay $t \to W(\to q\bar{q}')b$.
-Second, the substructure is more complex, featuring three-prong structure from the three hard quarks, in contrast to the predominantly single-prong structure of light jets.
-Third, the invariant mass of the jet is sharply peaked near $m_t = 173$~GeV, the kind of sharp feature that is difficult to reproduce with generative models as discussed in \cref{sec:vl-vld}.
+Modeling the posterior of top jets is more challenging than the light quark and gluon jets for three reasons.
+First, there are generally more jet constituents in the sample of top jets because the large \pt of the initiating top quark implies a longer evolution of the parton shower and thus more final-state hadrons.
+Second, the three-body decay of the initiating top quark produces the distinct three-prong substructure that must be reproduced by the model.
+Third, the jet mass of top jets is peaked near the mass of the top quark, in contrast to light quark and gluon jets which follow a smoothly falling mass distribution.
+Given all of this, modeling the posterior of top jets is a higher dimensional task with more complex distributions that must be reproduced at particle level.
 
-The unfolding results are shown in \cref{fig:cfm_t_constituents}.
-Notably, the invariant jet mass, which is sharply peaked at the top mass, is reproduced to within 10\% accuracy by L-GATr, while the standard transformer shows a small but significant deviation in the mass peak.
-This is a large improvement over the VL-VLD results of \cref{sec:vl-vld}, where the analogous particle-level top quark mass distribution showed substantially larger mis-modeling.
-The groomed momentum fraction $z_g$ is reproduced at the percent level, while the soft drop mass remains challenging due to its narrow peak structure.
-The EEC observable, which is discussed further in \cref{ch:zjets} of this thesis, is reproduced with slight mis-modeling in the tail of the peaked distribution at the lowest values, while the shoulder around $z \approx 10^{-3}$ is well reproduced.
-The $n$-subjettiness observables $\tau_1$, $\tau_2$, $\tau_3$ and the ratios $\tau_{21}$, $\tau_{32}$, $\tau_{43}$~\cite{Thaler:2010tr} show substantially better performance for top jets than for $Z$+jets.
-This can be understood from the three-prong substructure of the top jet: the n-subjettiness observables are sensitive to the number of hard prongs in the jet, and the harder substructure of top jets makes these distributions more tractable for the generative model.
-Deviations of the ratios $\tau_{32}$ and $\tau_{43}$ from truth distributions appear only below $\tau \lesssim 0.3$, where the distribution is in the statistical tail.
+Plots analogous to those shown for the light quark and gluon task above are shown in \cref{fig:cfm_t_constituents}.
+As in the previous application, the constituent multiplicity and jet kinematics are unfolded very accurately.
+The most important observable shown in the Figure is the jet mass (top right), whose particle-level truth distribution is strongly peaked similar to the top quark mass distributions in the previous section.
+The CFM model using the factorized posterior method is able to achieve much better precision.
+The transformer based model shows deviations of up to 20\%, while the L-GATr based model keeps all deviations from the truth below 10\%.
+This is impressive performance considering that reproducing this distribution requires accurately modeling the substructure of complicated top quark initiated jets with many tens of constituents.
+These results also suggest that the equivariant prior of the L-GATr network may be useful for modeling the overall kinematics of jet constituent point clouds.
+
+Other observables, such as the groomed momentum fraction $z_g$ and the jet width $w$ are reproducedd at percent-level precision.
+Substantially better performance for the $n$-subjettiness class observables ($\tau_1$, $\tau_2$, $\tau_3$ and the ratios $\tau_{21}$, $\tau_{32}$, $\tau_{43}$) is obtained compared to the previous application.
+Generally deviations in these observables are below 10\% except in the low statistics tails.
+The EEC observable is captured slightly worse than in the previous section, possibly simply due to the high constituent multiplicity.
+In all of these other observables, the accuracy of the transformer based and L-GATr based models is comparable.
 
 \begin{figure}[p]
   \centering
@@ -1175,60 +1217,70 @@ Deviations of the ratios $\tau_{32}$ and $\tau_{43}$ from truth distributions ap
   \includegraphics[width=0.30\linewidth, alt={21-subjettiness ratio (tau_21) for top jets.}, page=30]{figures/ch5/cfm_jets/plots_t}
   \includegraphics[width=0.30\linewidth, alt={32-subjettiness ratio (tau_32) for top jets.}, page=32]{figures/ch5/cfm_jets/plots_t}
   \includegraphics[width=0.30\linewidth, alt={43-subjettiness ratio (tau_43) for top jets.}, page=33]{figures/ch5/cfm_jets/plots_t}
-  \caption{Unfolded distributions for boosted top jet events computed from the full set of unfolded constituent kinematics.
-  Both transformer (orange) and L-GATr (green) predictions are shown alongside the detector-level (blue) and truth particle-level distributions (black).}
+  \caption{Comparisons between the particle-level distribution (black) and the distribution obtained by sampling the modeled posteriors for many different jet-level observables.
+  See the captions of \Cref{fig:cfm_z_constituents1,fig:cfm_z_constituents2} for definitions.
+  All observables are calculated from the jet constituents, rather than predicted by the jet predictor network.
+  Predictions are shown for the transformer based (dotten orange) and L-GATr based (dashed green) models.
+  The detector-level distributions (blue) are also provided for visual comparison.}
   \label{fig:cfm_t_constituents}
 \end{figure}
 
 \subsubsection{Summary}
 
-Ref.~\cite{Petitjean:2025tgk} demonstrated the first generative unfolding of the full substructure of jets, achieving $\mathcal{O}(100)$-dimensional unfolding that was previously out of reach for methods using generative models for the posterior.
-The key ingredient was to decompose the unfolding task into an autoregressive setup where the results of simpler unfolding tasks were used to condition the unfolding of the complicated point-cloud that described jet substructure.
-For both light-flavor $Z$+jets and boosted top jets, all jet-level observables and most substructure observables were reproduced at the percent level.
-The most challenging observables were the $n$-subjettiness ratios, particularly $\tau_{21}$ for light jets.
-For the top jets, the jet mass is reproduced to within 10\%, which is state-of-the-art performance for a generative model and approaches the precision needed for LHC measurements.
+Ref.~\cite{Petitjean:2025tgk} builds on the results of the previous sections and demonstrates that high and variable-dimensional posteriors can be accurately modeled with machine learning methods.
+This ability opens the possibility to perform a full unfolding, using the EM algorithm, with generative methods rather than the classifier-based Omnifold method.
+Motivation for using generative methods is discussed in \Cref{sec:generative-unfolding-methods}.
+The key innovation to increase the accuracy of the modeled posterior was an auto-regressive factorization into three pieces which simplifies the point-cloud generative task.
+Most jet kinematic and jet substructure observables are modeled to within a few percent precision in both posterior modeling tasks considered.
+The most challenging observables relate to $n$-subjettiness observables, in particular the ratio $\tau_{21}$ in the light quark and gluon jets application.
+The top mass peak in the boosted top jet task was recreated to within 10\%, which is approaching the precision needed to perform a realistic measurement at the LHC.
+As of this writing, the methods presented in this section are currently state-of-the-art for modeling posteriors of jet data with generative models.
 
 \FloatBarrier
 
 \section{Omnifold}
 \label{sec:omnifold}
 
-\Omnifold~\cite{Andreassen:2019cjw} is a classifier-based implementation of the EM algorithm.
-As will be shown, it can also be understood as the limit of IBU as the bin width goes to zero.
-Rather than modeling the posterior $p(z \mid x)$ directly with a generative model as in the generative unfolding methods of \Cref{sec:generative-unfolding-methods}, \Omnifold models two likelihood ratios per EM iteration using machine-learned classifiers.
-These furnish per-event reweighting functions $w_n(m)$ defined on the detector-level phase space and $\nu_n(t)$ defined on the truth-level phase space, where $n$ is the EM iteration index.
-The product of the $\nu_n$ weights accumulated across all iterations is the final \Omnifold weight that encodes the unfolded distribution.
+\Omnifold~\cite{Andreassen:2019cjw} is a classifier-based implementation of the EM algorithm that relies on reweighting distributions rather than generative models.
+Some discussion of \Omnifold and its place in the taxonomy of machine-learning-based unfolding algorithms is provided in \Cref{sec:unfolding-methods}.
+This section will provided statistical details, including motivating \Omnifold as the zero-bin-width limit of the popular IBU binned unfolding algorithm.
 
 \subsection{EM Structure}
 \label{sec:omnifold-em}
 
-The E-step of iteration $n$ requires estimating the likelihood ratio
+Instead of modeling the posterior $p(t \mid m)$ directly as in \Cref{sec:diffusion-unfolding}\footnote{In this section, the truth-level event configuration is denoted $t$ and the detector-level event configuration is denoted $m$.}, \Omnifold relies on modeling two density ratios to build the required pieces for the EM algorithm.
+In what follows these density ratios will be called $w_{n}(m)$ for the detector-level ratio and $\nu_{n}(t)$ for the truth-level ratio.
+For iteration $n+1$ which uses the result of iteration $n$ as a starting point, performing the E-step requires the likelihood ratio
 \begin{align}
 \label{eq:omnifold-estep}
-w_n(m) = \frac{p_{\mathrm{data}}(m)}{\displaystyle\int p(m \mid t)\, \nu^{\mathrm{of}}_{n-1}(t)\, p_{\mathrm{gen}}(t)\, dt},
+w_{n+1}(m) = \frac{p_{\mathrm{data}}(m)}{\displaystyle\int p(m \mid t)\, \nu^{\mathrm{of}}_{n}(t)\, p_{\mathrm{gen}}(t)\, dt},
 \end{align}
-where $p_{\mathrm{gen}}(t)$ is the truth-level distribution of the MC generator and $\nu^{\mathrm{of}}_{n-1}(t)\, p_{\mathrm{gen}}(t)$ is the updated truth-level prior from the previous iteration.
-The denominator is the detector-level distribution of the MC simulation reweighted by $\nu^{\mathrm{of}}_{n-1}$.
-In practice this ratio is estimated by training a classifier to distinguish observed data from the reweighted detector-level MC sample.
-The forward mapping between truth-level and detector-level events provided by the simulation $p(m \mid t)$ makes it possible to draw samples from the denominator without evaluating the integral explicitly, since each simulated event already carries a paired truth-level and detector-level configuration.
-Comparing \Cref{eq:omnifold-estep} with the IBU E-step in \Cref{eq:ibu2}, the ratio $w_n(m)$ plays the same role as $d_j$ divided by the denominator with the sum over bins replaced by an integral over the continuous detector-level space.
+where $p_{\mathrm{gen}}(t)$ is the truth-level distribution of the MC generator, $p_{\mathrm{data}}(m)$ is the data distribution, and $\nu^{\mathrm{of}}_{n}(t)$ is the \textit{unfolding function} that gives the current best estimate truth-level distribution at iteration $n$.
+The likelihood ratio is then between the detector-level data and the current best-estimate truth-level distribution pushed to detector level via the detector simulation, and can be intuitively understood as a reweighting function that shifts the detector-level MC simulation to match the data.
+In practice $w_{n+1}(m)$ is estimated by training a classifier to distinguish the detector-level data from the detector-level simulation.
+The ratio estimate can then be used to compute the E-step in \Cref{eq:ibu-continuous-estep} by noting that it is exactly the denominator of the fraction multiplied by the data density.
+To estimate the joint density, all that is left is to multiply this ratio by the numerator of the fraction, which is proportional to the posterior $p(t \mid m)$ via Bayes' theorem.
+This is done by pulling events at detector-level back through the detector simulation to produce truth-level events that have been reweighted by the density ratio $w_{n+1}(m)$.
+Note the posterior is no longer explicitly modeled.
+Instead the one-to-one mapping between truth-level and detector-level events is interpreted as the posterior.
+The end result is an estimate of the joint density $p_{(n+1)}(t, \, m)$ provided by a sample of Monte Carlo events that has been reweighted at detector level to match the data.
 
-The M-step computes the likelihood ratio at truth-level
+Performing the M-step of iteration $n+1$ requires the likelihood ratio
 \begin{align}
 \label{eq:omnifold-mstep}
-\nu_n(t) = \frac{\displaystyle\int w_n(m)\, p(m \mid t)\, dm}{\nu^{\mathrm{of}}_{n-1}(t)\, p_{\mathrm{gen}}(t)}.
+\nu_{n+1}(t) = \frac{\displaystyle\int w_n(m)\, p(t \mid m)\, dm}{\nu^{\mathrm{of}}_{n}(t)\, p_{\mathrm{gen}}(t)}.
 \end{align}
-The numerator is the expected value of the detector-level reweighting function $w_n(m)$ under $p(m \mid t)$, normalized by the current prior.
-Again draws from this distribution can be obtained without estimating the integral by using the mapping between truth-level and detector-level events provided by the simulation.
-The numerator is the continuous analog of the sum over $j$ in \Cref{eq:ibu1}, showing that \Omnifold is the zero-bin-width limit of IBU.
-In practice $\nu_n(t)$ is estimated by training a second classifier to distinguish reweighted truth-level MC events (carrying the push-forward of $w_n$) from the current prior truth-level MC events.
-
-The prior is then updated via
+The numerator is the result of the E-step integrated over the detector-level events $m$ as in \Cref{eq:ibu-continuous-mstep}.
+The denominator is the current best-estimate truth-level distribution.
+The likelihood ratio is then between the particle-level MC sample, reweighted by the ratio in \Cref{eq:omnifold-estep}, and the particle-level MC sample reweighted by the current unfolding function $\nu^{\mathrm{of}}_{n}(t)$.
+This can be interpreted as a correction to the reweighting function that matches it to the new estimate of the joint distribution provided by the E-step.
+In practice $\nu_n(t)$ is estimated by training a second classifier to distinguish the truth-level MC events reweighted by the pulled $w_{n+1}(m)$ weights from the truth-level MC events reweighted by the unfolding function.
+The unfolding function is then updated via
 \begin{align}
 \label{eq:omnifold-prior-update}
-\nu^{\mathrm{of}}_n(t) = \nu_n(t)\, \nu^{\mathrm{of}}_{n-1}(t),
+\nu^{\mathrm{of}}_{n+1}(t) = \nu_{n+1}(t)\, \nu^{\mathrm{of}}_{n}(t).
 \end{align}
-and the full \Omnifold weight after $N$ iterations is the accumulated product $\nu^{\mathrm{of}}_N(t)$.
+After the desired number of iterations $N$ has been run, the final output of \Omnifold is the reweighting function $\nu^{\mathrm{of}}_N(t)$.
 This procedure has been shown to converge to the maximum likelihood solution of the folding equation in the Appendix of Ref.~\cite{Andreassen:2019cjw}. 
 Alternatively, this can also be understood as the zero-bin-width limit of the analogous arguments for IBU~\cite{Shepp:1982}.
 
@@ -1237,58 +1289,65 @@ Alternatively, this can also be understood as the zero-bin-width limit of the an
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=1.0\linewidth]{figures/ch5/omnifold_schematic.pdf}
-    \caption{Schematic illustration of the \Omnifold procedure, reproduced from Ref.~\cite{ATLAS:2024xxl} under a CC~BY~4.0 license.
-    Two classifiers are trained per EM iteration.
-    Step~1 trains at detector level to reweight MC simulation to data.
-    Step~2 trains at truth level to push those weights back to the truth-level simulation.
-    The updated weights serve as the prior for the next iteration.
-    In the $Z$+jets measurement of \Cref{ch:zjets}, seven iterations are run.}
+    \includegraphics[width=1.0\linewidth]{figures/ch5/Omnifold-figure.pdf}
+    \caption{Schematic illustration of the \Omnifold procedure.
+    Two classifiers are trained per iteration.
+    Step~1 trains a classifier at detector level to reweight MC simulation to data.
+    Step~2 trains a classifier at truth level to reweight the MC simulation to itself with the weights derived in step 1 applied.
+    The MC simulation with weights calculated in step 2 then serve as the prior for the next iteration.
+    The choice of seven iterations is to align with the implementation of \Omnifold in \Cref{ch:zjets}.}
     \label{fig:omnifold-schematic}
 \end{figure}
 
-The EM procedure described above maps onto a concrete two-step algorithm, illustrated in \Cref{fig:omnifold-schematic}.
+The practical steps needed for the EM algorithm described above are illustrated in \Cref{fig:omnifold-schematic} and described in what follows.
 
 \textbf{Step 1.}
-A classifier is trained to separate observed data from a detector-level MC sample.
-If this is not the first iteration, the MC sample carries weights from the previous iteration.
-The classifier furnishes the reweighting function $w_n(m)$ that adjusts the detector-level MC distribution to match the data.
+Train a classifier to distinguish the data from a detector-level MC sample.
+If this is the first iteration the MC sample carries the raw event weights produced by the event generator.
+If it is not the first iteration, the MC sample carries the event weights formed by multiplying the event generator weights with the current particle-level unfolding function pushed to detector-level.
+The output of the classifier is interpreted as a reweighting function $w_n(m)$ that adjusts the detector-level MC distribution to match the data.
 
 \textbf{Pull to truth level.}
-The detector-level weights $w_n(m)$ are propagated to the truth-level simulation by assigning each truth-level MC event the weight of its paired detector-level counterpart\footnote{Events that pass the truth-level event selection but fail the detector-level selection can be assigned the weight of the prior, which is provided by the event generator.}.
+Pull the detector-level weights for the MC sample assigned by $w_n(m)$ to truth-level using the one-to-one mapping between detector-level and truth-level events\footnote{Events that pass the truth-level event selection but fail the detector-level selection can be assigned the weight of the prior, which is provided by the event generator.}.
 
 \textbf{Step 2.}
-A second classifier is trained to separate the reweighted truth-level MC (signal) from the raw, or previously weighted, truth-level MC (background).
-When training this classifier the events forming signal and background are identical and differ only by their weights.
-The classifier output furnishes $\nu_n(t)$, which is multiplied by all weights from previous iterations to obtain the updated \Omnifold weight $\nu^{\mathrm{of}}_n(t)$ via \Cref{eq:omnifold-prior-update}.
+Train a classifier to distinguish the truth-level MC sample reweighted by the pulled weights from the truth-level MC sample reweighted by the current unfolding function.
+In the first iteration the unfolding function is simply the raw event weights produced by the event generator.
+In the second and subsequent iterations the unfolding function is the composition of all previous step 2 reweighting functions.
+Importantly in step 2 the classifier is trained to distinguish the truth-level MC sample from itself, with the only difference between the classes being the event weights.
+The output of the classifier is interpreted as a reweighting function $\nu_n(t)$ that adjusts the unfolded distribution to match the pulled-weights distribution.
+The weights provided by this function are multiplied by the weights provided by all previous step 2 reweightings to produce the updated \Omnifold weights $\nu^{\mathrm{of}}_n(t)$.
 
 \textbf{Push to detector level.}
-If the desired number of iterations has been reached, the procedure terminates.
-The unfolded result is the truth-level MC simulation together with the final weights $\nu^{\mathrm{of}}_N(t)$.If more iterations are required, the updated weights are pushed back to the detector-level simulation and Steps 1 and 2 repeat\footnote{Events that pass the detector-level event selection but fail the truth-level selection can be assigned the weight of the prior at this step as well}.
+If the desired number of iterations has been run the procedure terminates and the \Omnifold weights are the result.
+Otherwise the \Omnifold weights are pushed to detector level, again using the one-to-one mapping between detector-level and truth-level events\footnote{Events that pass the detector-level event selection but fail the truth-level selection can be assigned the weight of the prior at this step as well. Note that every event will receive an adjustment by the step 1 or step 2 trainings, but only the events that pass the truth-level selection will be present in the final result.}.
+These pushed weights are used as the starting point for the next iteration.
 
 \subsection{Properties}
 \label{sec:omnifold-properties}
 
-Several features of \Omnifold are worth noting:
+A few features of \Omnifold should be noted explicitly before moving on.
 \begin{itemize}
   \item \textbf{Physical consistency.}
-    The output is a reweighted MC simulation, not a set of generated samples.
-    All events therefore satisfy energy and momentum conservation by construction, since they are the output of an MC generator.
-    This is not guaranteed by generative model based approaches, where the generated samples may not lie exactly on the physical manifold.
+    The output of the procedure is the reweighting function $\nu^{\mathrm{of}}_n(t)$ which is applied to a set of truth-level simulated events.
+    These events can be binned to construct a cross section measurement as discussed in \Cref{sec:zjets-method-norm}.
+    Given the events are produced by a theory-motivated event generator, they are constrained to satisfy conservation laws such as energy and momentum by construction.
+    This is not necessarily true for some generative approaches to unfolding, where samples from a generative model are not constrained to lie exactly on the manifold of physical event configurations.
 
   \item \textbf{Variable-dimensional distributions.}
-    Both Step~1 and Step~2 classifiers operate on event representations at detector and truth level respectively.
-    When the unfolding targets the full final-state phase space, these representations are variable-length particle lists, and a set-processing neural network (see \Cref{ch:ml}) can be used.
-    Crucially, training a set-processing classifier is substantially easier than training a set-conditional set-generative model, which is the alternative in the generative EM approach.
+    Extension of \Omnifold to variable-dimensional settings requires only replacing list-processing classifiers with set-processing classifiers, for example the neural networks used for jet classification in \Cref{ch:tagging}.
+    These classifiers are substantially easier to design and train than the set conditional and set generative models developed in \Cref{sec:diffusion-unfolding}.
 
   \item \textbf{Flexibility in classifier choice.}
-    In low- to moderate-dimensional fixed-observable tasks, neural networks are not required.
-    Gradient-boosted decision trees are fast to train and achieve comparable performance to neural networks in these cases.
+    Neural networks are used to estimate the likelihood ratios in \Cref{ch:zjets}, but in many applications, especially measurements which target low and fixed dimensional measurements, they are not required and may even be sub-optimal.
+    Simpler and computationally cheaper methods such as boosted decision trees can also be used to estimate likelihood ratios in these cases.
 
   \item \textbf{Terminology.}
-    The case where a single observable is unfolded in an unbinned fashion is called \textit{Unifold}, unfolding a fixed set of several observables is called \textit{Multifold}, and unfolding the full final-state phase space is \textit{Omnifold} in the strict sense (though the name \Omnifold is also used as an umbrella term to refer to the algorithm as a whole).
-    All existing experimental measurements in \Cref{tab:unbinned-unfolding-measurements}, with the exception of the H1 preliminary result~\cite{H1:prelim}, use Multifold.
+    The terminology surrounding \Omnifold can be confusing.
+    In the original paper~\cite{Andreassen:2019cjw}, utilizing the procedure above to unfold one observable in an unbinned fashion was called \textit{Unifold}, utilizing the procedure to unfold a fixed-length list of several observables was called \textit{Multifold}, and utilizing the procedure to produce a full phase space unfolding was called \textit{Omnifold}.
+    However over time the name \Omnifold has become an umbrella term that refers to the procedure itself, and covers each of the uses above.
+    In this thesis, the small-caps \Omnifold refers to the procedure while Multifold refers to the specific application of the procedure to unfold a fixed-length list of observables.
+    All existing experimental measurements in \Cref{tab:unbinned-unfolding-measurements}, with the exception of the H1 preliminary result~\cite{H1:prelim}, utilize Multifold.
 \end{itemize}
 
-\Omnifold is central to this thesis because it has been deployed on experimental ATLAS data to perform a high-dimensional $Z$+jets cross section measurement.
-This measurement is the subject of \Cref{ch:zjets}.
+The application of \Omnifold to produce a full phase space measurement of $Z$+jets production is the subject of the next chapter.
