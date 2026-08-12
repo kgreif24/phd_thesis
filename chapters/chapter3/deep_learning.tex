@@ -134,16 +134,16 @@ The intuition is that parameters with consistently large (small) gradients recei
 \subsubsection{Generalization and Regularization}
 
 A trained model may not perform well on unseen data if it has ``memorized'' the specific data points rather than learning the underlying function.
-This is called \textit{overfitting}, and is best understood as one extreme of the \textit{bias-variance tradeoff}.
+This is called \textit{overfitting}, and is best understood as one extreme of the \textit{bias--variance tradeoff}.
 A model with low capacity will be unable to fit the training data (high bias) and will simply predict a best guess for all data points (low variance).
 A model with high capacity is able to memorize specific training examples (low bias), but can overfit to the data and yield very different results for only slightly different inputs (high variance).
-\Cref{fig:bias_variance} illustrates overfitting and the bias-variance tradeoff in a 1D regression problem solved with a polynomial fit.
+\Cref{fig:bias_variance} illustrates overfitting and the bias--variance tradeoff in a 1D regression problem solved with a polynomial fit.
 A model with too little capacity (e.g. too few polynomial degrees) underfits and has high bias, while a model with too much capacity (e.g. too many polynomial degrees) that is not properly regularized overfits and has high variance.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.8\linewidth, alt={Three scatter plots with fitted curves illustrating the bias-variance tradeoff. The left plot shows an underfit model with a straight line that misses the curved trend in the data (high bias). The center plot shows a well-fit smooth curve that captures the underlying trend. The right plot shows an overfit model with a highly wiggly curve that passes through noise (high variance).}]{figures/ch3/bias_variance.pdf}
-    \caption{Illustration of the bias-variance tradeoff in the context of a 1D regression problem fitting a polynomial model. An underfit model with one polynomial degree (left) has high bias and fails to capture the true structure in the data. An overfit model with many polynomial degrees (right) has high variance and memorizes noise rather than the underlying function. The goal is to find the intermediate regime (center) that generalizes well.}
+    \includegraphics[width=0.8\linewidth, alt={Three scatter plots with fitted curves illustrating the bias--variance tradeoff. The left plot shows an underfit model with a straight line that misses the curved trend in the data (high bias). The center plot shows a well-fit smooth curve that captures the underlying trend. The right plot shows an overfit model with a highly wiggly curve that passes through noise (high variance).}]{figures/ch3/bias_variance.pdf}
+    \caption{Illustration of the bias--variance tradeoff in the context of a 1D regression problem fitting a polynomial model. An underfit model with one polynomial degree (left) has high bias and fails to capture the true structure in the data. An overfit model with many polynomial degrees (right) has high variance and memorizes noise rather than the underlying function. The goal is to find the intermediate regime (center) that generalizes well.}
     \label{fig:bias_variance}
 \end{figure}
 
@@ -157,7 +157,7 @@ A simple regularization strategy is early stopping, in which training is termina
 The training loss (blue curve) decreases monotonically except for small noise caused by the stochastic gradient estimates computed on mini-batches.
 The validation loss (red curve) follows the training loss initially before flattening out and beginning to increase as the model overfits.
 The configuration of model weights that offers the best generalization (lowest validation loss) is marked in the Figure.
-In early stopping, training is stopped after the validation loss fails to decrease for some number of epochs, called the \textit{patience}, to account for the noise in the validation loss.\footnote{The relationship between model capacity, dataset size, and generalization in modern overparameterized networks with many more parameters than training examples is more subtle than the usual bias-variance tradeoff picture. Very large models that are trained well past the point of interpolating the training data sometimes exhibit \textit{double descent}: a second regime in which increasing capacity or training time actually improves generalization.}
+In early stopping, training is stopped after the validation loss fails to decrease for some number of epochs, called the \textit{patience}, to account for the noise in the validation loss.\footnote{The relationship between model capacity, dataset size, and generalization in modern overparameterized networks with many more parameters than training examples is more subtle than the usual bias--variance tradeoff picture. Very large models that are trained well past the point of interpolating the training data sometimes exhibit \textit{double descent}: a second regime in which increasing capacity or training time actually improves generalization.}
 
 \begin{figure}[t]
     \centering
