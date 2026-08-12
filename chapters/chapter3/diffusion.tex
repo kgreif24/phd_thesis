@@ -2,8 +2,8 @@
 \section{Diffusion and Flow-Matching Models}
 \label{sec:diffusion}
 
-Diffusion models and flow-matching models are the current state of the art in standard generative modeling tasks like image generation.
-Both decompose the complex single-step transformation between a latent-variable distribution and the data distribution modeled by the decoder network of a VAE into many small, tractable steps.
+Diffusion and flow-matching models are the current state of the art in many generative tasks such as image generation.
+Both classes of models decompose the complex single-step transformation between a latent-variable distribution and the data distribution modeled by the decoder network of a VAE into many small, tractable steps.
 This is similar to flow based models, except the ``forward'' mapping between the latent-variable and data distributions is not required to be bijective.
 Instead the mapping from the data distribution to the latent-variable distribution is fixed, not learned, and the model learns only the reverse mapping.
 
@@ -18,12 +18,12 @@ More specifically this is a Markov chain over $T$ discrete time steps:
     \label{eqn:forward_step}
 \end{equation}
 where $\{\beta_t\}_{t=1}^T$ is a fixed \textit{noise schedule} with $0 < \beta_t \ll 1$.
-The joint forward distribution over the full chain is
+The joint forward distribution after $T$ steps is a product over \Cref{eqn:forward_step} for each time step:
 \begin{equation}
     q(x_{1:T} \mid x_0) = \prod_{t=1}^{T} q(x_t \mid x_{t-1}).
     \label{eqn:forward_joint}
 \end{equation}
-By choosing the noise schedule so that $\prod_{t=1}^T (1 - \beta_t) \to 0$, the probability of $x$ at time step $T$ becomes $q(x_T \mid x_0) \approx \mathcal{N}(0, I)$ for sufficiently large $T$.
+Under any noise schedule $\beta_t$ that satisfies $\prod_{t=1}^T (1 - \beta_t) \to 0$, the joint forward distribution becomes a standard normal $q(x_T \mid x_0) \approx \mathcal{N}(0, I)$ for sufficiently large $T$.
 In other words, adding increasingly high variance noise to the data sample will eventually result in a pure-noise sample.
 This pure noise distribution can be sampled from easily, analogous to the standard Gaussian latent variable distribution in a normalizing flow model.
 The goal of a diffusion model is then to learn the reverse of this process, that evolves a pure-noise sample back to the data distribution.
@@ -31,15 +31,17 @@ In what follows the definitions $\alpha_t = 1 - \beta_t$ and $\bar\alpha_t = \pr
 
 \subsubsection{The DDPM Objective as a Hierarchical ELBO}
 
-In the standard denoising diffusion probabilistic model (DDPM) objective, the generative model learns the reverse process
+The goal of the denoising diffusion probabilistic model (DDPM) objective is to learn the reverse process
 \begin{equation}
     p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\!\left(x_{t-1};\; \mu_\theta(x_t, t),\; \sigma_t^2 I\right),
     \label{eqn:reverse_step}
 \end{equation}
 which is parameterized by a neural network $\mu_\theta$ and a diagonal variance matrix which evolves with time $\sigma_t^2 I$.
-Starting from $p(x_T) = \mathcal{N}(0, I)$, iteratively applying \Cref{eqn:reverse_step} for $t = T, T-1, \ldots, 1$ produces a sample from the learned data distribution.
-The model is trained by maximizing a lower bound on $\log p_\theta(x_0)$, as was the case for VAEs~\cite{kingma2021variational}.
-The training objective has the same ELBO structure derived in \Cref{sec:vae}, but applied to a hierarchical latent variable model with $T$ latent variables $x_1, \ldots, x_T$:
+Given a starting sample from $p(x_T) = \mathcal{N}(0, I)$, repeatedly sampling from the learned distribution in \Cref{eqn:reverse_step} for time steps $t = T, T-1, \ldots, 1$ eventually yields a sample from the learned data distribution.
+This repeated sampling is a weakness of diffusion and flow matching models: inference on a neural network must be run $T$ times to generate just one sample from the data distribution.
+
+As was the case for VAEs, diffusion models are trained by maximizing a lower bound (ELBO) on $\log p_\theta(x_0)$~\cite{kingma2021variational}.
+The structure is identical to the one deried in \Cref{sec:vae}, but instead of a single KL-term enforcing a prior constraint on the latent variable $z$, there are many KL-terms each enforcing a prior constraint on the many latent variable latent variables $x_1, \ldots, x_T$:
 \begin{align}
     \log p_\theta(x_0)
     &\geq \mathbb{E}_{q}\!\left[\log p_\theta(x_0 \mid x_1)\right]
@@ -47,11 +49,12 @@ The training objective has the same ELBO structure derived in \Cref{sec:vae}, bu
     &\quad - \sum_{t=2}^{T} \underbrace{D_\text{KL}\!\left(q(x_{t-1} \mid x_t, x_0) \;\|\; p_\theta(x_{t-1} \mid x_t)\right)}_{L_{t-1}}.
     \label{eqn:ddpm_elbo}
 \end{align}
-The first term is a reconstruction term at $t=1$.
-The second term enforces that the posterior at time step $T$ is the pure-noise distribution.
+The first term in this Equation is identical to the reconstruction term in \Cref{eqn:elbo}.
+The second term enforces a Gaussian prior (pure noise) on the distribution of the highest-noise latent variable $x_T$.
 This is a constant term that does not depend on the model parameters $\theta$ given the noise process is not learned in the standard DDPM objective.
 The important terms are contained in the sum over $t$.
-Each $L_{t-1}$ compares the learned reverse step $p_\theta(x_{t-1} \mid x_t)$ against the \textit{fixed} forward-process posterior $q(x_{t-1} \mid x_t, x_0)$, which is tractable because the forward process is Gaussian:
+Each $L_{t-1}$ enforces that the \textit{learned} posterior $p_\theta(x_{t-1} \mid x_t)$ matches the \textit{fixed} forward process posterior $q(x_{t-1} \mid x_t, x_0)$ that can be computed in closed form.
+This is possible because the posterior of a product of Gaussian likelihoods is also a Gaussian:
 \begin{equation}
     q(x_{t-1} \mid x_t, x_0)
     = \mathcal{N}\!\left(x_{t-1};\; \tilde\mu_t(x_t, x_0),\; \tilde\beta_t I\right),
@@ -66,8 +69,7 @@ with
     \tilde\beta_t = \frac{1 - \bar\alpha_{t-1}}{1 - \bar\alpha_t}\,\beta_t.
     \label{eqn:posterior_mean}
 \end{equation}
-Crucially, the forward-process posterior \Cref{eqn:forward_posterior}\footnote{Note this is not to be confused with the latent-variable posterior $q_\phi(z|x)$ which is learned by the encoder network in a VAE.} is \textit{fixed} and Gaussian.
-Each term $L_{t-1}$ is the KL divergence between two Gaussians and reduces to a standard MSE loss between the predicted and true means.
+Under these equations the KL-terms in \Cref{eqn:ddpm_elbo} can be computed in closed form as the MSE loss between the means of the learned posterior and the fixed forward process posterior.
 
 \subsubsection{The Noise Prediction Objective}
 
@@ -91,20 +93,20 @@ where $\varepsilon_\theta$ is a neural network that predicts the noise $\varepsi
     L_{t-1} \propto \mathbb{E}_{x_0,\,\varepsilon}\!\left[\left\|\varepsilon - \varepsilon_\theta\!\left(\sqrt{\bar\alpha_t}\,x_0 + \sqrt{1-\bar\alpha_t}\,\varepsilon,\; t\right)\right\|^2\right].
     \label{eqn:ddpm_loss}
 \end{equation}
-The full training objective is therefore a sum of MSE losses, each comparing the network's predicted noise to the true noise injected at time step $t$.
-In practice, Ho et al.~\cite{Ho:2020ddpm} found that uniform random sampling of $t$ at each training step, rather than summing all terms, works well and further simplifies training.
+The final training objective is then an MSE loss comparing the network's predicted noise to the true noise injected at time step $t$.
+Typically uniform random sampling over the time step $t$ is used in training, rather than ensuring all terms are summed to calculate the loss before taking an optimizer step.
 The training algorithm is:
 \begin{enumerate}
     \item Sample $x_0 \sim p_\text{data}$, $t \sim \text{Uniform}(1, T)$, $\varepsilon \sim \mathcal{N}(0, I)$.
     \item Construct $x_t = \sqrt{\bar\alpha_t}\,x_0 + \sqrt{1 - \bar\alpha_t}\,\varepsilon$ via \Cref{eqn:xt_reparam}.
     \item Take a gradient step to minimize $\|\varepsilon - \varepsilon_\theta(x_t, t)\|^2$.
 \end{enumerate}
-The overall structure of the forward and reverse processes is illustrated in \Cref{fig:ddpm}.
+A diagram giving an overview of this process is provided in \Cref{fig:ddpm}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\linewidth]{figures/ch3/ddpm_diagram.pdf}
-    \caption{The forward (top) and reverse (bottom) processes of a denoising diffusion probabilistic model. The forward process $q$ progressively adds Gaussian noise to a data sample $x_0$ until it reaches approximately isotropic noise at $x_T$. The reverse process $p_\theta$, learned by a neural network, iteratively denoises $x_T$ back to a data sample. Figure adapted from~\cite{Ho:2020ddpm}.}
+    \caption{The forward (top) and reverse (bottom) processes of a denoising diffusion probabilistic model. The forward process $q$ progressively adds Gaussian noise to a data sample $x_0$ until the data sample is a draw from a Gaussian distribution. A neural network $p_\theta$ models the reverse process  $p_\theta$, iteratively denoising $x_T$ back to a data sample. Figure adapted from~\cite{Ho:2020ddpm}.}
     \label{fig:ddpm}
 \end{figure}
 
@@ -115,7 +117,7 @@ The drawback is that model inference must be run many times to generate a new sa
 
 \subsubsection{DDPM Sampling}
 
-To generate a new sample, one draws $x_T \sim \mathcal{N}(0, I)$ and iterates the learned reverse step for $t = T, \ldots, 1$.
+To generate a sample from the data distribution with a trained DDPM model, a sample of noise is drawn from $x_T \sim \mathcal{N}(0, I)$ and is repeatedly passed through the neural network for time steps $t = T, \ldots, 1$.
 Formally the forward process \Cref{eqn:forward_step} can be interpreted as the discretization of a \textit{stochastic differential equation} (SDE)~\cite{Song:2021score}.
 The reverse of this process is also an SDE, which can be solved by numerical methods using the noise predictions from the model as input.
 An example is the PNDM solver~\cite{liu2022pseudo} used in Ref.~\cite{Shmakov:2023kjj}, but many other solvers exist.
@@ -125,7 +127,7 @@ Ref.~\cite{Song:2021score} also shows that every forward SDE has a corresponding
     \label{eqn:prob_flow_ode}
 \end{equation}
 where $f$ and $g$ are the drift and diffusion coefficients of the forward SDE and $\nabla_x \log q_t(x)$ is the \textit{score function} of the marginal distribution at time $t$.
-Since $\varepsilon_\theta(x_t, t) \approx -\sqrt{1 - \bar\alpha_t}\,\nabla_{x_t} \log q_t(x_t)$, a trained diffusion model can solve either the stochastic reverse SDE or the deterministic probability flow ODE.
+Since $\varepsilon_\theta(x_t, t) \approx -\sqrt{1 - \bar\alpha_t}\,\nabla_{x_t} \log q_t(x_t)$, the same neural network can be used to solve either the stochastic SDE or deterministic ODE.
 The ODE solution can be understood as the continuous-time generalization of normalizing flows~\cite{chen2018neural}.
 This connection is made more apparent in the flow matching models in the next section.
 
@@ -133,32 +135,34 @@ This connection is made more apparent in the flow matching models in the next se
 \subsection{Flow Matching}
 \label{sec:flow_matching}
 
-Flow matching~\cite{lipman2022flow} is a closely related framework that trains a model to directly predict the \textit{vector field} that transports a noise distribution to the data distribution, rather than predicting added noise.
-The starting point is the \textit{continuity equation}: if $p_t(x)$ is a time-dependent density evolving under the vector field $v_t(x)$, then
+Flow matching~\cite{lipman2022flow} is a closely related class of models.
+Instead of predicting the noise added to a data sample, flow matching models predict a \textit{vector field} that transports the noise distributino to the data distribution.
+Given a time-dependent density $p_t(x)$ evolving under the vector field $v_t(x)$, the continuity equation supplies a constraint to keep the density normalized as with any solution to a PDE:
 \begin{equation}
     \frac{\partial p_t}{\partial t} + \nabla \cdot (p_t\,v_t) = 0.
     \label{eqn:continuity}
 \end{equation}
-Given a source distribution $p_0 = \mathcal{N}(0, I)$ and a target $p_1 = p_\text{data}$, the goal is to learn a neural network $u_\theta(x, t)$ that approximates the vector field $v_t$ generating a probability path $\{p_t\}_{t \in [0,1]}$ connecting them.
+At $t = 0$, $p_0 = \mathcal{N}(0, I)$ and at $t=1$, $p_1 = p_\text{data}$.
+The goal is then to train a neural network $u_\theta(x, t)$ that approximates the vector field $v_t$ which connects these two endpoints as the source distribution evolves under the continuity equation.
 
-The marginal vector field $v_t(x)$ is generally intractable to compute directly, but the \textit{conditional} vector field $u_t(x \mid x_1)$, which generates the conditional path $p_t(x \mid x_1)$ for a fixed data point $x_1$, has the same expected gradient as the marginal vector field and yields an equivalent training objective~\cite{lipman2022flow}:
+The marginal vector field $v_t(x)$ is intractable, but the \textit{conditional} vector field $u_t(x \mid x_1)$ for a single data point $x_1$ has the same expected gradient as the marginal vector field and yields an equivalent training objective~\cite{lipman2022flow}:
 \begin{equation}
     \mathcal{L}_\text{CFM}(\theta)
     = \mathbb{E}_{t,\,x_1 \sim p_\text{data},\,x_t \sim p_t(\cdot \mid x_1)}
       \left\| u_\theta(x_t, t) - u_t(x_t \mid x_1) \right\|^2.
     \label{eqn:cfm_loss}
 \end{equation}
-The conditional vector field $u_t(x \mid x_1)$ depends on the choice of conditional probability path.
-With Gaussian conditional paths $p_t(x \mid x_1) = \mathcal{N}(x;\, \mu_t(x_1),\, \sigma_t^2 I)$, the CFM objective is equivalent to the DDPM objective~\cite{lipman2022flow}.
+Different choices of conditional probability paths imply different conditional vector fields and different training objectives.
+Under Gaussian conditional paths $p_t(x \mid x_1) = \mathcal{N}(x;\, \mu_t(x_1),\, \sigma_t^2 I)$ the CFM objective becomes equivalent to the DDPM objective~\cite{lipman2022flow}.
 Alternatively one could just interpolate between the noise and target data points,
 \begin{equation}
     x_t = (1 - t)\,x_0 + t\,x_1, \qquad x_0 \sim \mathcal{N}(0, I),
     \label{eqn:linear_path}
 \end{equation}
-for which the conditional vector field is simply $u_t(x \mid x_1) = x_1 - x_0$.
+for which the conditional vector field takes the simple form $u_t(x \mid x_1) = x_1 - x_0$.
 The straight paths in data space are much simpler to integrate than the curved trajectories that result from Gaussian conditional paths.
 This means flow matching models trained with these paths typically require fewer neural function evaluations to generate a sample accurately.
-\Cref{fig:flow_matching} illustrates the difference between diffusion trajectories and linear flow-matching paths.
+\Cref{fig:flow_matching} shows the difference between diffusion trajectories and linear flow-matching paths.
 
 \begin{figure}[ht]
     \centering
@@ -171,7 +175,7 @@ This means flow matching models trained with these paths typically require fewer
 \subsection{Applications in HEP and Comparative Performance}
 \label{sec:diffusion_hep}
 
-Diffusion models were adopted quickly within HEP after they demonstrated state-of-the-art performance on image generation tasks in 2021~\cite{Ho:2020ddpm,Song:2021score}.
+Diffusion models were first applied in HEP after they demonstrated state-of-the-art performance on image generation tasks in 2021~\cite{Ho:2020ddpm,Song:2021score}.
 The first applications targeted fast calorimeter shower simulation~\cite{Mikuni:2022xry,Amram:2023onf}, a task which aims to train a model to generate calorimeter showers based on a training set generated from the realistic but expensive \textsc{Geant4} simulation used by most particle physics experimental collaborations~\cite{GEANT4:2002zbu}.
 Diffusion and flow-matching models have since been applied to anomaly detection and unfolding, the latter being a central topic of \Cref{ch:unfolding}.
 Given calorimeter simulation is the most obviously useful application of generative models in HEP and provides a very useful benchmark, it's worth showing some results a community challenge in this domain here.
