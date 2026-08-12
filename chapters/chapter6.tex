@@ -14,7 +14,7 @@ The rest of the plots should be considered a work in progress.
 \begin{figure}[htb]
     \centering
     \input{figures/ch6/lo_feynman_diagrams}
-    \caption{Leading-order Feynman diagrams for $V$+jets production ($V = Z$ or $W$) in proton--proton collisions.
+    \caption{Leading order Feynman diagrams for $V$+jets production ($V = Z$ or $W$) in proton--proton collisions.
     (a,\,b) The quark--antiquark annihilation channel $q\bar{q}' \to V g$, with the vector boson emitted from the quark leg (a) or the antiquark leg (b).
     (c,d) The quark--gluon Compton channel $qg \to Vq$, with the vector boson emitted after (c) or before (d) the gluon is absorbed.
     For $Z$ production $q$ and $\bar{q}'$ are the same flavour and for $W$ production they are different flavours.
@@ -25,7 +25,7 @@ The rest of the plots should be considered a work in progress.
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.85\linewidth, alt={Diagram of Z+jets production in proton--proton collisions, illustrating the hard scatter that produces the Z boson and associated partons, the parton shower, and the hadronization into final-state charged and neutral hadrons that are observed in the detector.}]{figures/ch6/zjets_production.pdf}
-    \caption{Schematic illustration of $Z$+jets production and other possible processes in a single proton--proton collision. Two partons, a gluon from the left proton and a quark from the right, participate in a hard scatter producing a $Z$ boson recoiling against a quark. The $Z$ boson decays to two muons. The quark initiates the parton shower and hadronization processes, resulting in a collimated spray of hadrons. Additional processes produce radiation that did not result from the hard scatter. Beam--beam remnants (BBR) are hadrons resulting from the parton shower and hadronization of partons that did not participate in the hard scatter. Initial and final-state radiation (ISR and FSR) result in radiation from the initial and final states of the hard scatter process. Finally multiple parton interactions (MPI) can occur between partons in the colliding protons that do not participate in the hard scatter.}
+    \caption{Schematic illustration of $Z$+jets production and other possible processes in a single proton--proton collision. Two partons, a gluon from the left proton and a quark from the right, participate in a hard scatter producing a $Z$ boson recoiling against a quark. The $Z$ boson decays to two muons. The quark initiates the parton shower and hadronization processes, resulting in a collimated spray of hadrons. Additional processes produce radiation that did not result from the hard scatter. Beam--beam remnants (BBR) are hadrons resulting from the parton shower and hadronization of partons that did not participate in the hard scatter. Initial and final-state radiation (ISR and FSR) result in radiation from the initial and final states of the hard scatter process. Finally multiple parton interactions (MPI) can occur between partons in the colliding protons that do not participate in the hard scatter. Figure generated with Claude Opus 4.7.}
     \label{fig:zjets-production}
 \end{figure}
 
@@ -355,7 +355,7 @@ This is more evidence in support of the hypothesis that equivariant architecture
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.85\linewidth, alt={Schematic of the Particle Transformer architecture showing the particle embedding MLP, stack of particle attention blocks with pairwise physics-motivated features added to the attention logits, class attention block with learned class token, and final MLP producing a single output logit.}]{figures/ch6/part_arch.pdf}
-    \caption{Schematic of the Particle Transformer architecture, reproduced from Ref.~\cite{Qu:2022mxj} under a CC~BY~4.0 license. The input list of particle features is embedded into a fixed-length feature vector per particle, passed through a stack of particle attention blocks in which physics-motivated pairwise features ($\log k_T$, $\log z$, $\log \Delta R$, $\log m^2$) are added to the attention logits before the softmax, and aggregated into a single class-token output by a class attention block. A final MLP produces the output logit whose transformation via the sigmoid is a monotonic function of the likelihood ratio.}
+    \caption{Schematic of the Particle Transformer architecture. The input list of particle features is embedded into a fixed-length feature vector per particle, passed through a stack of particle attention blocks in which physics-motivated pairwise features ($\log k_T$, $\log z$, $\log \Delta R$, $\log m^2$) are added to the attention logits before the softmax, and aggregated into a single class-token output by a class attention block. A final MLP produces the output logit whose transformation via the sigmoid is a monotonic function of the likelihood ratio. Reproduced from Ref.~\cite{Qu:2022mxj} under a CC~BY~4.0 license.}
     \label{fig:zjets-part-arch}
 \end{figure}
 
