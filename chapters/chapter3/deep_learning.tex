@@ -47,7 +47,7 @@ These functions are plotted in \Cref{fig:activations}.
 
 The most important property of MLPs is that they are universal function approximators, meaning that an MLP with a single hidden layer of sufficient width can approximate any continuous function on a compact domain to arbitrary precision~\cite{cybenko1989approximation,hornik1989multilayer}.
 The MLP is in principle flexible enough to approximate any function, even for example the very complicated functions contained in modern LLMs.
-In practice this property of MLPs is of limited use because it guarantess only that a solution exists, not that it can be found by any of the gradient-based optimization strategies discussed below.
+In practice this property of MLPs is of limited use because it guarantees only that a solution exists, not that it can be found by any of the gradient-based optimization strategies discussed below.
 Deep MLPs and more sophisticated network architectures are used much more widely than very wide, two-layer MLPs because they are empirically observed to find much better solutions when trained with gradient descent.
 There are some theoretical motivations for why this might be the case~\cite{jacot2018neural}, but there is not a rigorous theory explaining why some networks optimize better than others.
 The MLP architecture on its own is little used in modern deep learning, but it is used as a component in graph and transformer architectures.
@@ -62,7 +62,7 @@ The canonical example of a loss function is the binary cross-entropy (BCE) loss 
     \label{eqn:bce}
 \end{equation}
 where $f_\theta(\mathbf{x}_i) \in (0,1)$ is the network's predicted probability that example $i$ belongs to class 1.
-Minimizing the BCE loss is equivalent to maximizing the log-likelihood of the data given their labels are described by a Bernoulli random variable.
+Minimizing the BCE loss is equivalent to maximizing the log-likelihood of the training data under the assumption that their labels are described by a Bernoulli random variable.
 Constructing loss functions that maximize the log-likelihood of the training data is a recurring pattern across machine learning.
 
 \subsubsection{Backpropagation}
@@ -133,7 +133,7 @@ The intuition is that parameters with consistently large (small) gradients recei
 
 \subsubsection{Generalization and Regularization}
 
-A trained may not perform well on unseen data if it has ``memorized'' the specific data points rather than learning the underlying function.
+A trained model may not perform well on unseen data if it has ``memorized'' the specific data points rather than learning the underlying function.
 This is called \textit{overfitting}, and is best understood as one extreme of the \textit{bias-variance tradeoff}.
 A model with low capacity will be unable to fit the training data (high bias) and will simply predict a best guess for all data points (low variance).
 A model with high capacity is able to memorize specific training examples (low bias), but can overfit to the data and yield very different results for only slightly different inputs (high variance).
@@ -152,7 +152,7 @@ Standard practice to ensure generalization is to partition available data into t
 Gradients are never computed using the validation or test sets.
 A classic signal of overfitting is when the loss, calculated over the validation set, begins to decrease with further training, while the training loss always decreases since it is directly minimized.
 \textit{Regularization} is a set of methods for preventing the model from overfitting.
-A simple regularization strategy is regularization, in which training is terminated when the validation loss stops decreasing, preventing the network from entering the high variance overfitting regime.
+A simple regularization strategy is early stopping, in which training is terminated when the validation loss stops decreasing, preventing the network from entering the high variance overfitting regime.
 \Cref{fig:early_stopping} shows a typical training curve illustrating this procedure.
 The training loss (blue curve) decreases monotonically except for small noise caused by the stochastic gradient estimates computed on mini-batches.
 The validation loss (red curve) follows the training loss initially before flattening out and beginning to increase as the model overfits.
@@ -168,7 +168,7 @@ In early stopping, training is stopped after the validation loss fails to decrea
 
 Two other widely used regularization techniques are \textit{dropout} and \textit{weight decay}.
 Dropout~\cite{hinton2012improving} randomly zeros a set of activation functions with probability $p$, called the \textit{dropout probability}, during training.
-At inference time, all activations are activated.
+At inference time, all activations are retained.
 Weight decay adds an L2 norm penalty on the parameters of the network $\|\theta\|^2$ to the loss.
 This discourages large weights and limits the capacity of the network to overfit.
 Weight decay can be understood as placing a zero-mean Gaussian prior on the network parameters.
@@ -176,16 +176,16 @@ Weight decay can be understood as placing a zero-mean Gaussian prior on the netw
 \subsection{Convolutional Neural Networks}
 \label{sec:cnn}
 
-MLPs operate on flat vectors of inputs and have no \textit{implicit bias}, or architectural specialization to a given known structure in the input data..
+MLPs operate on flat vectors of inputs and have no \textit{implicit bias}, or architectural specialization to a given known structure in the input data.
 Convolutional neural networks (CNNs) encode \textit{translational symmetry} into the network architecture, meaning that a feature at one spatial location should not affect the network output if shifted to another location.
-This is achieved by \textit{weight sharing}, in which a set of weights and biases, often called a \textit{filter}, is scanned across the inputs rather than applying a separate set of weightsper position.
+This is achieved by \textit{weight sharing}, in which a set of weights and biases, often called a \textit{filter}, is scanned across the inputs rather than applying a separate set of weights per position.
 CNNs were first developed for computer vision tasks using image data as input.
 Specifically AlexNet was an early example of a CNN architecture.
 
 Concretely, a CNN layer applies a set of $F$ learned filters $\{k_f\}_{f=1}^F$.
 The set of learned weights that define each filter are often called a \textit{kernel}.
 The kernel has a spatial extent $K$ (or $K \times K$ for 2D convolutions) which gives the number of input positions it considers at one time, and a depth which is equal to the number of \textit{channels} attached to each input position $C_{\text{in}}$.
-The space output channels is equal to the number of filters $F = C_{\text{out}}$.
+The number of output channels is equal to the number of filters $F = C_{\text{out}}$.
 For the specific case of a 2D convolution, the output at spatial position $(i, j)$ and output channel $f$ is
 \begin{equation}
     h_{f,i,j} = \sigma\!\left( \sum_{c=1}^{C_{\text{in}}} \sum_{p=0}^{K-1} \sum_{q=0}^{K-1} k_{f,c,p,q} \cdot x_{c,\, i+p,\, j+q} + b_f \right),
@@ -195,10 +195,10 @@ where $x_{c,i,j}$ is the input at channel $c$ and position $(i,j)$, $k_{f,c,p,q}
 The number of channels $C$ sets how many floating point numbers are used to represent each spatial location.
 For the input layer in image data this is typically 3 (RGB color channels), but it grows to hundreds in the deeper layers of large networks.
 This channel dimension is also directly analogous to the \textit{hidden dimension} of transformer models, which will be discussed in \Cref{sec:attention} and used extensively in this thesis.
-The filters of a given convolutional layer are sometimes applied with a \textit{stride} $s > 1$, meaning they advances by $s$ positions at each step.
+The filters of a given convolutional layer are sometimes applied with a \textit{stride} $s > 1$, meaning they advance by $s$ positions at each step.
 This makes the number of spatial sites in the output smaller than in the input, allowing the network to extract increasingly broad summary features.
 
-Another important operation in CNNs is \textit{pooling}, in which an aggregation operation like maximum (\textit{max pooling}) or averae (\textit{average pooling}) is applied across a spatial region.
+Another important operation in CNNs is \textit{pooling}, in which an aggregation operation like maximum (\textit{max pooling}) or average (\textit{average pooling}) is applied across a spatial region.
 As with setting a filter's stride to be greater than one, pooling reduces the spatial dimensions of feature maps and encourages the network to extract broader summary features as depth increases.
 Both operations are illustrated in \Cref{fig:convolution}.
 
@@ -215,7 +215,7 @@ One method developed to address this was the \textit{residual} or \textit{skip} 
     \mathbf{h}_{\text{out}} = \mathcal{F}(\mathbf{h}_{\text{in}}) + \mathbf{h}_{\text{in}},
     \label{eqn:residual}
 \end{equation}
-where $\mathcal{F}$ denotes one or more operations\footnote{Re-arranging this equation implies that the role of the operations is to learn \textit{residual} corrections on the data representation needed to minimize the loss. This idea connects to the idea of \textit{boosting} in tree models and to the diffusion models introduced in \Cref{sec:diffusion}}.
+where $\mathcal{F}$ denotes one or more operations\footnote{Re-arranging this equation implies that the role of the operations is to learn \textit{residual} corrections on the data representation needed to minimize the loss. This idea connects to the idea of \textit{boosting} in tree models and to the diffusion models introduced in \Cref{sec:diffusion}.}.
 The skip connection creates a direct gradient path from the output to the input of each block, making it possible to train networks with hundreds of layers.
 The structure of a single residual block is shown in \Cref{fig:resblock}.
 
@@ -228,7 +228,7 @@ The structure of a single residual block is shown in \Cref{fig:resblock}.
 
 The \textit{ResNet} architecture~\cite{He:2015resnet} stacks many residual blocks on top of each other as shown in \Cref{fig:resnet}.
 The ``ID blocks'' shown in the Figure correspond to skip connections.
-ResNet was the dominant image classification architecture for several years after in was introduced in 2015.
+ResNet was the dominant image classification architecture for several years after it was introduced in 2015.
 The first application of CNNs in HEP was for jet tagging tasks as discussed in \Cref{ch:tagging}, where the energy deposits in a calorimeter were interpreted as a 2D image and used as input to CNN models~\cite{Cogan:2014oua,deOliveira:2017pjk}.
 ResNet-based models showed nearly state-of-the-art performance on jet classification tasks as recently as 2019~\cite{Kasieczka:2019dbj}.
 They were ultimately superseded by graph neural networks and then transformers, but CNNs are an important part of the history of deep learning applications in HEP.
@@ -263,11 +263,11 @@ In EdgeConv, the message passed along the edge from node $j$ to node $i$ is comp
     \label{eqn:edgeconv}
 \end{equation}
 where $\phi_{\text{edge}}$ is a small MLP.
-The relative features $\mathbf{h}_j - \mathbf{h}_i$ capture pairwise distances between inputs and are empirically found to be very useful in HEP, for example because the difference between two particle's four momenta is physically meaningful.
+The relative features $\mathbf{h}_j - \mathbf{h}_i$ capture pairwise distances between inputs and are empirically found to be very useful in HEP, for example because the difference between two particles' four-momenta is physically meaningful.
 
 Another important type of message passing GNN is graph attention networks (GATs), which generalize this pattern by replacing the uniform averaging in \Cref{eqn:edgeconv} with learned, input-dependent weights over the neighborhood.
 This is identical to the attention mechanism covered in \Cref{sec:attention}, except with some entries of the attention matrix zeroed such that only inputs within a connected neighborhood of each other can attend.
-The better expresivity and better scaling properties of full attention, in which the strenght of two inputs connection is allowed to be a learned feature, has led attention-based networks to largely supplant GNNs in HEP applications.
+The better expressivity and better scaling properties of full attention, in which the strength of the connection between two inputs is allowed to be a learned feature, has led attention-based networks to largely supplant GNNs in HEP applications.
 
 \subsection{Attention and Transformers}
 \label{sec:attention}
@@ -276,7 +276,7 @@ The attention mechanism, and the transformer architecture built on top of it, un
 They have seen equally broad adoption in HEP, so this Section will introduce them in some detail.
 
 The origins of attention were in augmenting recurrent neural networks (RNNs) to perform better on machine translation tasks~\cite{bahdanau2014neural, luong2015effective, cheng2016long, lin2017structured}.
-In early versions of attention the decoder of an RNN, whose job is to generate the next output token given the networks current internal representation, could selectively weight all positions in the input sequence according to their relevance to the current decoding step.
+In early versions of attention the decoder of an RNN, whose job is to generate the next output token given the network's current internal representation, could selectively weight all positions in the input sequence according to their relevance to the current decoding step.
 This was found to be more performant than compressing every token in the input into a fixed-size vector to provide context for the decoder.
 The next conceptual step was to remove the recurrence entirely and simply compute attention between all items in the input sequence, with the relative positions of the items provided to the attention mechanism as positional encodings.
 This was the contribution of the famous ``Attention Is All You Need'' paper~\cite{Vaswani:2017attention}\footnote{Arguably the citation count of this paper relative to the initial papers that actually introduced attention is evidence of the Matthew effect in science, in which papers with high citation counts attract even more citations as time goes on. The Vaswani paper became the point of reference for early transformer models like BERT and GPT. That made it the starting point for anyone learning about attention and ensured it would keep being cited in the future. Despite this success Vaswani et al. did not actually invent attention; that credit belongs to Bahdanau et al. and Luong et al.}.
@@ -297,7 +297,7 @@ Self-attention is then computed using these three matrices as
     \label{eqn:attention}
 \end{equation}
 The matrix $Q K^\top / \sqrt{d_k} \in \mathbb{R}^{N \times N}$ is the \textit{attention matrix}.
-The $(i,j)$-th entry of this matrix can be interpreted as setting how much the input at position $i$ (query) should effect the item at position $j$ (key).
+The $(i,j)$-th entry of this matrix can be interpreted as setting how much the input at position $i$ (query) should affect the item at position $j$ (key).
 Applying a softmax row-wise ensures that these attention weights for a given query sum to one.
 Multiplying by $V$ produces a weighted sum of value vectors for each position, which is the output of the attention operation.
 Note that the vectors which determine the attention weights (keys) are not the same as the vectors which are being attended to (values).
@@ -323,13 +323,13 @@ A diagram of the entire multi-head attention operation is shown in \Cref{fig:mul
 \end{figure}
 
 Self-attention is the most important operation in the \textit{transformer block}.
-It captures relationships between inputs, but doesn't allow the element-wise processing of representations.
+It captures relationships between inputs, but does not allow the element-wise processing of representations.
 To address this, the \textit{transformer block} stacks an element-wise MLP on top of the attention mechanism, in addition to layer normalization and residual connection operations:
 \begin{align}
     \mathbf{X}' &= \text{LayerNorm}\!\left( X + \text{MultiHead}(X) \right), \label{eqn:transformer_attn} \\
     \mathbf{X}'' &= \text{LayerNorm}\!\left( \mathbf{X}' + \text{FFN}(\mathbf{X}') \right). \label{eqn:transformer_ffn}
 \end{align}
-A transformer network is built by stacking $L$ such blocks, with the output of each block serving as the input to the next\footnote{More specifically the network described here is a transformer \textit{encoder}. The transformer architecture as originally published is meant specifically for machine translation and includes a decoder network for producing output sequences. However in current terminology, any network that utilizes the transformer block can be called a transformer}.
+A transformer network is built by stacking $L$ such blocks, with the output of each block serving as the input to the next\footnote{More specifically the network described here is a transformer \textit{encoder}. The transformer architecture as originally published is meant specifically for machine translation and includes a decoder network for producing output sequences. However in current terminology, any network that utilizes the transformer block can be called a transformer.}.
 The transformer block is illustrated in \Cref{fig:transformer_block}.
 
 \begin{figure}[htbp]

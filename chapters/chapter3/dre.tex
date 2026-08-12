@@ -15,12 +15,12 @@ The likelihood ratio between two densities $p(x)$ and $q(x)$ is simply
     r(x) = \frac{p(x)}{q(x)}.
     \label{eqn:likelihood_ratio}
 \end{equation}
-The likelihood ratio trick is a method for computing $r(x)$ that only requires training a neural network classifier with binary cross-entropy (BCE) loss\footnote{Other loss functions such as the MSE and MLC losses are also minimized by the likelihood ratio and so can be used in this way as well.}.
+The likelihood ratio trick is a method for computing $r(x)$ that only requires training a neural network classifier with binary cross-entropy (BCE) loss\footnote{Other loss functions such as the MSE loss are also minimized by the likelihood ratio and so can be used in this way as well.}.
 A proof that the likelihood ratio can be obtained from the function that minimizes the BCE loss is provided in what follows.
 
 \subsubsection{Proof: the Optimal BCE Classifier Recovers the Likelihood Ratio}
 
-Consider a classifier $f_\theta(x) \in (0,1)$ trained to minimize the BCE loss betweeen samples from $p(x)$ (label $y=1$) and $q(x)$ (label $y=0$):
+Consider a classifier $f_\theta(x) \in (0,1)$ trained to minimize the BCE loss between samples from $p(x)$ (label $y=1$) and $q(x)$ (label $y=0$):
 \begin{equation}
     \mathcal{L}(f) = -\mathbb{E}_{x \sim p}\!\left[\log f(x)\right]
                     -\mathbb{E}_{x \sim q}\!\left[\log(1 - f(x))\right].
@@ -78,7 +78,7 @@ Using a network trained with a BCE loss to estimate the likelihood ratio is some
 
 Practically, \Cref{eqn:ratio_from_classifier} implies that the output of a trained classifier can be used to reweight samples from $q(x)$ to instead be samples from $p(x)$, or vice versa since the inverse of the likelihood ratio is also a monotonic rescaling of $f^*(x)$.
 Each sample $x_i \sim q$ is assigned a weight $w_i = r(x_i) = f^*(x_i) / (1 - f^*(x_i))$.
-If the samples are, for example, binned with the contribution of each sample weighted appropriate, the resulting histogram will be an estimate of $p(x)$.
+If the samples are, for example, binned with the contribution of each sample weighted appropriately, the resulting histogram will be an estimate of $p(x)$.
 
 Reweighting samples from one probability distribution to samples from another is not a new idea in HEP.
 A standard method is to derive correction factors as ratios of one-dimensional histograms, which is a simple form of density ratio estimation in a single variable.

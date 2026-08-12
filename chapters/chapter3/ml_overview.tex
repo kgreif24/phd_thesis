@@ -19,7 +19,7 @@ Machine learning methods organize naturally into several paradigms based on the 
     Many examples of both tasks exist in particle physics, and \Cref{ch:tagging} is entirely dedicated to the jet tagging classification task.
     \item \textit{Unsupervised learning} involves learning structures in the data without relying on explicit labels.
     Examples of unsupervised tasks include clustering, compression, and generation.
-    The latter task, which involves developing generative models that learn to produce new samples from $p_{\text{data}}$, are the focus of much of \cref{ch:unfolding}.
+    The latter task, which involves developing generative models that learn to produce new samples from $p_{\text{data}}$, is the focus of much of \cref{ch:unfolding}.
     \item \textit{Self-supervised learning} is a hybrid approach where the structure of the data themselves is exploited to provide class labels.
     Self-supervised techniques, like contrastive learning and next-token prediction, are most commonly used to learn general-purpose representations in the context of 
     \textit{foundation models} rather than solve a particular task.
@@ -32,11 +32,11 @@ Machine learning methods organize naturally into several paradigms based on the 
 
 Machine learning has a long history of application in particle physics.
 Boosted decision trees (BDTs) have been in use in HEP since the Tevatron~\cite{D0:2006ngk,CDF:2009itk}.\footnote{The history of BDTs in HEP is interesting. The original application of BDTs illustrated that they \textit{outperformed} artificial neural networks. Following the deep learning revolution initiated by AlexNet, BDTs were largely supplanted by neural networks, which proved far more expressive on the high-dimensional data common in HEP. More recently, BDTs have seen something of a resurgence, driven by their remarkable training speed relative to neural networks, and their robustness against noisy or irrelevant features in the density ratio estimation tasks covered in \cref{sec:dre}~\cite{Finke:2023ltw}.}
-The deep learning era kicked off by AlexNet changed the scale of the datasets and models rather than introduced the concept of machine learned classifiers.
+The deep learning era kicked off by AlexNet changed the scale of the datasets and models rather than introducing the concept of machine learned classifiers.
 Neural networks scale better than BDTs, and so could handle the more complicated tasks that have driven much of the interest in ML in recent years.
 
 Two key structural advantages of HEP datasets enabled the success of machine learning techniques.
-The first is the ability to generate high-quality synethetic data with the Monte Carlo event generators discussed in \cref{sec:jets}.
+The first is the ability to generate high-quality synthetic data with the Monte Carlo event generators discussed in \cref{sec:jets}.
 These simulated datasets are a very close approximation to experimental data and carry \textit{truth level} information that can be used to derive effective training labels.
 This is a significant advantage over other application domains where manual labeling is a significant bottleneck.
 The second advantage is that the underlying data generating processes are relatively simple, are known to respect several key symmetries, and can be run in tightly controlled laboratory environments.

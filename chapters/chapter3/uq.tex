@@ -2,14 +2,14 @@
 \section{Uncertainty Quantification}
 \label{sec:uq}
 
-Uncertainty quantification for HEP applications of deep learning is very problem-specific, so it's difficult to give a general overview of the methods.
+Uncertainty quantification for HEP applications of deep learning is very problem-specific, so it is difficult to give a general overview of the methods.
 This section covers the main types of uncertainty considered in the deep learning literature and how they map on to HEP problems.
 The primary goal is to discuss the quantification methods, which are widely used in \Cref{ch:tagging,ch:zjets}.
 \Cref{fig:uncertainty_types} provides visual intuition for each category of uncertainties on a toy problem.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{figures/ch3/uncertainty_types.pdf}
+    \includegraphics[width=\linewidth, alt={Three scatter plots with fitted curves illustrating aleatoric uncertainty, epistemic uncertainty, and domain shift on a toy regression problem. The left plot shows noisy data scattered around a true function, representing irreducible aleatoric noise. The center plot shows training data covering only part of the input range, with growing model uncertainty in the region with no training data, representing epistemic uncertainty. The right plot shows training data (blue) and evaluation data (red) drawn from different regions of the input space, representing domain shift.}]{figures/ch3/uncertainty_types.pdf}
     \caption{Illustration of the three categories of uncertainty on a toy regression problem: aleatoric uncertainty (irreducible scatter in the data), epistemic uncertainty (model uncertainty due to limited training data, for example in regions of phase space where no data is available), and domain shift (mismatch between training and evaluation distributions).}
     \label{fig:uncertainty_types}
 \end{figure}
@@ -39,15 +39,15 @@ An example of epistemic uncertainty is the inability of a model to generalize ou
 Epistemic uncertainty is in principle reducible by collecting more data, using a more expressive architecture, or improving training.
 In HEP, the relevance of epistemic uncertainty depends heavily on the task.
 In jet tagging, epistemic uncertainties are present and result in sub-optimal classification performance, but the model is still useful.
-For example using very simple cut based jet tagging methods would have very large epistemic uncertainty since they are poor estimators of the likelihood ratio, but this does not prevent them from being used to define signal regions and perform measurements.
-However in applications like unfolding, neural simulation based inference (NSBI), and anomaly detection, the model outputs are used directly in the statistical analysis and epistemic uncertainty can have a significant impact on the result.
+For example using very simple cut-based jet tagging methods would have very large epistemic uncertainty since they are poor estimators of the likelihood ratio, but this does not prevent them from being used to define signal regions and perform measurements.
+However in applications like unfolding, neural simulation-based inference (NSBI), and anomaly detection, the model outputs are used directly in the statistical analysis and epistemic uncertainty can have a significant impact on the result.
 For example in NSBI, the model outputs are used directly as a test statistic in statistical tests to determine confidence intervals on the parameter of interest.
-Failure of the model to fully capture the true test statistic (usually the likelihood ratio) will produce an un-accounted for systematic bias in the measurement.
+Failure of the model to fully capture the true test statistic (usually the likelihood ratio) will produce an unaccounted-for systematic bias in the measurement.
 In this case assessing and eliminating epistemic uncertainty is crucial.
 A few methods are used to estimate epistemic uncertainty in practice, but given there is limited theoretical understanding of gradient descent applied to neural networks there are no fully robust methods.
 In HEP applications where epistemic uncertainty is important, auxiliary cross checks are typically needed to ensure the epistemic uncertainty is small or captured by appropriate systematics, as will be the case in \Cref{ch:zjets}.
 
-\paragraph{Ensembling:}
+\paragraph{Ensembling.}
 The simplest method is to train many independent but identical models and treat the variance over their outputs as an estimate of the epistemic uncertainty.
 The models are independent in that they have different weight initializations and different mini-batch sampling in the optimization process.
 This approach has been previously applied in ATLAS measurements, for example in Refs.~\cite{ATLAS:2024xxl, ATLAS:2025clx}.
@@ -55,7 +55,7 @@ Ensembling is an easy and generally applicable method, but it does not capture t
 For example if the models lack sufficient capacity to capture the true optimum function, this will not be reflected by the ensemble.
 
 \paragraph{Bayesian neural networks.}
-Another approach is to assume prior distribution over the model weights and frame the optimization problem as computing the posterior given the training data.
+Another approach is to assume a prior distribution over the model weights and frame the optimization problem as computing the posterior given the training data.
 The posterior encodes a specific type of epistemic uncertainty due to limited training data.
 Bayesian neural networks have seen limited use in HEP~\cite{Bollweg:2019skg} relative to ensembling, partly because the epistemic uncertainty due to limited training data is typically a small consideration in HEP tasks where simulated training data is plentiful.
 
@@ -63,7 +63,7 @@ Bayesian neural networks have seen limited use in HEP~\cite{Bollweg:2019skg} rel
 \subsection{Domain Shift}
 \label{sec:domain_shift}
 
-Domain shift occurs when probability distribution governing the data used in evaluation differs from the distribution governing the data used in training.
+Domain shift occurs when the probability distribution governing the data used in evaluation differs from the distribution governing the data used in training.
 This type of uncertainty is visualized in the right hand panel of \cref{fig:uncertainty_types} where the testing data (red) is not drawn from the same distribution as the training data (blue).
 This is the most common type of uncertainty in HEP.
 In particular experimental systematic uncertainties typically fall in this category.
@@ -90,5 +90,5 @@ This may still be a desirable tradeoff, for example jet taggers are typically de
 \paragraph{Parametrized models.}
 Typically the optimal approach is to incorporate the domain shift directly into the model by conditioning on the nuisance parameter or systematic variation as an additional input~\cite{Louppe:2016ylz,Baldi:2016fzo,Ghosh:2021roe}.
 A model trained this way can learn the correct function across the full range of systematic variations, and the uncertainty on the output can be assessed by varying the conditioning parameter passed into the model.
-This techinque is powerful, but at a minimum requires detailed knowledge of the types of domain shifts that will be observed to be known beforehand, and may not be applicable even if this is the case.
+This technique is powerful, but at a minimum requires detailed knowledge of the types of domain shifts that will be observed to be known beforehand, and may not be applicable even if this is the case.
 For example there is no well-established method for parametrizing the iterative unfolding methods discussed in \Cref{ch:unfolding}, even if all systematic uncertainties are known and understood beforehand.

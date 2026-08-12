@@ -24,7 +24,7 @@ The joint forward distribution after $T$ steps is a product over \Cref{eqn:forwa
     \label{eqn:forward_joint}
 \end{equation}
 Under any noise schedule $\beta_t$ that satisfies $\prod_{t=1}^T (1 - \beta_t) \to 0$, the joint forward distribution becomes a standard normal $q(x_T \mid x_0) \approx \mathcal{N}(0, I)$ for sufficiently large $T$.
-In other words, adding increasingly high variance noise to the data sample will eventually result in a pure-noise sample.
+In other words, adding increasingly high-variance noise to the data sample will eventually result in a pure-noise sample.
 This pure noise distribution can be sampled from easily, analogous to the standard Gaussian latent variable distribution in a normalizing flow model.
 The goal of a diffusion model is then to learn the reverse of this process, that evolves a pure-noise sample back to the data distribution.
 In what follows the definitions $\alpha_t = 1 - \beta_t$ and $\bar\alpha_t = \prod_{s=1}^t \alpha_s$ will be used in place of $\beta_t$ to simplify the notation.
@@ -38,10 +38,10 @@ The goal of the denoising diffusion probabilistic model (DDPM) objective is to l
 \end{equation}
 which is parameterized by a neural network $\mu_\theta$ and a diagonal variance matrix which evolves with time $\sigma_t^2 I$.
 Given a starting sample from $p(x_T) = \mathcal{N}(0, I)$, repeatedly sampling from the learned distribution in \Cref{eqn:reverse_step} for time steps $t = T, T-1, \ldots, 1$ eventually yields a sample from the learned data distribution.
-This repeated sampling is a weakness of diffusion and flow matching models: inference on a neural network must be run $T$ times to generate just one sample from the data distribution.
+This repeated sampling is a weakness of diffusion and flow-matching models: inference on a neural network must be run $T$ times to generate just one sample from the data distribution.
 
 As was the case for VAEs, diffusion models are trained by maximizing a lower bound (ELBO) on $\log p_\theta(x_0)$~\cite{kingma2021variational}.
-The structure is identical to the one deried in \Cref{sec:vae}, but instead of a single KL-term enforcing a prior constraint on the latent variable $z$, there are many KL-terms each enforcing a prior constraint on the many latent variable latent variables $x_1, \ldots, x_T$:
+The structure is identical to the one derived in \Cref{sec:vae}, but instead of a single KL-term enforcing a prior constraint on the latent variable $z$, there are many KL-terms each enforcing a prior constraint on the many latent variables $x_1, \ldots, x_T$:
 \begin{align}
     \log p_\theta(x_0)
     &\geq \mathbb{E}_{q}\!\left[\log p_\theta(x_0 \mid x_1)\right]
@@ -105,7 +105,7 @@ A diagram giving an overview of this process is provided in \Cref{fig:ddpm}.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\linewidth]{figures/ch3/ddpm_diagram.pdf}
+    \includegraphics[width=\linewidth, alt={Diagram of the forward and reverse processes of a denoising diffusion probabilistic model. The top row shows the forward process progressively adding Gaussian noise to a data sample until it becomes pure noise. The bottom row shows the reverse process, in which a neural network iteratively denoises a pure-noise sample back into a data sample.}]{figures/ch3/ddpm_diagram.pdf}
     \caption{The forward (top) and reverse (bottom) processes of a denoising diffusion probabilistic model. The forward process $q$ progressively adds Gaussian noise to a data sample $x_0$ until the data sample is a draw from a Gaussian distribution. A neural network $p_\theta$ models the reverse process  $p_\theta$, iteratively denoising $x_T$ back to a data sample. Figure adapted from~\cite{Ho:2020ddpm}.}
     \label{fig:ddpm}
 \end{figure}
@@ -129,14 +129,14 @@ Ref.~\cite{Song:2021score} also shows that every forward SDE has a corresponding
 where $f$ and $g$ are the drift and diffusion coefficients of the forward SDE and $\nabla_x \log q_t(x)$ is the \textit{score function} of the marginal distribution at time $t$.
 Since $\varepsilon_\theta(x_t, t) \approx -\sqrt{1 - \bar\alpha_t}\,\nabla_{x_t} \log q_t(x_t)$, the same neural network can be used to solve either the stochastic SDE or deterministic ODE.
 The ODE solution can be understood as the continuous-time generalization of normalizing flows~\cite{chen2018neural}.
-This connection is made more apparent in the flow matching models in the next section.
+This connection is made more apparent in the flow-matching models in the next section.
 
 % -------------------------------------------------------------------
 \subsection{Flow Matching}
 \label{sec:flow_matching}
 
 Flow matching~\cite{lipman2022flow} is a closely related class of models.
-Instead of predicting the noise added to a data sample, flow matching models predict a \textit{vector field} that transports the noise distributino to the data distribution.
+Instead of predicting the noise added to a data sample, flow matching models predict a \textit{vector field} that transports the noise distribution to the data distribution.
 Given a time-dependent density $p_t(x)$ evolving under the vector field $v_t(x)$, the continuity equation supplies a constraint to keep the density normalized as with any solution to a PDE:
 \begin{equation}
     \frac{\partial p_t}{\partial t} + \nabla \cdot (p_t\,v_t) = 0.
@@ -161,12 +161,12 @@ Alternatively one could just interpolate between the noise and target data point
 \end{equation}
 for which the conditional vector field takes the simple form $u_t(x \mid x_1) = x_1 - x_0$.
 The straight paths in data space are much simpler to integrate than the curved trajectories that result from Gaussian conditional paths.
-This means flow matching models trained with these paths typically require fewer neural function evaluations to generate a sample accurately.
+This means flow-matching models trained with these paths typically require fewer neural function evaluations to generate a sample accurately.
 \Cref{fig:flow_matching} shows the difference between diffusion trajectories and linear flow-matching paths.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\linewidth]{figures/ch3/flow_matching_vs_diffusion.pdf}
+    \includegraphics[width=0.8\linewidth, alt={Two side-by-side diagrams comparing sampling trajectories between a noise distribution and a data distribution. The diffusion model trajectory follows a curved path. The linear flow-matching trajectory follows a straight path.}]{figures/ch3/flow_matching_vs_diffusion.pdf}
     \caption{Comparison of probability flow trajectories for diffusion models (curved paths) and linear flow matching (straight paths). Straighter paths require fewer neural function evaluations to integrate accurately, making flow matching more computationally efficient at inference time.}
     \label{fig:flow_matching}
 \end{figure}
@@ -178,27 +178,27 @@ This means flow matching models trained with these paths typically require fewer
 Diffusion models were first applied in HEP after they demonstrated state-of-the-art performance on image generation tasks in 2021~\cite{Ho:2020ddpm,Song:2021score}.
 The first applications targeted fast calorimeter shower simulation~\cite{Mikuni:2022xry,Amram:2023onf}, a task which aims to train a model to generate calorimeter showers based on a training set generated from the realistic but expensive \textsc{Geant4} simulation used by most particle physics experimental collaborations~\cite{GEANT4:2002zbu}.
 Diffusion and flow-matching models have since been applied to anomaly detection and unfolding, the latter being a central topic of \Cref{ch:unfolding}.
-Given calorimeter simulation is the most obviously useful application of generative models in HEP and provides a very useful benchmark, it's worth showing some results a community challenge in this domain here.
+Given calorimeter simulation is the most obviously useful application of generative models in HEP and provides a very useful benchmark, it is worth showing some results from a community challenge in this domain here.
 The Calorimeter Simulation Challenge (CaloChallenge)~\cite{Krause:2024avx} required participants to train models that could generate calorimeter showers for three increasingly complicated and granular calorimeter geometries.
 Some results from datasets 2 and 3 are shown in \Cref{fig:calochallenge_ds2,fig:calochallenge_ds3}.
-The plots show the multi-class log posterior (a measure of sample quality, with higher being more similar to the ground GEANT4 simulation) versus generation time per shower (lower is better).
+The plots show the multi-class log posterior (a measure of sample quality, with higher being more similar to the ground truth \textsc{Geant4} simulation) versus generation time per shower (lower is better).
 The takeaway from these plots is that diffusion (such as CaloDiffusion~\cite{Amram:2023onf}) and flow-matching (such as CaloDREAM~\cite{Favaro:2024rle}) models achieve the best sample quality, but at the cost of relatively slow sampling.
-Of course they are still far faster than the GEANT simulation.
+Of course they are still far faster than the \textsc{Geant4} simulation.
 Interestingly normalizing-flow-based methods like CaloPointFlow~\cite{Schnake:2024mip} are competitive and substantially faster to sample from.
-There is some possibility that diffusion and flow matching models are actually generating samples with higher quality than is needed for downstream tasks, in which case using simpler models would be more efficient.
+There is some possibility that diffusion and flow-matching models are actually generating samples with higher quality than is needed for downstream tasks, in which case using simpler models would be more efficient.
 However in other generative tasks in HEP, such as anomaly detection or the unfolding task discussed in \Cref{ch:unfolding}, sample quality is essential and sampling speed is essentially irrelevant.
 In these tasks, diffusion and flow-matching models are the current state of the art.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=1.0\linewidth]{figures/ch3/ds2_logpost_time.png}
-    \caption{CaloChallenge Dataset 2: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling time. The normalizing flow based models (CaloINN) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
+    \includegraphics[width=1.0\linewidth, alt={Scatter plot of log-posterior score versus generation time per shower for CaloChallenge Dataset 2 submissions. Diffusion and flow-matching models achieve the highest log-posterior scores but have the longest generation times. Normalizing-flow-based models achieve a favorable balance of moderate score and low generation time.}]{figures/ch3/ds2_logpost_time.png}
+    \caption{CaloChallenge Dataset 2: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling time. The normalizing-flow-based models (CaloINN) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
     \label{fig:calochallenge_ds2}
 \end{figure}
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=1.0\linewidth]{figures/ch3/ds3_logpost_time.png}
-    \caption{CaloChallenge Dataset 3: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling time. The normalizing flow based models (CaloPointFlow) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
+    \includegraphics[width=1.0\linewidth, alt={Scatter plot of log-posterior score versus generation time per shower for CaloChallenge Dataset 3 submissions. Diffusion and flow-matching models achieve the highest log-posterior scores but have the longest generation times. Normalizing-flow-based models achieve a favorable balance of moderate score and low generation time.}]{figures/ch3/ds3_logpost_time.png}
+    \caption{CaloChallenge Dataset 3: log-posterior score (higher is better) versus generation time per shower (lower is better) for all CaloChallenge submissions. The diffusion (CaloDiffusion) and flow-matching models (CaloDREAM) show the best sample quality, but have high sampling time. The normalizing-flow-based models (CaloPointFlow) offer a good compromise. Reproduced from~\cite{Krause:2024avx}, \textit{Rep. Prog. Phys.}, \textbf{88}, 116201, 2025. \copyright~IOP Publishing Ltd. All rights reserved.}
     \label{fig:calochallenge_ds3}
 \end{figure}
