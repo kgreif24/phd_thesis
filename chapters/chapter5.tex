@@ -271,7 +271,7 @@ This requires a differentiable surrogate for the detector response $p(x \mid z)$
 Since neural networks are differentiable by construction, gradients can flow through $q_\theta(x \mid z)$ allowing for the direct optimization of $q_\phi(z)$ using a log-likelihood loss as in \Cref{sec:generative}.
 The models $q_\theta$ and $q_\phi$ can be optimized independently or jointly end-to-end~\cite{Vandegar:2020yvw, Butter:2025via}.
 These methods are attractive for their direct approach and the ability to include nuisance parameters in the unfolding problem as with profile likelihood unfolding.
-However the optimization can be difficult, especially in high and variable dimensional settings where point-cloud generative models must be trained.
+However the optimization can be difficult, especially in high- and variable-dimensional settings where point-cloud generative models must be trained.
 
 The classifier-based approach, which has only been recently explored, replaces the generative models with classifiers.
 Dividing both sides of \Cref{eq:folding-continuous} by a reference density provided by an alternative simulation $p_{\mathrm{sim}}(x)$ yields a ratio equation, where the ratios can be learned with classifiers via the likelihood ratio trick discussed in \Cref{ch:ml}.
@@ -1227,7 +1227,7 @@ In all of these other observables, the accuracy of the transformer-based and L-G
 
 \subsubsection{Summary}
 
-Ref.~\cite{Petitjean:2025tgk} builds on the results of the previous sections and demonstrates that high and variable-dimensional posteriors can be accurately modeled with machine learning methods.
+Ref.~\cite{Petitjean:2025tgk} builds on the results of the previous sections and demonstrates that high- and variable-dimensional posteriors can be accurately modeled with machine learning methods.
 This ability opens the possibility to perform a full unfolding, using the EM algorithm, with generative methods rather than the classifier-based \Omnifold method.
 Motivation for using generative methods is discussed in \Cref{sec:generative-unfolding-methods}.
 The key innovation to increase the accuracy of the modeled posterior was an auto-regressive factorization into three pieces which simplifies the point-cloud generative task.
