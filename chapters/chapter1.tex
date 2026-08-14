@@ -144,7 +144,7 @@ I do not discount such feelings as irrelevant as they have produced discoveries 
     }
     \item{
         \textbf{V-A structure of the weak interaction}: The weak interaction couples exclusively to the left-handed fermion fields.
-        Another way of stating this is that the weak interactions are maximally parity violating: the weak force would effect the dynamics of some particles but be completely turned off for their parity inverted counterparts.
+        Another way of stating this is that the weak interactions are maximally parity violating: the weak force would affect the dynamics of some particles but be completely turned off for their parity inverted counterparts.
         This is an experimentally established fact but there is no clear theoretical explanation for why the weak forces should single out left-handed fields.
     }
 \end{enumerate}
@@ -195,7 +195,7 @@ A brief survey of this progress and how it has entered particle physics research
 
 In the years following AlexNet, deeper networks with many millions of parameters provided even better performance on classification tasks~\cite{Simonyan:2014vgg,He:2015resnet}.
 This was an early example of how larger scale improves neural network performance.
-The particle physics community adopted deep learning very soon after AlexNet showed promise in computer vision, with the first papers proposing deep learning based jet taggers appearing only two years after AlexNet in 2014~\cite{Cogan:2014oua,Baldi:2014kfa}.
+The particle physics community adopted deep learning very soon after AlexNet showed promise in computer vision, with the first papers proposing deep-learning-based jet taggers appearing only two years after AlexNet in 2014~\cite{Cogan:2014oua,Baldi:2014kfa}.
 Neural network based generative models, which produce additional samples from the underlying probability distribution of the training data, were also developed in this period.
 Generative Adversarial Networks (GANs)~\cite{Goodfellow:2014gan} and Variational Autoencoders (VAEs)~\cite{Kingma:2013vae} were early generative models that were picked up by the HEP community for generative tasks like fast calorimeter simulation and anomaly detection~\cite{deOliveira:2017pjk,Paganini:2017hrr,Paganini:2017dwg,Cerri:2018anq}.
 A large milestone in the development of artificial intelligence through reinforcement learning (RL) came in 2016 when AlphaGo~\cite{Silver:2016alphago} defeated the world champion Go player.
@@ -259,23 +259,30 @@ The task is now to use those tools to achieve concrete physics goals.
 
 The remainder of this thesis is organized as follows.
 
-Chapter~\ref{ch:qcd} provides theoretical background on quantum chromodynamics (QCD), since the cross section measurement at the core of the thesis is fundamentally a measurement of QCD processes.
+\Cref{ch:qcd} provides theoretical background on quantum chromodynamics (QCD), since the cross section measurement at the core of the thesis is fundamentally a measurement of QCD processes.
 This chapter is highly selective.
 Rather than surveying the Standard Model broadly, it focuses on the aspects of QCD that are directly relevant to jet physics and jet substructure at the LHC.
-This section will also introduce some of the exotic jet substructure observables measured in Chapter~\ref{ch:zjets}.
+This section will also introduce some of the exotic jet substructure observables measured in \Cref{ch:zjets}.
 
-Chapter~\ref{ch:ml} introduces the deep learning methods that are used extensively in the research chapters that follow.
+\Cref{ch:ml} introduces the deep learning methods that are used extensively in the research chapters that follow.
 The goal of this chapter is to provide the background necessary to understand the variational latent diffusion models used in the unfolding work of \Cref{ch:unfolding}, and the classifier models used for the cross section measurement in \Cref{ch:zjets}.
 
-Chapter~\ref{ch:tagging} turns to the first of the three original research contributions in the thesis.
-It presents the results of an ATLAS paper which demonstrates the performance of deep learning based classifiers and provides a novel framework for uncertainty quantification.
-Given this study was published some time ago the chapter concludes with a summary of recent progress and future directions in jet tagging at the LHC.
+\Cref{ch:tagging} turns to the first of the original research contributions in the thesis.
+It presents the results of an ATLAS paper which demonstrates the performance of deep-learning-based classifiers and provides a novel framework for uncertainty quantification~\cite{ATLAS:2024rua}.
+Given this study was published some time ago, the chapter concludes with a summary of recent progress and future directions in jet tagging at the LHC.
 
-Chapter~\ref{ch:unfolding} discusses the problem of \textit{unfolding} in particle physics.
+\Cref{ch:unfolding} discusses the problem of \textit{unfolding} in particle physics.
 It begins with a review of classical unfolding methods, specifically Iterative Bayesian Unfolding (IBU).
-Two deep learning based unfolding methods are then described in detail: the Variational Latent Diffusion (VLD) model which I developed with collaborators, and \Omnifold~\cite{Andreassen:2019cjw}.
-\Omnifold is then used to perform a high and variable dimensional cross section measurement of $Z$+jets production in \Cref{ch:zjets}.
+Several deep-learning-based unfolding methods are then described in detail.
+First, the Variational Latent Diffusion approach I developed with collaborators is covered.
+These results have been published in Refs.~\cite{Shmakov:2023kjj,Shmakov:2024gkd}.
+Second, a method specifically for unfolding jet substructure is covered.
+I advised on the development of this method, and the results have thus far been published as a preprint~\cite{Petitjean:2025tgk}.
+Finally, the \Omnifold method is introduced~\cite{Andreassen:2019cjw}.
+
+\Omnifold is then used to perform a high- and variable-dimensional cross section measurement of $Z$+jets production in \Cref{ch:zjets}.
+These results have not yet been published and are currently in ATLAS internal review.
 After describing the methodology, uncertainty treatment, and validation, the chapter presents results across four physics use cases that illustrate the power of unbinned and high-dimensional cross section measurements.
 It concludes with future prospects and argues that unbinned and high-dimensional cross section measurements should become standard practice in particle physics experiments.
 
-Chapter~\ref{ch:conclusion} concludes the thesis by drawing on overall themes and discussing future roles of deep learning and artificial intelligence in particle physics research.
+\Cref{ch:conclusion} concludes the thesis by drawing on overall themes and discussing future roles of deep learning and artificial intelligence in particle physics research.
