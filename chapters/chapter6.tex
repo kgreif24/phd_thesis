@@ -45,11 +45,11 @@ The previous measurement will be referred to as the ``Multifold measurement'', a
 The Multifold measurement was the first to apply an unbinned and high-dimensional unfolding method to LHC data, and illustrated that these techniques can be used in a realistic context.
 The follow-up measurement discussed here addresses two shortcomings.
 First, there are many jet substructure observables, and it is impossible to enumerate all of them and construct a measurement differential in each.
-As discussed in \Cref{sec:unbinned-motivation}, full phase space measurements are maximally information preserving and allow for unforeseen observables of interest to be measured without requiring a new analysis.
+As discussed in \Cref{sec:unbinned-motivation}, full-phase-space measurements are maximally information preserving and allow for unforeseen observables of interest to be measured without requiring a new analysis.
 Second, some classes of observables cannot be trivially unfolded with a fixed-length set of observables.
 Two such observables are measured in this chapter: the two-point energy correlator and nearest neighbor intrinsic dimension observables introduced in \Cref{sec:eec,sec:id} respectively.
 
-A full phase space measurement of $Z$+jets production is substantially more complicated than a fixed-length measurement.
+A full-phase-space measurement of $Z$+jets production is substantially more complicated than a fixed-length measurement.
 Measuring the full phase space requires capturing the cross section including all of the complicated processes that occur within proton--proton collisions at the LHC.
 The leading order Feynman diagrams for $Z$+jets production at a hadron collider are illustrated in \Cref{fig:zjets-lo-diagrams}.
 The top (bottom) row diagrams result in events where the $Z$ boson recoils against a gluon (quark).
@@ -60,13 +60,13 @@ Beyond this additional sensitivity to the hard scatter, the full phase space is 
 A diagrammatic representation of some of these processes is provided in \Cref{fig:zjets-production}.
 After the parton shower and hadronization processes, a $Z$+jets event can contain several tens of stable charged particles that are measured by the detector.
 These could be the muons from the $Z$ boson decay, or hadrons from the hard scatter recoil, beam--beam remnants, initial or final state radiation, or multiple parton interactions.
-In principle a full phase space measurement is sensitive to all of these processes\footnote{In practice measuring the kinematics of beam--beam remnants is typically not possible given the limited coverage of ATLAS in the forward region.}, making it a powerful tool for improving the theoretical modeling of proton--proton collisions.
+In principle a full-phase-space measurement is sensitive to all of these processes\footnote{In practice measuring the kinematics of beam--beam remnants is typically not possible given the limited coverage of ATLAS in the forward region.}, making it a powerful tool for improving the theoretical modeling of proton--proton collisions.
 
 The remainder of this chapter is organized as follows.
 \Cref{sec:zjets-eventsel} describes the event selection and Monte Carlo samples used for the measurement.
 \Cref{sec:zjets-omnifold} details the \Omnifold implementation, including the neural network classifiers, the pretraining procedure, and the unbinned background subtraction.
 \Cref{sec:zjets-uncert} describes the uncertainty propagation, and \Cref{sec:zjets-validation} presents the statistical validation including comparisons to alternative measurements, in particular IBU based measurements and the previous round Multifold result.
-\Cref{sec:zjets-results} then presents measurements of four classes of observables obtained from the full phase space measurement.
+\Cref{sec:zjets-results} then presents measurements of four classes of observables obtained from the full-phase-space measurement.
 In order, these are simple event-level observables that are poorly modeled by MC generators, jet-shape observables, the energy-energy correlator (EEC), and the nearest-neighbor intrinsic dimension (NNID) of jets.
 \Cref{sec:zjets-discussion} draws conclusions and offers some lessons learned that should be applied to future measurements which use AI/ML based unfolding techniques.
 
@@ -463,7 +463,7 @@ The variance is defined as the spread in the reweighted truth-level MC when runn
 The pretraining step dramatically reduces the method bias, especially the tails of the distribution where the statistics are most limited.
 It also produces a modest reduction in the neural network initialization uncertainty, which is directly related to the variance.
 The method bias produced by \Omnifold without the pretraining is likely too large to make a publishable measurement in these particular observables, so the inclusion of the pretraining is a significant advance.
-It was only after including the pretraining step that the method bias produced by the full phase space unfolding was close to the method bias produced by Multifold and IBU.
+It was only after including the pretraining step that the method bias produced by the full-phase-space unfolding was close to the method bias produced by Multifold and IBU.
 See \Cref{sec:zjets-validation}.
 The substantial performance gains offered by pretraining also motivate data-limited likelihood ratio estimation tasks as an important application of HEP specific foundation models, despite the current literature's focus on jet classification as the primary application.
 See \Cref{sec:tagging-future} for a discussion.
@@ -705,7 +705,7 @@ For this reason the method bias in the pseudodata measurement and data-driven un
 Further the data-driven unfolding uncertainty is identical for both the pseudodata and data measurements, since for both measurements the data inputs are the reweighted \mgpy sample and the nominal MC.
 
 The hidden variable unfolding uncertainty is also assessed by running OmniSequential, but this time to reweight the particle-level \sherpa samples to match the particle-level \mgpy sample.
-This reweighting is performed in a set of observables that are all functions of the full-phase space explicitly included in the \Omnifold unfolding procedure.
+This reweighting is performed in a set of observables that are all functions of the full phase space explicitly included in the \Omnifold unfolding procedure.
 The result is an alternative MC sample that looks similar to the nominal MC sample, but has possibly different hidden variables.
 Then this alternative MC sample is used as the MC sample in the unfolding routine, and the difference between the result produced with the alternative and nominal MC samples is taken as the uncertainty.
 An assumption of this uncertainty is that all possible hidden variables that might bias the detector response are different between the nominal and alternative MC samples.
@@ -754,7 +754,7 @@ In practice this uncertainty is observed to be small except in the jet mass obse
 Before concluding this section, it is worth noting that a possible advantage of a high-dimensional unfolding is that it is less sensitive to hidden variables since it is differential in more observables.
 For example if observable B biases the response of observable A, then performing a simultaneous unfolding in both observables should eliminate observable B as a hidden variable.
 However this does not account for hidden variables that are not constrained by the detector altogether, for example the hadron fractions discussed above.
-These are hidden variables even for a full-phase space unfolding.
+These are hidden variables even for a full-phase-space unfolding.
 These considerations will be important for comparing the relative accuracy of the IBU and \Omnifold based unfoldings in \Cref{sec:zjets-validation-ibu}.
 
 \FloatBarrier
@@ -834,13 +834,13 @@ The p-value quantifies the probability of observing a test statistic larger than
 A large p-value indicates that the probability of the observed test statistic is large under the null hypothesis and the null hypothesis can be accepted.
 A small p-value indicates the opposite and that the null hypothesis should be rejected.
 A typical threshold for acceptable p-values is $0.05$, indicating that there is a 5\% chance of the observed statistic or greater under the null hypothesis.
-\Cref{tab:zjets-closure-pvalues} shows the resulting p-values for the full phase-space \Omnifold measurement, together with the corresponding values from the previous round Multifold measurement on the 24 common observables.
+\Cref{tab:zjets-closure-pvalues} shows the resulting p-values for the full-phase-space \Omnifold measurement, together with the corresponding values from the previous round Multifold measurement on the 24 common observables.
 For every observable, the \Omnifold p-value exceeds the $0.05$ threshold, indicating no significant tension between the unfolded distribution and the pseudodata truth.
 The smallest \Omnifold p-value is $0.056$ for the sub-leading track-jet mass, and the smallest Multifold $p$-value is $0.17$ for the leading track-jet mass.
 
 \begin{table}[tb]
     \centering
-    \caption{Binned $\chi^2$ and $p$-value from the pseudodata closure test, for every observable measured in the previous round plus \nch and \HT. Results are shown for the full phase-space \Omnifold measurement and for the previous round Multifold measurement on the 24 common observables. Empty cells correspond to observables not measured by a particular method. The closure test is performed in the fiducial volume restricted to events with sub-leading track-jet $p_T > 5$~GeV, with Gaussian-kernel smoothing applied to the hidden-variable unfolding uncertainty for every observable except the jet-mass observables.}
+    \caption{Binned $\chi^2$ and $p$-value from the pseudodata closure test, for every observable measured in the previous round plus \nch and \HT. Results are shown for the full-phase-space \Omnifold measurement and for the previous round Multifold measurement on the 24 common observables. Empty cells correspond to observables not measured by a particular method. The closure test is performed in the fiducial volume restricted to events with sub-leading track-jet $p_T > 5$~GeV, with Gaussian-kernel smoothing applied to the hidden-variable unfolding uncertainty for every observable except the jet-mass observables.}
     \label{tab:zjets-closure-pvalues}
     \input{tables/ch6/closure_pvalues.tex}
 \end{table}
@@ -1004,11 +1004,11 @@ In this context, the slightly degraded accuracy of the measurement is a very sma
 \end{figure}
 
 The previous round Multifold measurement~\cite{ATLAS:2024xxl} measured the same 24 observables in the same fiducial volume using the same input dataset and MC samples.
-The unbinned spectra from the Multifold measurement are publicly available, allowing the results from the full phase space measurement to be compared to its smaller-scale counterpart.
+The unbinned spectra from the Multifold measurement are publicly available, allowing the results from the full-phase-space measurement to be compared to its smaller-scale counterpart.
 The principal methodological differences between the measurements are the classifier (MLP operating on a fixed-length input versus ParT operating on variable-length inputs) and the absence of pretraining in the Multifold measurement.
 
 \Cref{fig:zjets-mf-data} shows this comparison for the same four representative observables used in the IBU comparison.
-Unlike the IBU comparison the central values predicted by the full phase space measurement are shifted uniformly up from the Multifold measurement.
+Unlike the IBU comparison the central values predicted by the full-phase-space measurement are shifted uniformly up from the Multifold measurement.
 This is because the full run 2 luminosity measurement was revised upward between the Multifold and Omnifold measurements~\cite{ATLAS:2022hro}.
 Beyond this the measurements are very similar in these four observables and the other 20 observables which are not explicitly shown here.
 This is expected given the data inputs and unfolding methodology are very similar.
@@ -1019,7 +1019,7 @@ These results show that with the methodological improvements discussed in \Cref{
 \section{Results: Four Physics Use Cases}
 \label{sec:zjets-results}
 
-Unlike standard binned cross section measurements, the unbinned full phase space measurement is best understood as a dataset that can be processed to produce measurements of arbitrary observables.
+Unlike standard binned cross section measurements, the unbinned full-phase-space measurement is best understood as a dataset that can be processed to produce measurements of arbitrary observables.
 This section presents applications of this dataset to produce measurements of four observables.
 The broad goal of each application is to provide measurements that can be used to improve the theoretical modeling of QCD processes, addressing one of the open problems discussed in \Cref{ch:intro}.
 In some cases the measurements are immediately applicable to this goal since large deviations between the data and current theoretical models are observed.
@@ -1031,7 +1031,7 @@ The other three applications would either require significant approximations, or
 \subsection{Underlying Event Observables}
 \label{sec:zjets-results-ue}
 
-Measurements of simple event-level observables can be produced en-masse with the full phase space measurement by simply calculating the observable and binning the data.
+Measurements of simple event-level observables can be produced en-masse with the full-phase-space measurement by simply calculating the observable and binning the data.
 The resulting plots are very similar to IBU based measurements of the same observables as can be seen in \Cref{sec:zjets-validation-ibu}, but the underlying unbinned measurement is far more flexible.
 For example, correlations between event-level observables are preserved and can be used in down-stream applications, the binning applied to each observable can be modified without the need to re-run the unfolding, and the observables can be measured in sub-regions of the full fiducial volume.
 Two measurements of standard observables that show particularly poor modeling by the MC generators, \nch and \HT, are shown in this section.
@@ -1084,7 +1084,7 @@ The limited time that human researchers have to produce these calibrations impli
 Measurements utilizing jet definitions beyond these few supported types of jets are difficult, and few such measurements have been performed~\cite{ATLAS:2013uet}.
 The result is that questions of how different jet definitions affect jet substructure are largely unexplored.
 
-However in the full phase space measurement, the jet itself is not a calibrated input to the measurement.
+However in the full-phase-space measurement, the jet itself is not a calibrated input to the measurement.
 It is a function constructed on the unfolded charged particles, just like any other event-level observable.
 These charged particles can be clustered using an arbitrary jet definitions, and then these jets can be used to measure arbitrary substructure observables.
 This allows questions about the interplay of jet substructure and jet definition, previously difficult and time consuming to pursue, to be answered very quickly, even without the need to conduct an additional measurement.
@@ -1099,9 +1099,9 @@ where $r$ is the angular distance from the jet axis in $(y, \phi)$ space, $\Delt
 Because the sum is averaged over jets, the observable is invariant under overall normalization changes and cannot be interpreted as a cross section.
 Note also that a given jet contributes some \pt density to each bin in the radius $r$.
 Accounting for these correlations is difficult with binned unfolding methods, but they are tracked naturally in the unbinned \Omnifold measurement since a single event weight is applied to the jets contribution to each bin.
-This makes this observable doubly difficult to measure without a full phase space measurement.
+This makes this observable doubly difficult to measure without a full-phase-space measurement.
 First each jet definition would need to be calibrated independently as mentioned above, and second the correlations between bins would need to be understood and characterized.
-The full phase space measurement elegantly avoids both of these issues.
+The full-phase-space measurement elegantly avoids both of these issues.
 
 The \pt density is calculated using all charged particles, even those that are not clustered in the jets, allowing the density to be non-zero outside of the jet radius.
 The jet selection is $p_T^{\mathrm{jet}} \in [120,\,150]$~GeV and $|y^{\mathrm{jet}}| < 1$, a narrow window just above the peak of the leading-jet \pt spectrum.
@@ -1113,7 +1113,7 @@ This dip is an artifact of the anti-$k_t$ clustering algorithm which centers the
 The unbinned measurement can provide a test of this interpretation by repeating the measurement with different jet clustering algorithms.
 \Cref{fig:zjets-results-shape-algos} compares $\langle \rho(r) \rangle$ computed with the anti-$k_t$, $k_t$~\cite{Ellis:1993tq}, and Cambridge--Aachen (C/A)~\cite{Dokshitzer:1997in} algorithms, all with a radius parameter $R = 0.4$.
 The dip at $r \approx R$ is much less pronounced for $k_t$ and C/A jets, confirming that the feature is driven by the clustering algorithm rather than by the data.
-Producing the measurements in \Cref{fig:zjets-results-shape-algos} would be very difficult with conventional unfolding methods, but requires only a light data analysis built on top of the unbinned spectra given this full phase space measurement.
+Producing the measurements in \Cref{fig:zjets-results-shape-algos} would be very difficult with conventional unfolding methods, but requires only a light data analysis built on top of the unbinned spectra given this full-phase-space measurement.
 Further exploration of jet shape observables, including many exotic observables that have never been measured in data, should be explored with these data in the future~\cite{Ba:2023hix,Gambhir:2024ndc}.
 
 \FloatBarrier
@@ -1145,7 +1145,7 @@ This requires a three-dimensional unfolding, which is at the limit of what can b
 Second, even if binned methods can be made to work in two or three dimensions they do not account for correlations in the bin counts resulting from each particle in an event entering the histogram many times.
 As with the jet shape observables in \Cref{sec:zjets-results-shape}, the \Omnifold measurement handles this effect naturally since the correlations are preserved by the common event weight.
 
-\Cref{fig:zjets-results-eec} shows the EEC measured using the full phase space measurement, with the sum running over all pairs of charged particles in the event.
+\Cref{fig:zjets-results-eec} shows the EEC measured using the full-phase-space measurement, with the sum running over all pairs of charged particles in the event.
 This is the first measurement of this observable in proton--proton collisions, since all existing measurements either use jets as input objects rather than individual particles, or measure the EEC within individual jets rather than on the event as a whole.
 The practical distinction between measuring the EEC with all particles rather than within jets is that the measurement is not truncated when the angular distance between charged particle pairs grows larger than the jet radius.
 The measurement achieves $5\%$ accuracy or better across the full range of $z$ shown in the figure, which corresponds to opening angles from $0.002$ to $0.64$ radians.
@@ -1164,9 +1164,9 @@ Below the hadronization regime at $z < 10^{-4}$, the \sherpa generator substanti
 A similar effect was observed in Ref.~\cite{CMS:2024mlf}.
 The \mgpy generator describes this regime to within several percent.
 The covariance matrix of the measurement, shown in \cref{fig:zjets-results-eec-cov}, encodes the bin-to-bin correlations of the total uncertainty and is required for any quantitative use of the measurement, such as an extraction of $\alpha_s$.
-This matrix would be difficult to extract from a measurement of this observable relying on binned unfolding methods, but is easily available from the full phase space measurement.
+This matrix would be difficult to extract from a measurement of this observable relying on binned unfolding methods, but is easily available from the full-phase-space measurement.
 
-A further benefit of the full phase space measurement is that higher order ($N > 2$) energy correlator observables are also measured.
+A further benefit of the full-phase-space measurement is that higher order ($N > 2$) energy correlator observables are also measured.
 Though these applications are not shown here, this would be a relatively straightforward extension.
 In particular the ratio of the E3C to the E2C is very sensitive to $\alpha_s$ and could be used to extract this parameter from jet substructure.
 Higher point correlators than the E3C have never been measured in data, so this application of this measurement would be very novel and valuable.
@@ -1183,7 +1183,7 @@ This is part of the reason this class of observables have never been measured in
 However unbinned measurements circumvent this problem since the result is a dataset rather than a histogram, and this dataset can be used as input to any intrinsic dimension estimator.
 In principle this could have been done using the 24-dimensional cross section produced by the Multifold measurement, but this dimensionality would be unphysical since the inputs would be summary observables of the underlying data rather than the data themselves.
 Calculating a physical intrinsic dimensionality requires that the data are used as input, and this requires that the four-momenta of individual particles are unfolded.
-This is exactly the setup delivered by the full phase space measurement.
+This is exactly the setup delivered by the full-phase-space measurement.
 This section presents the first measurement of the intrinsic dimensionality of a particle physics dataset using the nearest-neighbor intrinsic dimension estimator (NNID)~\cite{NIPS2004_74934548} evaluated on a sample of jets drawn from the unfolded charged final state.
 
 The procedure for calculating the NNID starts with clustering jets with the anti-$k_T$ algorithm and a radius parameter of 1.0 using the particle-level MC samples needed to build the measurement.
@@ -1235,7 +1235,7 @@ Ideally this measurement also serves as some motivation for the theory community
 \section{Discussion}
 \label{sec:zjets-discussion}
 
-This chapter has presented a full phase space measurement of $Z(\to\mu\mu)$+jets production in proton--proton collisions at $\sqrt{s} = 13$~TeV using the full Run~2 ATLAS dataset.
+This chapter has presented a full-phase-space measurement of $Z(\to\mu\mu)$+jets production in proton--proton collisions at $\sqrt{s} = 13$~TeV using the full Run~2 ATLAS dataset.
 The measurement is the highest-dimensional cross section measurement ever performed, reaching up to 843 simultaneous dimensions and a mean of 150 dimensions per event.
 It supersedes the previous round Multifold measurement~\cite{ATLAS:2024xxl}, extending from a fixed set of 24 observables to the phase space of all charged particles.
 The result is best understood as a dataset rather than a histogram, which can be projected onto any observable of interest without repeating the measurement.
@@ -1260,7 +1260,7 @@ Finally, quark/gluon tagging applied to the charged particle jets would allow di
 One limitation of the measurement is that all observables are constructed from charged particles only, so direct comparison to perturbative QCD calculations is complicated by the absence of the neutral component.
 Significant theoretical progress has been made in this direction through the track function formalism~\cite{Chang:2013rca,Chang:2013iba}, which provides a systematic framework for performing perturbative calculations on charged-particle observables.
 
-This measurement also demonstrates that full phase space cross section measurements are technically feasible at a hadron collider, so extension of these methods to measurements of other processes is a natural next step.
+This measurement also demonstrates that full-phase-space cross section measurements are technically feasible at a hadron collider, so extension of these methods to measurements of other processes is a natural next step.
 Dijet production, diboson production, top quark pair production, Higgs processes, and multi-lepton final states are all promising targets.
 Measurements of these processes would be very useful for global EFT fits~\cite{CMS:2023xyc,CMS:2025ugn,Heimel:2024drk}, which currently rely on a patchwork of binned measurements that are typically single or double differential at best.
 Highly differential cross section measurements are useful for breaking degeneracies between EFT operators in likelihood fits, so highly differential measurements produced through unbinned and high-dimensional unfolding would be ideal inputs for EFT fits performed by phenomenologists.
