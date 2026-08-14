@@ -379,7 +379,7 @@ Translating to the notation of \Cref{sec:ddpm}, $\hat{\varepsilon}_\theta$ is th
 \paragraph{Noise schedule.}
 When training the VLD model, we follow Ref.~\cite{kingma2021variational} and parametrize the noise schedule as 
 \begin{equation}
-    \sigma_t^2 = \textrm{sigmoid}(\gamma_\eta(t))
+    \sigma_t^2 = \textrm{sigmoid}(\gamma_\eta(t)),
     \label{eq:noise-schedule}
 \end{equation}
 where $\gamma_\eta(t)$ is a monotonic neural network with learned parameters $\eta$.
@@ -672,7 +672,7 @@ The particle-level event configuration to be predicted by VL-VLD is then a set o
 Jet clustering reduces the dimensionality of the required posterior, but this simplified representation is still variable dimensional.
 Events contain between four and ten jets at particle level, corresponding to a posterior with several tens of dimensions on average.
 
-As in the previous section, simulated $t\bar{t}$ events from proton--proton collisions are generated with the Standard Model (SM) at a centre-of-mass energy of $\sqrt{s}=13$~TeV using \textsc{MadGraph\_aMC@NLO}~\cite{Alwall:2014hca} for the matrix element calculation and \textsc{Pythia8}~\cite{Sjostrand:2014zea} for the parton showering and hadronization.
+As in the previous section, simulated $t\bar{t}$ events from proton--proton collisions are generated with the Standard Model (SM) at a center-of-mass energy of $\sqrt{s}=13$~TeV using \textsc{MadGraph\_aMC@NLO}~\cite{Alwall:2014hca} for the matrix element calculation and \textsc{Pythia8}~\cite{Sjostrand:2014zea} for the parton showering and hadronization.
 Interaction with the experimental apparatus is simulated with \textsc{Delphes}~\cite{deFavereau:2013fsa} using the default CMS detector card.
 Events are required to have one electron or muon and at least four jets, of which at least two are $b$-tagged using the standard \textsc{Delphes} b-tagging approximation.
 Electrons, muons, and jets are required to have a transverse momentum \pt $> 25$~GeV and absolute pseudo-rapidity $|\eta| < 2.5$.

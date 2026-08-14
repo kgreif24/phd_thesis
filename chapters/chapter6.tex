@@ -676,7 +676,7 @@ In order to reweight some source distribution to match a target, one iteration o
 \begin{itemize}
   \item The variable with the worst agreement between the source and target is determined as the one with the worst (largest) `chi-squared pull', using binned spectra ($n_\text{dof}=n_\text{bins}$):
   \begin{align}
-  z_{\chi^2} &= \frac{\chi^2-E[\chi^2]}{\sigma[\chi^2]} = \frac{\chi^2-n_\text{dof}}{\sqrt{2n_\text{dof}}}
+  z_{\chi^2} &= \frac{\chi^2-E[\chi^2]}{\sigma[\chi^2]} = \frac{\chi^2-n_\text{dof}}{\sqrt{2n_\text{dof}}}.
   \end{align}
   \item A Gaussian Kernel fit is then performed for the identified variable, resulting in a smooth function that quantifies the target to source ratio
   \item The source events are then reweighted based on the result of the fit. Each source event weight is multiplied by the target to source ratio given by the Gaussian Kernel fit evaluated at the value of the variable in question

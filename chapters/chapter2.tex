@@ -17,13 +17,13 @@
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.85\linewidth, alt={Diagram of the Standard Model elementary particles, organized by quarks, leptons, gauge bosons, and the Higgs boson, with their masses, charges, and spins labeled.}]{figures/ch2/particle_content}
-  \caption{The elementary particles of the Standard Model. The dynamics of the 6 quarks and the 8 gluons (all gluon fields are represented by one box in the diagram), described by the theory of quantum chromodynamics, is most relevant to this thesis. Figure reproduced from Ref.~\cite{Cush:SMdiagram} under the CC~3.0 license.}
+  \caption{The elementary particles of the Standard Model. The dynamics of quarks and gluons, described by the theory of quantum chromodynamics, are most relevant to this thesis. Figure reproduced from Ref.~\cite{Cush:SMdiagram} under the CC~3.0 license.}
   \label{fig:sm-particles}
 \end{figure}
 
 \input{tables/particle_reps.tex}
 
-This chapter provides a very high level overview of quantum chromodynamics (QCD), with a focus on the aspects of the theory relevant to the Large Hadron Collider (LHC).
+This chapter provides a very high level overview of QCD, with a focus on the aspects of the theory relevant to the LHC.
 It does not survey the Standard Model or QCD with any completeness.
 Instead the goal is to motivate two of the observables measured in Chapter~\ref{ch:zjets} from first principles.
 They will be introduced in Sections~\ref{sec:eec} and~\ref{sec:id}.
@@ -31,7 +31,7 @@ They will be introduced in Sections~\ref{sec:eec} and~\ref{sec:id}.
 QCD is our current best theory of the strong nuclear force.
 It affects the dynamics of all particles that carry color charge, meaning they transform under a non-trivial representation of the $\mathrm{SU}(3)_c$ sub-group of the Standard Model gauge group:
 \begin{equation}
-  \mathrm{SU}(3)_c \times \mathrm{SU}(2)_L \times \mathrm{U}(1)_Y
+  \mathrm{SU}(3)_c \times \mathrm{SU}(2)_L \times \mathrm{U}(1)_Y.
   \label{eqn:sm_gauge_group}
 \end{equation}
 The particles of the Standard Model are shown in Figure~\ref{fig:sm-particles}.
@@ -146,7 +146,7 @@ At high energies, quarks and gluons can propagate freely but this does not mean 
 The QCD splitting functions, which describe the probability of a parton\footnote{Quarks and gluons are often referred to as partons, since they are the constituent parts of the hadrons we observe at low energies. At high energies, the term is still used but is less descriptive since quarks and gluons can propagate freely.} to emit a gluon, have soft and collinear divergences.
 The leading-order splitting function is given schematically by
 \begin{equation}
-  dP = \frac{\alpha_s}{\pi} C_f \frac{d\epsilon}{\epsilon}\frac{d\theta^2}{\theta^2}
+  dP = \frac{\alpha_s}{\pi} C_f \frac{d\epsilon}{\epsilon}\frac{d\theta^2}{\theta^2},
   \label{eqn:splitting}
 \end{equation}
 where $\epsilon = 1 - z$ is one minus the momentum fraction carried by one of the daughter partons $z$, $C_F = 4/3$ is the fundamental Casimir of $\mathrm{SU}(3)$, and $\theta$ is the emission angle between the daughter partons.
@@ -257,7 +257,7 @@ See Ref.~\cite{Moult:2025nhu} for a recent review.
 Interest has been driven by a few properties of the two-point correlator in the highly collinear limit, which is dominated by the highly collimated radiation within jets.
 The two-point correlator is given as
 \begin{equation}
-  EEC(z) = \frac{1}{\sigma} \sum_{i,j} \int d\sigma \frac{E_i E_j}{Q^2} \delta(z - \frac{1- \cos \theta_{ij}}{2})
+  EEC(z) = \frac{1}{\sigma} \sum_{i,j} \int d\sigma \frac{E_i E_j}{Q^2} \delta(z - \frac{1- \cos \theta_{ij}}{2}),
   \label{eqn:eec}
 \end{equation}
 where $\sigma$ is the total cross section, $E_i$ is the transverse energy of the $i$-th particle, $Q$ is the sum of the transverse energies of all particles ($\sum_i E_i$), $\theta_{ij}$ is the angle between the three-momentum vectors of the $i$-th and $j$-th particles, and $z = \frac{1- \cos \theta_{ij}}{2}$.
@@ -435,7 +435,7 @@ Varying the index $i$ then produces a curve that shows how the NNID estimator ev
 
 Note that particle physics datasets are typically produced with event weights.
 This is true for simulated datasets produced by event generators, and for the unbinned spectra that build the cross section measurement in \Cref{ch:zjets}.
-The NNID calculation can be extended to accommodate event weights by scaling each jet's contribution to the likelihood in \Cref{eqn:likelihood} by its weight, and replacing the nearest neighbor assignments $i(k)$ and $j(k)$ by their weighted analogues.
+The NNID calculation can be extended to accommodate event weights by scaling each jet's contribution to the likelihood in \Cref{eqn:likelihood} by its weight, and replacing the nearest neighbor assignments $i(k)$ and $j(k)$ by their weighted analogs.
 
 \subsection{Generator-Level Results}
 
