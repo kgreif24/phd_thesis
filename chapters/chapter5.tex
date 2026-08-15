@@ -6,6 +6,7 @@ This chapter is a detailed treatment of \textit{unfolding}, a problem in particl
 It will introduce the problem and why it is important in LHC physics, then illustrate conventional solutions that have been in use for many years.
 Then it will turn to AI/ML based unfolding methods, highlighting a few methods that I played a role in developing.
 These methods enable very high dimensional cross section measurements with many downstream physics applications.
+The results have been published in Refs.~\cite{Shmakov:2023kjj,Shmakov:2024gkd,Huetsch:2024quz,Petitjean:2025tgk}.
 The Chapter closes with an overview of the \Omnifold method.
 This method is applied to experimental data to produce such a high dimensional cross section measurement in \Cref{ch:zjets}.
 
@@ -14,7 +15,7 @@ This method is applied to experimental data to produce such a high dimensional c
 
 The detectors used in particle physics experiments are not perfect.
 Every measurement they make has finite resolution and acceptance.
-For example the ATLAS calorimeters are divided into calorimeter cells whose size place a firm lower bound on the angular resolution, and ATLAS as a whole has limited acceptance in the forward region because detectors cannot be placed inside the beampipe.
+For example the ATLAS calorimeters are divided into calorimeter cells whose size places a firm lower bound on the angular resolution, and ATLAS as a whole has limited acceptance in the forward region because detectors cannot be placed inside the beampipe.
 These imperfect measurements introduce \textit{detector effects} which must be accounted for in order to compare cross section measurements to theoretical predictions\footnote{Note that it is possible to neglect these effects if the measurement is performed in sufficiently coarse bins or in regions of phase space where acceptance effects are negligible. In this case the response matrix (see \Cref{sec:binned-unfolding-methods}) is completely diagonal and the detector-level and truth-level histograms are identical. These cases are rare because measurements are typically designed to make full use of the detector response, and so use finer binning and more inclusive phase space selections at the expense of introducing significant detector effects.}.
 There are two general approaches to accounting for detector effects.
 The first is \textit{forward folding} in which theoretical predictions, specifically the output of an MC event generator (see \Cref{ch:qcd}) that specifies the final state four-momenta of all long-lived particles produced in a collision, are passed through a simulation of the detector response and compared to the raw experimental data.
@@ -33,8 +34,8 @@ A complete list is:
 \begin{enumerate}[label={(\arabic*)}]
     \item Acceptance and efficiency: particles produced may not be measured, or migrate out of the fiducial volume targeted by the measurement between truth level and detector level.
     \item Fakes: particles measured may not be from real particles, or migrate in to the fiducial volume targeted by the measurement between truth level and detector level.
-    \item Background processes: if one wants to measure the differential cross section of a particular process, then you may want to subtract the contributions from background processes.
-    \item Combinatorics: if there are $n$ particles and you want to measure the properties of a particular order (e.g. leading $p_T$), the detector effects can change the order.
+    \item Background processes: if one wants to measure the differential cross section of a particular process, then one may want to subtract the contributions from background processes.
+    \item Combinatorics: if there are $n$ particles and one wants to measure the properties of a particular order (e.g. leading $p_T$), the detector effects can change the order.
     \item Detector distortions: the detector response introduces bias and resolution effects.
 \end{enumerate}
 In a well-structured measurement, the unfolding will primarily need to address effect (5).
@@ -47,25 +48,25 @@ These may be very sub-leading in which case the precision of both approaches is 
 Despite this limitation, unfolding is often worth the added uncertainty for a few reasons which are worth spelling out in detail:
 
 \begin{itemize}
-    \item Unfolded measurements can be compared directly to theoretical predictions furnished by MC event generators without the need to pass the simulated events through the detector simulation. This is an enormous practical benefit. The general hope with any cross section measurement is that it will be used to improve our knowledge of particle physics, for example by constraining a free parameter of the Standard Model or tuning a hadronization model used to provide theoretical predictions. All of these downstream tasks are greatly simplified when detector simulation is not needed. For LHC datasets, the detector simulation is mostly proprietary, computationally expensive, and requires substantial expertise to run, making the forward folding approach inconvenient\footnote{Note that ``inconvenient'' can mean anything from hard to do within the personnel and funding constraints of a research group, to computationally infeasible with existing computational resources. Some downstream applications, for example fitting many Wilson coefficients of an effective field theory to measured spectra, require large amounts of simulation that may be impossible to produce at detector level.}. For legacy datasets, such as those produced by experiments at LEP or SLC, the detector simulation is no longer available, making the forward folding approach impossible. Unfolding can then be understood as a way of preserving cross section measurements for future unforeseen use cases, which might be understood only many years after the intial data taking of an experiment is complete.
-    \item Unfolded measurements can be compared to non fully-inclusive theory predictions. In particular they can be compared to resummed calculations of jet substructure observables, which are defined at particle level but are represented as smooth functions rather than lists of final state particle four-momenta. This is an underappreciated motivation for unfolding. It is \textbf{required} to compare data to the rigorously understood theoretical predictions provided by state-of-the-art QCD calculations.
+    \item Unfolded measurements can be compared directly to theoretical predictions furnished by MC event generators without the need to pass the simulated events through the detector simulation. This is an enormous practical benefit. The general hope with any cross section measurement is that it will be used to improve our knowledge of particle physics, for example by constraining a free parameter of the Standard Model or tuning a hadronization model used to provide theoretical predictions. All of these downstream tasks are greatly simplified when detector simulation is not needed. For LHC datasets, the detector simulation is mostly proprietary, computationally expensive, and requires substantial expertise to run, making the forward folding approach inconvenient\footnote{Note that ``inconvenient'' can mean anything from hard to do within the personnel and funding constraints of a research group, to computationally infeasible with existing computational resources. Some downstream applications, for example fitting many Wilson coefficients of an effective field theory to measured spectra, require large amounts of simulation that may be impossible to produce at detector level.}. For legacy datasets, such as those produced by experiments at LEP or SLC, the detector simulation is no longer available, making the forward folding approach impossible. Unfolding can then be understood as a way of preserving cross section measurements for future unforeseen use cases, which might be understood only many years after the initial data taking of an experiment is complete.
+    \item Unfolded measurements can be compared to non-fully-inclusive theory predictions. In particular they can be compared to resummed calculations of jet substructure observables, which are defined at particle level but are represented as smooth functions rather than lists of final state particle four-momenta. This is an underappreciated motivation for unfolding. It is \textbf{required} to compare data to the rigorously understood theoretical predictions provided by state-of-the-art QCD calculations.
     \item Finally unfolded measurements are much easier to combine with other measurements, perhaps from different experiments, to exploit additional statistical power. Combining forward folded measurements is possible, but requires access to the detector simulation for proper correlation of uncertainties. This becomes especially difficult if results from different experiments are combined. Combining unfolded spectra is much easier. See Ref.~\cite{Heimel:2024drk} for an excellent example.
 \end{itemize}
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.66\linewidth]{figures/ch5/paper_citations.png}
+    \includegraphics[width=0.66\linewidth, alt={Overlaid histograms of citation counts received by ATLAS and CMS physics results, comparing searches, measurements that forward fold, and measurements that unfold.}]{figures/ch5/paper_citations.png}
     \caption{Histograms of all ATLAS and CMS physics results in the number of citations received. The tail of the distribution at very high citation counts is not shown. Histograms are shown for searches, measurements which forward fold, and measurements which unfold. Data scraped from the InspireHEP archive, and sorted based on keywords in abstracts and whether they cite key papers. Note these data are very approximate given unfolding is not always labeled explicitly.}
     \label{fig:paper-citations}
 \end{figure}
 
 Given that these motivations may or may not apply depending on the goals of a given measurement, the decision to use forward folding or unfolding is highly context specific.
-It's worth mentioning a few contexts from LHC physics before moving on.
+It is worth mentioning a few contexts from LHC physics before moving on.
 Searches for beyond-Standard-Model (BSM) particles almost never unfold.
 Such searches look for coherent shapes like resonances in low-statistics regions of phase space, and unfolding would substantially reduce sensitivity.
 It is true that a search using unfolded spectra would be vastly easier to re-interpret, but there is little practical motivation for doing this since well-established procedures exist within the experimental collaborations for re-interpreting searches via forward folding.
 Among measurements of Standard Model processes, unfolding is used in roughly one third of published ATLAS and CMS measurements (excluding for example detector performance papers and searches), as illustrated in \Cref{fig:paper-citations}.
-Extractions of parameters such as particle masses or Wilson coefficients typically do not unfold unless one of the goals of the result is to be used in combinations, while differential cross section measurements typically do.
+Extractions of parameters such as particle masses or Wilson coefficients typically do not unfold unless the result is intended to be used in combinations, while differential cross section measurements typically do.
 This picture is complicated by the fact that some unfolded measurements are not described as such explicitly.
 The Simplified Template Cross Section (STXS) framework used in ATLAS and CMS Higgs measurements~\cite{Berger:2019wnu}, for example, is an instance of profile likelihood unfolding (see \Cref{sec:binned-unfolding-methods}), but is rarely labeled as such in publications.
 In summary, unfolding occupies a niche but important role in the LHC physics program, and is essential for data preservation and comparisons to resummed theory calculations.
@@ -74,7 +75,7 @@ In summary, unfolding occupies a niche but important role in the LHC physics pro
 \label{sec:binned-unfolding-methods}
 
 For the past century of physics research, cross section measurements have been reported as bin counts in histograms.
-Given the goal is to report a histogram, the unfolding task reduces to inferring a truth-level histogram given to inputs: the detector-level histogram produced by binning the data, and a \textit{response matrix} that encodes how events migrate between the defined bins at truth-level and detector-level.
+Given the goal is to report a histogram, the unfolding task reduces to inferring a truth-level histogram given two inputs: the detector-level histogram produced by binning the data, and a \textit{response matrix} that encodes how events migrate between the defined bins at truth-level and detector-level.
 This response matrix is constructed by binning the truth-level and detector-level configurations of a sample of simulated events provided by an event generator.
 
 The unfolding problem can be formalized as a system of linear equations
@@ -96,11 +97,11 @@ In practice this maximum likelihood estimator is often not useful, because the r
 The maximum likelihood solution amplifies statistical fluctuations in the detector-level histogram by factors proportional to the condition number of the response matrix.
 If the matrix is ill-conditioned and the condition number is large, the maximum likelihood estimator for the truth histogram has large variance.
 This means that the naive solution to \Cref{eq:foldingequation} is highly unstable, in that small changes to the detector level histogram produce large and unphysical fluctuations in the predicted truth level histogram.
-The most commonly used unfolding methods reduce this large variance by injecting a small bias into the estimator, a procedure known as \textit{regularization} with conceptual ties to the bias-variance tradeoff discussed in \Cref{sec:ml-overview}.
+The most commonly used unfolding methods reduce this large variance by injecting a small bias into the estimator, a procedure known as \textit{regularization} with conceptual ties to the bias--variance tradeoff discussed in \Cref{sec:ml-overview}.
 In HEP applications this bias is typically estimated and propagated as a systematic uncertainty on the final result.
 Reviews of binned unfolding methods in the context of high-energy physics can be found in Refs.~\cite{Cowan:2002in, Blobel:2011fih}.
 A common feature of all methods is that they do not scale beyond unfolding a few simultaneous dimensions.
-This is due to the curse of dimensionality, where the number of bins in a histogram grows exponentially with the number of dimensions making populating the bins of a high dimensional histogram intractable.
+This is due to the curse of dimensionality, where the number of bins in a histogram grows exponentially with the number of dimensions making populating the bins of a high-dimensional histogram intractable.
 The inability of binned unfolding methods to scale to high dimensions is one motivation for unbinned unfolding, which will be discussed in the next Section.
 
 \subsection{Profile Likelihood Unfolding}
@@ -141,7 +142,7 @@ See Ref.~\cite{Collaboration:2944725} for an example of relatively high-dimensio
 
 The standard binned unfolding method in HEP is \textit{Iterative Bayesian Unfolding} (IBU)~\cite{DAgostini:1994fjx}, also known as Lucy-Richardson deconvolution in other fields~\cite{Lucy:1974yx, Richardson:1972}.
 IBU is an example of an expectation-maximization (EM) algorithm, where a likelihood over the bin counts for both the detector-level and truth-level histograms is approximated with an expectation value (expectation step) and then maximized (maximization step).
-Note that the expectation step is required because we don't know the truth-level bin counts by construction.
+Note that the expectation step is required because we do not know the truth-level bin counts by construction.
 Instead we have a prior furnished by MC simulation that is iteratively updated, which is why the method is referred to as Bayesian even though it is fundamentally attempting to maximize a likelihood.
 For simplicity the equations below set $\textbf{b}=\textbf{0}$ and $\textbf{f}=\textbf{c}=\textbf{1}$, so \Cref{eq:foldingequation} reduces to $\textbf{R}\cdot\textbf{t} = \textbf{d}$.
 
@@ -183,16 +184,16 @@ This section motivates adopting unbinned and high-dimensional unfolding techniqu
 
 There are three key challenges of the binned unfolding methods, all of which can be addressed by unbinned and high-dimensional unfolding.
 First, with binned methods the binning must be fixed before the measurement is complete and cannot be changed without rerunning the analysis code which requires access to the data.
-This is limiting because cross section measurements can be used for different purposes, and a binning optimized for one applications will often be inappropriate for another.
+This is limiting because cross section measurements can be used for different purposes, and a binning optimized for one application will often be inappropriate for another.
 This is particularly relevant if one wishes to compute statistical moments of measured distributions, since binning introduces artifacts that will bias the result.
 Unbinned unfolding avoids all of this by allowing the binning to be adjusted post-hoc or avoided entirely in the case of computing statistical moments.
 This trick will be used extensively in \Cref{ch:zjets}.
 Note that unbinned but low-dimensional unfolding methods that do not used deep learning have been proposed~\cite{Lindemann:1995ut, Aslan:2003vu, Glazov:2017vni}, as well as a deep learning approach for unfolding statistical moments directly~\cite{Desai:2024yft}.
 
 The second challenge is that binned unfolding methods do not scale to high dimensions.
-This means that all cross section measurements performed before 2019 are differential in usually one, or at most two or three observables.
+This means that all cross section measurements performed with them are differential in typically no more than two observables.
 As discussed in \Cref{sec:binned-unfolding-methods}, extending binned unfolding to more dimensions is not possible due to the curse of dimensionality.
-High-dimensional unfolding make measurements of very highly differential cross sections possible.
+High-dimensional unfolding makes measurements of very highly differential cross sections possible.
 In practice this requires the unfolding be unbinned, and rely on machine learning methods since they are a natural tool for processing high-dimensional data.
 
 The third challenge is that low-dimensional unfoldings do not take into account all possible auxiliary features that control the detector response.
@@ -222,7 +223,7 @@ A growing number of experimental measurements, summarized in \Cref{tab:unbinned-
 All of them use the \Omnifold algorithm, which is described in detail in \Cref{sec:omnifold}.
 The measurements span a range of collision systems, including $pp$, $ep$, $e^+e^-$, and neutrino scattering, illustrating that these methods are general purpose and not only for use in LHC experiments.
 The world record for the highest-dimensional cross section measurement is held by a preliminary H1 result~\cite{H1:prelim}, which targets the full phase space of high-$Q^2$ DIS events that reaches a maximum of a few hundred dimensions.
-This preliminary result was a proof of concept for full phase space measurements.
+This preliminary result was a proof of concept for full-phase-space measurements.
 The rest of the measurements in \Cref{tab:unbinned-unfolding-measurements} target fixed-length cross sections ranging from 4 to 24 simultaneous dimensions.
 Only a few of these measurements are from LHC collaborations, and most have been carried out in the past two to three years.
 Remaining barriers to broader adoption of these methods by the community will be discussed in \Cref{ch:conclusion}.
@@ -270,13 +271,13 @@ This requires a differentiable surrogate for the detector response $p(x \mid z)$
 Since neural networks are differentiable by construction, gradients can flow through $q_\theta(x \mid z)$ allowing for the direct optimization of $q_\phi(z)$ using a log-likelihood loss as in \Cref{sec:generative}.
 The models $q_\theta$ and $q_\phi$ can be optimized independently or jointly end-to-end~\cite{Vandegar:2020yvw, Butter:2025via}.
 These methods are attractive for their direct approach and the ability to include nuisance parameters in the unfolding problem as with profile likelihood unfolding.
-However the optimization can be difficult, especially in high and variable dimensional settings where point-cloud generative models must be trained.
+However the optimization can be difficult, especially in high- and variable-dimensional settings where point-cloud generative models must be trained.
 
-The classifier based approach, which has only been recently explored, replaces the generative models with classifiers.
+The classifier-based approach, which has only been recently explored, replaces the generative models with classifiers.
 Dividing both sides of \Cref{eq:folding-continuous} by a reference density provided by an alternative simulation $p_{\mathrm{sim}}(x)$ yields a ratio equation, where the ratios can be learned with classifiers via the likelihood ratio trick discussed in \Cref{ch:ml}.
 A novel loss function enforces that the learned ratios solve the integral equation.
 This method is purely classifier-based and solves the integral equation directly without EM iteration~\cite{Ore:2026qgp}.
-This new method carries substantial promise because it does not require training generative models, but the lack of iterations makes the method substantially less computationally expensive than \Omnifold, which is the only other purely-classifier unfolding method.
+This new method carries substantial promise because it does not require training generative models and the lack of iterations makes the method substantially less computationally expensive than \Omnifold, which is the only other purely-classifier unfolding method.
 See in addition Ref.~\cite{Qureshi:2026oiv} for a recent method that derives a similar reweighting using an adversarial loss rather than classification.
 
 \subsection{Generative Unfolding Methods}
@@ -297,17 +298,17 @@ This defines a truth-level distribution $p^{(n+1)}(z)$ that is used as the prior
 This approach requires passing samples from the updated truth-level distribution through the detector simulation, possibly via a surrogate model~\cite{Butter:2025mek}.
 
 These methods are quite mature, but as of this writing none have been applied to experimental data.
-This is partially because they require additional machine learning complexity (the training of generative models) but reduce to the same statistical procedure as the classifier based \Omnifold.
-These methods do have lighter assumptions than \Omnifold on the support of the MC simulations used in the training, but it is unclear whether these assumptions are ever actually limiting for \Omnifold and how much better the generative model based approaches would perform if such a case were found.
+This is partially because they require additional machine learning complexity (the training of generative models) but reduce to the same statistical procedure as the classifier-based \Omnifold.
+These methods do have lighter assumptions than \Omnifold on the support of the MC simulations used in the training, but it is unclear whether these assumptions are ever actually limiting for \Omnifold and how much better the generative-model-based approaches would perform if such a case were found.
 This is doubly true because the same MC simulation support assumptions enter if the classifier-based approach is used in the M-step.
-The purely generative model based approach of Ref.~\cite{Butter:2025mek} is explicitly free of them, but still implicitly carries assumptions given generative models have difficulty generalizing out of distribution.
+The purely generative-model-based approach of Ref.~\cite{Butter:2025mek} is explicitly free of them, but still implicitly carries assumptions given generative models have difficulty generalizing out of distribution.
 For another alternative, see Ref.~\cite{Acosta:2025shf} which forgoes the EM procedure entirely, and treats unfolding as a Bayesian problem with a fixed prior.
 Despite these issues applications of methods that replace parts of the EM procedure with generative models should be pursued, since the pros and cons of different methods often only appear in realistic circumstances.
 
 \subsection{Classifier-Based EM}
 \label{sec:omnifold-preview}
 
-The final class of methods uses the EM procedure but uses classifiers to estimate density ratios rather then generative models to estimate densities.
+The final class of methods uses the EM procedure but uses classifiers to estimate density ratios rather than generative models to estimate densities.
 \Omnifold~\cite{Andreassen:2019cjw} and its variants~\cite{Chan:2023tbf, Zhu:2024drd} are the prime example of these techniques.
 Given \Omnifold is central to the $Z$+jets measurement detailed in \Cref{ch:zjets}, a full discussion is provided in \Cref{sec:omnifold}.
 
@@ -319,7 +320,7 @@ Given \Omnifold is central to the $Z$+jets measurement detailed in \Cref{ch:zjet
 
 Ref.~\cite{Shmakov:2023kjj}, the second major research contribution of this thesis, was the first paper to apply diffusion models to unfolding.
 It considers only the E-step of the EM algorithm, and uses a diffusion model framework to model the posterior on the left-hand-side of \Cref{eq:ibu-continuous-estep}.
-Before this study, the normalizing flow based approach of Ref.~\cite{Bellagente:2020piv} was the state-of-the-art result for this task.
+Before this study, the normalizing-flow-based approach of Ref.~\cite{Bellagente:2020piv} was the state-of-the-art result for this task.
 Rather than use a standard DDPM as discussed in \Cref{sec:ddpm} to model the posterior, we chose to use a novel framework termed \textit{variational latent diffusion} (VLD), which to our knowledge had never appeared in the generative modeling literature before this paper.
 
 The VLD model stems from latent diffusion models (LDMs), which are a popular class of models that are roughly speaking the current state of the art for image generation tasks.
@@ -331,7 +332,7 @@ These multi-modal embeddings were ultimately not used in modeling the posterior 
 However they were an early motivation to explore latent diffusion, because the posterior must condition generation of one modality of data (the truth-level event configuration) on another modality of data (the detector-level event configuration).
 
 However the LDMs in Ref.~\cite{rombach2022high} train the VAE and diffusion models independently.
-This approach is simple and easy, but it intuitively lowers the capactiy of the end-to-end model given the VAE latent space is not optimized to be a useful representation in which to train a diffusion model.
+This approach is simple and easy, but it intuitively lowers the capacity of the end-to-end model given the VAE latent space is not optimized to be a useful representation in which to train a diffusion model.
 A possible improvement is to optimize all aspects of the end-to-end model (the VAE and the diffusion model) simultaneously.
 This requires constructing a single unified training objective for both models, which is the topic of the next section.
 
@@ -339,12 +340,12 @@ This requires constructing a single unified training objective for both models, 
 
 A schematic of the VLD model is provided in \Cref{fig:vld-diagram}.
 A few notational differences between this section and the rest of the thesis should be stated explicitly.
-The variables $x$ and $y$ denote the truth-level and detector-level event configurations respecitvely.
-Like all diffusion models, the VLD framework introduces a set of latent variables $z_t$, parametrized by a continuous diffuion time $t \in [0, 1]$.
+The variables $x$ and $y$ denote the truth-level and detector-level event configurations respectively.
+Like all diffusion models, the VLD framework introduces a set of latent variables $z_t$, parametrized by a continuous diffusion time $t \in [0, 1]$.
 $t = 0$ corresponds to zero added noise, and $z_0$ is a draw from the VAE encoder posterior $q(z_0 \mid x, y)$.
 As $t$ increases, more Gaussian noise is added to the sample so that $z_1$ becomes pure noise and can be considered to be a sample from $p(z_1) = \mathcal{N}(0, I)$.
 If a trained noise-prediction model is in hand, samples from the posterior we seek to model can be obtained by sampling a new configuration of the latent variable $z_1$, then using either an SDE or ODE solver as outlined in \Cref{sec:generative-unfolding-methods} to reverse the diffusion process and yield a new sample from the VAE latent space.
-Finally the samples is passed through the VAE decoder which models $p(x \mid z_0, y)$.
+Finally the sample is passed through the VAE decoder which models $p(x \mid z_0, y)$.
 The latent variable $z_0$ can be marginalized over by repeating this process many times, producing a set of samples from the desired posterior.
 
 Producing this model requires training three independent neural networks: the VAE encoder and decoder, and the noise-prediction model.
@@ -379,7 +380,7 @@ Translating to the notation of \Cref{sec:ddpm}, $\hat{\varepsilon}_\theta$ is th
 \paragraph{Noise schedule.}
 When training the VLD model, we follow Ref.~\cite{kingma2021variational} and parametrize the noise schedule as 
 \begin{equation}
-    \sigma_t^2 = \textrm{sigmoid}(\gamma_\eta(t))
+    \sigma_t^2 = \textrm{sigmoid}(\gamma_\eta(t)),
     \label{eq:noise-schedule}
 \end{equation}
 where $\gamma_\eta(t)$ is a monotonic neural network with learned parameters $\eta$.
@@ -407,7 +408,7 @@ The consistency loss is
     \label{eq:vld-consistency}
 \end{equation}
 with hyperparameter $\lambda_C$ controlling the weight of this loss relative to the main VLD objective.
-This constraint can be thought of as a second term in the reconstruction loss term in \Cref{eq:loss_lvd}
+This constraint can be thought of as a second term in the reconstruction loss term in \Cref{eq:loss_lvd}.
 This constraint was found to be very useful for accurately modeling the very sharp peaks in the parton-level mass distributions of heavy resonances.
 
 \subsubsection{Model Architecture}
@@ -481,7 +482,7 @@ Distributions for a selection of parton-level observables are shown in \Cref{fig
 The VLD model is able to reproduce the truth distributions for all observables.
 This includes distributions with difficult-to-model peaks such as the masses of the $W$ bosons and top quarks.
 The agreement with the truth is not perfect but it is superior to all baselines.
-Further modeling mass peaks at parton level is very difficult since they are sharp, whereas the same observables are smeared out by parton shower and hadronization effects at particle level.
+Modeling mass peaks at parton level is very difficult since they are sharp, whereas the same observables are smeared out by parton shower and hadronization effects at particle level.
 In practice few analyses attempt to perform this type of parton-level unfolding.
 The performance shown in this Figure was state-of-the-art at the time of publication, but is probably not good enough to support a realistic measurement using LHC data.
 It would be interesting to return to this problem with some of the current state-of-the-art generative unfolding methods described below.
@@ -489,7 +490,7 @@ It would be interesting to return to this problem with some of the current state
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth, alt={Comparison of unfolded kinematic distributions for selected parton-level components including top quark masses energies and W boson masses comparing VLD UC-VLD LDM CINN and VDM models against truth distributions with ratio panels}]{figures/ch5/particle_highlights}
-    \caption{Highlighted unfolded distributions for five of the 55 unfolded observables in the parton-level event configuration. Upper panels show the predicted and truth-level distributions, and lower panels show the ratio of predicted to truth. Truth distributions are shown in blue, the results of the proposed VLD model are shown in orange, and the results of the LDM and CINN models are shown in green and red respecitvely. Figure reproduced from Ref.~\cite{Shmakov:2023kjj}.}
+    \caption{Highlighted unfolded distributions for five of the 55 unfolded observables in the parton-level event configuration. Upper panels show the predicted and truth-level distributions, and lower panels show the ratio of predicted to truth. Truth distributions are shown in blue, the results of the proposed VLD model are shown in orange, and the results of the LDM and CINN models are shown in green and red respectively. Figure reproduced from Ref.~\cite{Shmakov:2023kjj}.}
     \label{fig:particle-highlights}
 \end{figure}
 
@@ -521,23 +522,23 @@ Ref.~\cite{Shmakov:2023kjj} was the first work to apply diffusion and flow match
 This class of models remains state-of-the-art for this task, though the exact approach has been improved upon.
 The unified end-to-end VLD training objective was additionally a novel contribution to the machine learning literature, and could be useful in tasks outside of physics.
 A latent diffusion model trained with this objective achieved greater accuracy than all considered baselines, and achieved roughly a factor of 3 improvement in distribution-free metrics relative to a latent diffusion model with VAE and diffusion model optimized independently.
-This work also demonstrated that generative-AI could accurately model posteriors in several tens of dimensions.
-The parton-level phase space is described by 55 dimensions, which was the highest dimensional posterior modeling task ever considered at the time of publication.
+This work also demonstrated that generative AI could accurately model posteriors in several tens of dimensions.
+The parton-level phase space is described by 55 dimensions, which was the highest-dimensional posterior-modeling task ever considered at the time of publication.
 With this posterior model, extension of these methods to a proper unfolding method using either of the approaches described in \Cref{sec:generative-unfolding-methods} should be possible.
 Despite this progress, the VLD model is still not capable of modeling a variable-dimensional posterior, in which the number of components of the feature vector $x$ is not fixed.
-Extension of the VLD framework to this variable dimensional setting is the subject of the next section.
+Extension of the VLD framework to this variable-dimensional setting is the subject of the next section.
 
 \subsection{Variable Length VLD}
 \label{sec:vl-vld}
 
 The VLD model described in the last section is capable of accurately estimating a 55-dimensional posterior, but still has a few important limitations.
 Most importantly the model has no way to model a variable-dimensional truth-level phase space configuration.
-The generation of variable-length outputs is a prerequisite for the full phase space unfolding application described in \Cref{sec:unbinned-motivation}.
+The generation of variable-length outputs is a prerequisite for the full-phase-space unfolding application described in \Cref{sec:unbinned-motivation}.
 The parton-level task in the last section does estimate the posterior for essentially all of the parton-level phase space.
 This is possible because parton-level event configurations are typically fixed length: every event is assummed to be a semi-leptonic $t\bar{t}$ event and have exactly the set of partons described in the previous section.
 However the vast majority of LHC measurements target the particle-level phase space because unfolding to the parton-level phase space incurs significant modeling uncertainties due to the assummed parton shower and hadronization models.
 The full particle-level phase space is inherently variable dimensional, so an unfolding must either target a fixed subset of observables or accommodate variable dimensions.
-All of this strongly motivates developing methods for estimating variable-dimesional posteriors.
+All of this strongly motivates developing methods for estimating variable-dimensional posteriors.
 A final limitation of the previous section is that only the E-step of the EM procedure was considered.
 The full EM procedure can be understood as removing the \textit{prior dependence} from the modeled posterior.
 A demonstration that this prior dependence is not too large would back up the claim that the EM procedure can be applied.
@@ -545,7 +546,7 @@ The section that follows summarizes Ref.~\cite{Shmakov:2024gkd} which addresses 
 
 \subsubsection{Model Architecture}
 
-When modeling a variable-dimensional posterior $p(x \mid y)$ for unfolding with the EM algorithm, both the detector-level condition $y$ and the truth-level sample $x$ are variable dimensional vectors which are not necessarily of the same length.
+When modeling a variable-dimensional posterior $p(x \mid y)$ for unfolding with the EM algorithm, both the detector-level condition $y$ and the truth-level sample $x$ are variable-dimensional vectors which are not necessarily of the same length.
 In the remainder of this section, the truth-level phase space will be referred to as the particle-level phase space, since the VL-VLD model is specifically designed to model the posterior in particle level unfolding tasks.
 Modeling this posterior can be described as a set-conditional set-generation task.
 Specifically given a set of $M$ detector-level physics analysis objects $\mathcal{O}_D = \{y_1, y_2, \ldots, y_M\}$, the model must generate a set of $N$ truth-level objects $\mathcal{O}_P = \{x_1, x_2, \ldots, x_N\}$.
@@ -672,17 +673,17 @@ The particle-level event configuration to be predicted by VL-VLD is then a set o
 Jet clustering reduces the dimensionality of the required posterior, but this simplified representation is still variable dimensional.
 Events contain between four and ten jets at particle level, corresponding to a posterior with several tens of dimensions on average.
 
-As in the previous section, simulated $t\bar{t}$ events from proton-proton collisions are generated with the Standard Model (SM) at a centre-of-mass energy of $\sqrt{s}=13$~TeV using \textsc{MadGraph\_aMC@NLO}~\cite{Alwall:2014hca} for the matrix element calculation and \textsc{Pythia8}~\cite{Sjostrand:2014zea} for the parton showering and hadronization.
+As in the previous section, simulated $t\bar{t}$ events from proton--proton collisions are generated with the Standard Model (SM) at a center-of-mass energy of $\sqrt{s}=13$~TeV using \textsc{MadGraph\_aMC@NLO}~\cite{Alwall:2014hca} for the matrix element calculation and \textsc{Pythia8}~\cite{Sjostrand:2014zea} for the parton showering and hadronization.
 Interaction with the experimental apparatus is simulated with \textsc{Delphes}~\cite{deFavereau:2013fsa} using the default CMS detector card.
 Events are required to have one electron or muon and at least four jets, of which at least two are $b$-tagged using the standard \textsc{Delphes} b-tagging approximation.
-Electrons, muons, and jets are required to have a transverse momentum $\pt > 25$~GeV and absolute pseudo-rapidity $|\eta| < 2.5$.
+Electrons, muons, and jets are required to have a transverse momentum \pt $> 25$~GeV and absolute pseudo-rapidity $|\eta| < 2.5$.
 All events must pass these selections at both detector level and particle level.
 In total 14 million events are used for training and 1 million events are used for testing.
 
 Different particle-level and detector-level event representations are used, given these representations have different roles in the model.
 Particle-level objects have five kinematic features $(P_x, P_y, P_z, \log(E+1), \log(M+1))$ and four one-hot encodings which tell whether the object is a light-quark jet, b-quark jet, electron, or muon.
 Event-level observables are taken to be the magnitude and azimuthal angle of the missing transverse momentum, and the kinematics of the neutrino $(P_x^\nu, P_y^\nu, P_z^\nu, E^\nu)$.
-At detector-level, two representations of each of the objects kinematics are provided to the detector encoder.
+At detector level, two representations of each of the objects kinematics are provided to the detector encoder.
 These are the cartesian representation used for the particle-level objects, and a polar coordinate representation.
 The same four one-hot encoded features are also included at detector level.
 The event-level observables are only the magnitude and azimuthal angle of the missing transverse momentum ($E_T^\text{miss}$ and $\phi^\text{miss}$), since the neutrino kinematics are not constrained at detector level.
@@ -848,7 +849,7 @@ As with the jet mass distributions, the \HT distributions in \Cref{subfig:vl_vld
 \Cref{tab:vl_vld_kinematics_distance} shows the Wasserstein, energy, and Kullback--Leibler distances between two pairs of distributions: the truth particle-level distribution and the distribution predicted by the learned posterior (Unfolded), and the truth particle-level distribution and the detector-level distribution (Detector).
 In almost all cases the predicted distributions are closer to the truth than the detector-level distributions which are used to condition the generation.
 This is further evidence that the VL-VLD model is correctly modeling the posterior.
-Given this is the first method that has been used to solve a variable-dimensional posterior modeling task, no comparison to existing baselines is possible.
+Given this is the first method that has been used to solve a variable-dimensional posterior-modeling task, no comparison to existing baselines is possible.
 
 \begin{table}[tb]
   \caption{Wasserstein, energy, and Kullback--Leibler distance metrics between two pairs of distributions: the particle-level truth and the learned posterior (Unfolded) and the particle-level truth and the detector-level (Detector). Metrics are calculated for observables grouped into three categories: jet kinematics (top), lepton kinematics (middle), and event-level observables (bottom).
@@ -936,7 +937,7 @@ These issues with derived observables is a significant limitation of the current
 In addition to inspecting the one-dimensional marginal distributions of the top quark kinematics, it is also useful to inspect two-dimensional distributions.
 This ensures that the correlations between different observables are properly captured in the modeled posterior.
 \Cref{fig:vl_vld_corner} shows corner plots of the hadronic top quark kinematic observables for both the truth particle-level distributions and for the VL-VLD model predictions.
-The correlations are visibly very similar, indicating that the VL-VLD model is correctly capturing the correlations between these observables and not only reproducing the corerct marginal distributions.
+The correlations are visibly very similar, indicating that the VL-VLD model is correctly capturing the correlations between these observables and not only reproducing the correct marginal distributions.
 The VL-VLD model is able to capture the overall structure of the ground truth posterior, but the precision of the learned model is lacking.
 Greater precision often boils down to finding the correct parametrization for the generative task, as will be shown in the next section.
 
@@ -1027,12 +1028,12 @@ Applying the EM algorithm would still be necessary in an application of this met
 
 \subsubsection{Summary}
 
-Ref.~\cite{Shmakov:2024gkd} presents the first method for modeling a variable dimensional posterior in the context of unfolding.
-The VLD model of Ref.~\cite{Shmakov:2023kjj} is extended with transformer-based neural networks to handle postion equivariant set data types, per-position noise schedules, and a multiplicity predictor network to ensure variable-length generation.
-The VL-VLD model is applied to model the posterior for particle-level event configutations conditioned on the detector-level data for semi-leptonic $t\bar{t}$ events.
+Ref.~\cite{Shmakov:2024gkd} presents the first method for modeling a variable-dimensional posterior in the context of unfolding.
+The VLD model of Ref.~\cite{Shmakov:2023kjj} is extended with transformer-based neural networks to handle position-equivariant set data types, per-position noise schedules, and a multiplicity predictor network to ensure variable-length generation.
+The VL-VLD model is applied to model the posterior for particle-level event configurations conditioned on the detector-level data for semi-leptonic $t\bar{t}$ events.
 Unlike the posterior modeling task in the previous section, this task is inherently variable dimensional and the VL-VLD model is able to accurately reproduce observables relating to this variable dimensionality such as the jet multiplicity.
 Other kinematic observables that are directly optimized show excellent agreement with the particle-level truth, while derived observables such as those relating to the kinematics of candidate top quarks are not captured as accurately.
-This short-coming motivates the work in the next section which investigates how clever parametrizations of the generative task can improve accuracy.
+This shortcoming motivates the work in the next section which investigates how clever parametrizations of the generative task can improve accuracy.
 Finally the prior dependence of the learned posterior is assessed by sampling the posterior trained on an SM sample using a sample that has been adjusted by a large non-zero EFT operator.
 Despite the sizeable shift in the truth-level distributions, the VL-VLD model is able to adjust its predictions based on the condition provided by the detector-level data.
 This is strong evidence that the EM algorithm could be applied to build a complete unfolding method using the VL-VLD model.
@@ -1066,7 +1067,7 @@ In Ref.~\cite{Petitjean:2025tgk}, we sought to improve on the accuracy by develo
   \label{eq:cfm_factorization}
 \end{align}
 where $N_\text{part}$ is the particle-level constituent multiplicity and $J_\text{part}$ the particle-level jet kinematics.
-Each of the factors is modeled by an independent neural network with trainable parameters $\theta$, $\phi$, and $psi$ respecitvely.
+Each of the factors is modeled by an independent neural network with trainable parameters $\theta$, $\phi$, and $\psi$ respectively.
 The network that models $p_\theta(N_\text{part} \,|\, x_\text{reco})$ serves the same role as the multiplicity predictor network in the previous section.
 The novel contribution of this section is therefore the factorization of the second two terms: the posterior of the jet kinematics and the posterior of the constituent kinematics conditional on the jet kinematics.
 The overall framework is illustrated in \Cref{fig:cfm_model} and each neural network is implemented as follows:
@@ -1076,10 +1077,10 @@ The overall framework is illustrated in \Cref{fig:cfm_model} and each neural net
   The multiplicity prediction is obtained by sampling from the distribution and rounding to the nearest integer.
   \item \textbf{Jet predictor}: A CFM model is used to model the posterior of the jet kinematics, conditioned on the detector-level jet kinematics and $N_\text{part}$.
   The jet four-momentum are represented as $J_\text{part} = (\log p_{T,J},\, \phi_J,\, \eta_J,\, \log m_J^2)$.
-  Note that give we wish to unfold the jet substructure, $J_\text{part}$ is not the final product of the model.
+  Note that given we wish to unfold the jet substructure, $J_\text{part}$ is not the final product of the model.
   Instead it is used autoregressively to define a physically motivated parametrization of the constituent posterior.
   \item \textbf{Constituent predictor}: A second, larger CFM network models the posterior of the jet constituents, conditional on the detector-level jet kinematics, $N_\text{part}$, and $J_\text{part}$.
-  The particle-level jet kinematics are additionally used to define relative coordinates in which all jet kinematics are represented\footnote{The detector-level jet kinematics are represented in the equivalent coordinates, but using the detector-level jet kinematics}:
+  The particle-level jet kinematics are additionally used to define relative coordinates in which all jet kinematics are represented\footnote{The detector-level jet kinematics are represented in the equivalent coordinates, but using the detector-level jet kinematics.}:
   \begin{equation}
     (\delta_{\log p_T},\, \delta_\phi,\, \delta_\eta) = (\log p_T - \log p_{T,J},\, \phi - \phi_J,\, \eta - \eta_J).
     \label{eq:cfm_relative}
@@ -1101,7 +1102,7 @@ The overall framework is illustrated in \Cref{fig:cfm_model} and each neural net
   \def\Jdet{J_\text{reco}}%
   \scalebox{0.82}{\input{figures/ch5/cfm_jets/model.tex}}
   \endgroup
-  \caption{A diagram of the three-stage posterior decomposition developing in Ref.~\cite{Petitjean:2025tgk}.
+  \caption{A diagram of the three-stage posterior decomposition developed in Ref.~\cite{Petitjean:2025tgk}.
   The posterior is conditional in only the detector-level jet represented by $x_\text{reco}$.
   This is used to condition the multiplicity predictor (Mult) which provides the particle-level constituent count $N_\text{part}$.
   All available information then conditions the jet predictor (Jet) which produces the particle-level jet kinematics $J_\text{part}$.
@@ -1114,25 +1115,25 @@ The overall framework is illustrated in \Cref{fig:cfm_model} and each neural net
 
 The posterior modeling framework is applied to two different example datasets.
 The first is the well known unfolding benchmark dataset of Ref.~\cite{Andreassen:2019cjw}.
-It consists of light-flavor jets produced in association with a $Z$ boson in proton-proton collisions at $\sqrt{s} = 14$~TeV.
+It consists of light-flavor jets produced in association with a $Z$ boson in proton--proton collisions at $\sqrt{s} = 14$~TeV.
 Strong $Z$ boson production via $pp \to Z + \text{jets}$ is simulated using \textsc{Pythia}~8.243~\cite{Sjostrand:2014zea}, with detector response modeled by \textsc{Delphes}~3.4.2~\cite{deFavereau:2013fsa} using the default CMS card.
 The $Z$ boson is required to satisfy $p_T^Z > 150$~GeV to ensure a sufficient hadronic recoil.
 Detector-level and particle-level jets are clustered with the anti-$k_T$ algorithm~\cite{Cacciari:2008gp} with $R = 0.4$.
-In total 1.6 million events are saved, with 80\% are used for training and 20\% for evaluation in what follows.
-CFM models are trained using both a standard position equivariant transformer and a Lorentz equivariant L-GATr as the underlying neural networks.
+In total 1.6 million events are saved, with 80\% used for training and 20\% used for evaluation in what follows.
+CFM models are trained using both a standard position-equivariant transformer and a Lorentz-equivariant L-GATr as the underlying neural networks.
 
 Both the multiplicity predictor and jet predictor networks, once trained, are able to reproduce the particle-level distributions at percent-level accuracy.
-This is expected since both of these modeling tasks are low dimesional and the CFM models are more than capable of high precision in this setting.
+This is expected since both of these modeling tasks are low dimensional and the CFM models are more than capable of high precision in this setting.
 The difficult task is training the constituent predictor network, and in particular producing accurate distributions for derived observables, which were not accurately modeled in the previous section.
 The top row of \cref{fig:cfm_z_constituents1} compares the particle-level truth and modeled distributions for the jet \pt, $\eta$, and mass observables computed from the constituent kinematics rather than as-modeled by the jet predictor network.
 This is a non-trivial check because the constituent predictor network must ensure that the constituent kinematics produce a jet that has the correct properties when they are clustered together.
-The particle-level truth is reproduced with percent level accuracy for each of these observables by both the transformer and L-GATr based models.
+The particle-level truth is reproduced with percent-level accuracy for each of these observables by both the transformer-based and L-GATr-based models.
 The bottom row of \cref{fig:cfm_z_constituents1} shows equivalent plots for three other derived observables relating to the jet substructure.
 These are the groomed momentum fraction $z_g$~\cite{Larkoski:2014wba}, the logarithm of the soft drop mass $\log\rho$, and the two-point energy correlator (EEC)~\cite{Moult:2025nhu}.
 The EEC in particular is an observable of current interest to the QCD community.
 See \Cref{sec:eec}.
 The $z_g$ and EEC observables are predicted with percent accuracy, while the $\log\rho$ observable shows deviations up to 10\%.
-These deviations are common to the transformer and L-GATr based models.
+These deviations are common to the transformer-based and L-GATr-based models.
 % Overall the performance is much better than was shown in the previous section.
 % Again there are no comparable methods to compare these results against.
 % As of the writing of this thesis this is state-of-the-art performance for modeling posteriors with generative models in the context of unfolding.
@@ -1146,7 +1147,7 @@ These deviations are common to the transformer and L-GATr based models.
   \includegraphics[width=0.325\linewidth, alt={Soft drop mass log rho for Z+jets.}, page=29]{figures/ch5/cfm_jets/plots_z}
   \includegraphics[width=0.325\linewidth, alt={Two-point energy-energy correlator EEC for Z+jets.}, page=46]{figures/ch5/cfm_jets/plots_z}
   \caption{Comparisons between the particle-level distribution (black) and the distribution obtained by sampling the modeled prior for a set of six jet-level observables.
-  Predictions are shown for the transformer based (dotten orange) and L-GATr based (dashed green) models.
+  Predictions are shown for the transformer-based (dotted orange) and L-GATr-based (dashed green) models.
   The detector-level distributions (blue) are also provided for visual comparison.
   All observables are calculated from the jet constituents, rather than predicted by the jet predictor network.
   The top row shows jet kinematics observables: the \pt, $\eta$, and mass.
@@ -1157,8 +1158,8 @@ These deviations are common to the transformer and L-GATr based models.
 
 Plots illustrating the agreement of the sampled posterior with the particle-level truth in a few $n$-subjettiness observables~\cite{Thaler:2010tr} are provided in \Cref{fig:cfm_z_constituents2}.
 The $1$-subjettiness is modeled with percent-level precision, while the $2$-subjettiness shows a deviation between the modeled and truth distributions in the tail.
-$\tau_{21}$, or the ratio os the $2$-subjettiness to the $1$-subjettines shows deviations between the modeled distributions and the ground truth upwards of 10\%.
-As of this writing this performance is state-of-the-art for high and variable dimensional posterior modeling in the context of unfolding, but there is still room for improvement in these methods.
+$\tau_{21}$, or the ratio of the $2$-subjettiness to the $1$-subjettiness, shows deviations between the modeled distributions and the ground truth upwards of 10\%.
+As of this writing, this performance is state-of-the-art for high- and variable-dimensional posterior modeling in the context of unfolding, but there is still room for improvement in these methods.
 As with previous observables, no differences between the transformer based and L-GATr based models is visible, indicating that the equivariant prior is not useful but also not harmful for this particular task.
 
 \begin{figure}[tb]
@@ -1167,7 +1168,7 @@ As with previous observables, no differences between the transformer based and L
   \includegraphics[width=0.325\linewidth, alt={2-subjettiness (tau_2) for Z+jets.}, page=23]{figures/ch5/cfm_jets/plots_z}
   \includegraphics[width=0.325\linewidth, alt={21-subjettiness ratio (tau_21) for Z+jets, showing the most challenging observable with 5-10 percent deviations.}, page=26]{figures/ch5/cfm_jets/plots_z}
   \caption{Comparisons between the particle-level distribution (black) and the distribution obtained by sampling the modeled posteriors for three $n$-subjettiness observables: $1$-subjettiness ($\tau_1$), $2$-subjettiness ($\tau_2$), and the ratio of the $2$-subjettiness to the $1$-subjettiness ($\tau_{21}$).
-  Predictions are shown for the transformer based (dotten orange) and L-GATr based (dashed green) models.
+  Predictions are shown for the transformer-based (dotted orange) and L-GATr-based (dashed green) models.
   The detector-level distributions (blue) are also provided for visual comparison.}
   \label{fig:cfm_z_constituents2}
 \end{figure}
@@ -1193,7 +1194,7 @@ Plots analogous to those shown for the light quark and gluon task above are show
 As in the previous application, the constituent multiplicity and jet kinematics are unfolded very accurately.
 The most important observable shown in the Figure is the jet mass (top right), whose particle-level truth distribution is strongly peaked similar to the top quark mass distributions in the previous section.
 The CFM model using the factorized posterior method is able to achieve much better precision.
-The transformer based model shows deviations of up to 20\%, while the L-GATr based model keeps all deviations from the truth below 10\%.
+The transformer-based model shows deviations of up to 20\%, while the L-GATr-based model keeps all deviations from the truth below 10\%.
 This is impressive performance considering that reproducing this distribution requires accurately modeling the substructure of complicated top quark initiated jets with many tens of constituents.
 These results also suggest that the equivariant prior of the L-GATr network may be useful for modeling the overall kinematics of jet constituent point clouds.
 
@@ -1201,34 +1202,33 @@ Other observables, such as the groomed momentum fraction $z_g$ and the jet width
 Substantially better performance for the $n$-subjettiness class observables ($\tau_1$, $\tau_2$, $\tau_3$ and the ratios $\tau_{21}$, $\tau_{32}$, $\tau_{43}$) is obtained compared to the previous application.
 Generally deviations in these observables are below 10\% except in the low statistics tails.
 The EEC observable is captured slightly worse than in the previous section, possibly simply due to the high constituent multiplicity.
-In all of these other observables, the accuracy of the transformer based and L-GATr based models is comparable.
+In all of these other observables, the accuracy of the transformer-based and L-GATr-based models is comparable.
 
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.30\linewidth, alt={Unfolded jet transverse momentum for top jets.}, page=11]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={Unfolded jet mass for top jets, showing sharply peaked truth distribution at the top mass.}, page=13]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={Unfolded jet pseudorapidity for top jets.}, page=14]{figures/ch5/cfm_jets/plots_t}\\[3pt]
-  \includegraphics[width=0.30\linewidth, alt={Groomed momentum fraction z_g for top jets.}, page=35]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={Soft drop mass for top jets.}, page=34]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={Energy-energy correlator EEC for top jets.}, page=51]{figures/ch5/cfm_jets/plots_t}\\[3pt]
-  \includegraphics[width=0.30\linewidth, alt={Jet width (tau_1) for top jets.}, page=28]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={2-subjettiness (tau_2) for top jets.}, page=29]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={3-subjettiness (tau_3) for top jets.}, page=31]{figures/ch5/cfm_jets/plots_t}\\[3pt]
-  \includegraphics[width=0.30\linewidth, alt={21-subjettiness ratio (tau_21) for top jets.}, page=30]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={32-subjettiness ratio (tau_32) for top jets.}, page=32]{figures/ch5/cfm_jets/plots_t}
-  \includegraphics[width=0.30\linewidth, alt={43-subjettiness ratio (tau_43) for top jets.}, page=33]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={Unfolded jet transverse momentum for top jets.}, page=11]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={Unfolded jet mass for top jets, showing sharply peaked truth distribution at the top mass.}, page=13]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={Unfolded jet pseudorapidity for top jets.}, page=14]{figures/ch5/cfm_jets/plots_t}\\[3pt]
+  \includegraphics[width=0.28\linewidth, alt={Groomed momentum fraction z_g for top jets.}, page=35]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={Soft drop mass for top jets.}, page=34]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={Energy-energy correlator EEC for top jets.}, page=51]{figures/ch5/cfm_jets/plots_t}\\[3pt]
+  \includegraphics[width=0.28\linewidth, alt={Jet width (tau_1) for top jets.}, page=28]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={2-subjettiness (tau_2) for top jets.}, page=29]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={3-subjettiness (tau_3) for top jets.}, page=31]{figures/ch5/cfm_jets/plots_t}\\[3pt]
+  \includegraphics[width=0.28\linewidth, alt={21-subjettiness ratio (tau_21) for top jets.}, page=30]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={32-subjettiness ratio (tau_32) for top jets.}, page=32]{figures/ch5/cfm_jets/plots_t}
+  \includegraphics[width=0.28\linewidth, alt={43-subjettiness ratio (tau_43) for top jets.}, page=33]{figures/ch5/cfm_jets/plots_t}
   \caption{Comparisons between the particle-level distribution (black) and the distribution obtained by sampling the modeled posteriors for many different jet-level observables.
-  See the captions of \Cref{fig:cfm_z_constituents1,fig:cfm_z_constituents2} for definitions.
   All observables are calculated from the jet constituents, rather than predicted by the jet predictor network.
-  Predictions are shown for the transformer based (dotten orange) and L-GATr based (dashed green) models.
+  Predictions are shown for the transformer-based (dotted orange) and L-GATr-based (dashed green) models.
   The detector-level distributions (blue) are also provided for visual comparison.}
   \label{fig:cfm_t_constituents}
 \end{figure}
 
 \subsubsection{Summary}
 
-Ref.~\cite{Petitjean:2025tgk} builds on the results of the previous sections and demonstrates that high and variable-dimensional posteriors can be accurately modeled with machine learning methods.
-This ability opens the possibility to perform a full unfolding, using the EM algorithm, with generative methods rather than the classifier-based Omnifold method.
+Ref.~\cite{Petitjean:2025tgk} builds on the results of the previous sections and demonstrates that high- and variable-dimensional posteriors can be accurately modeled with machine learning methods.
+This ability opens the possibility to perform a full unfolding, using the EM algorithm, with generative methods rather than the classifier-based \Omnifold method.
 Motivation for using generative methods is discussed in \Cref{sec:generative-unfolding-methods}.
 The key innovation to increase the accuracy of the modeled posterior was an auto-regressive factorization into three pieces which simplifies the point-cloud generative task.
 Most jet kinematic and jet substructure observables are modeled to within a few percent precision in both posterior modeling tasks considered.
@@ -1289,7 +1289,7 @@ Alternatively, this can also be understood as the zero-bin-width limit of the an
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=1.0\linewidth]{figures/ch5/Omnifold-figure.pdf}
+    \includegraphics[width=1.0\linewidth, alt={Schematic flowchart of the Omnifold procedure, showing a detector-level classifier that reweights simulation to data in step 1 and a truth-level classifier that reweights the simulation to itself in step 2, with the updated weights carried into the next iteration.}]{figures/ch5/Omnifold-figure.pdf}
     \caption{Schematic illustration of the \Omnifold procedure.
     Two classifiers are trained per iteration.
     Step~1 trains a classifier at detector level to reweight MC simulation to data.
@@ -1339,15 +1339,15 @@ A few features of \Omnifold should be noted explicitly before moving on.
     These classifiers are substantially easier to design and train than the set conditional and set generative models developed in \Cref{sec:diffusion-unfolding}.
 
   \item \textbf{Flexibility in classifier choice.}
-    Neural networks are used to estimate the likelihood ratios in \Cref{ch:zjets}, but in many applications, especially measurements which target low and fixed dimensional measurements, they are not required and may even be sub-optimal.
+    Neural networks are used to estimate the likelihood ratios in \Cref{ch:zjets}, but in many applications, especially low- and fixed-dimensional measurements, they are not required and may even be sub-optimal.
     Simpler and computationally cheaper methods such as boosted decision trees can also be used to estimate likelihood ratios in these cases.
 
   \item \textbf{Terminology.}
     The terminology surrounding \Omnifold can be confusing.
-    In the original paper~\cite{Andreassen:2019cjw}, utilizing the procedure above to unfold one observable in an unbinned fashion was called \textit{Unifold}, utilizing the procedure to unfold a fixed-length list of several observables was called \textit{Multifold}, and utilizing the procedure to produce a full phase space unfolding was called \textit{Omnifold}.
+    In the original paper~\cite{Andreassen:2019cjw}, utilizing the procedure above to unfold one observable in an unbinned fashion was called \textit{Unifold}, utilizing the procedure to unfold a fixed-length list of several observables was called \textit{Multifold}, and utilizing the procedure to produce a full-phase-space unfolding was called \textit{Omnifold}.
     However over time the name \Omnifold has become an umbrella term that refers to the procedure itself, and covers each of the uses above.
     In this thesis, the small-caps \Omnifold refers to the procedure while Multifold refers to the specific application of the procedure to unfold a fixed-length list of observables.
     All existing experimental measurements in \Cref{tab:unbinned-unfolding-measurements}, with the exception of the H1 preliminary result~\cite{H1:prelim}, utilize Multifold.
 \end{itemize}
 
-The application of \Omnifold to produce a full phase space measurement of $Z$+jets production is the subject of the next chapter.
+The application of \Omnifold to produce a full-phase-space measurement of $Z$+jets production is the subject of the next chapter.

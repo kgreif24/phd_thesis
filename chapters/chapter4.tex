@@ -4,8 +4,8 @@
 
 Jet classification, commonly referred to as ``jet tagging'', was one of the first applications of deep learning in particle physics and remains arguably the most important.
 The techniques covered in this chapter are used by both ATLAS and CMS and are driving improvements in the search for di-Higgs production, which is the main goal of the current LHC physics program.
-This chapter will introduce jet tagging as a problem, then cover an ATLAS study on top tagging that is the first original research contribution in this thesis.
-It closes with a discussion of how jet tagging has progressed since the publication of the ATLAS top tagging paper and prospects for the high luminosity LHC.
+This chapter will introduce jet tagging as a problem, then cover an ATLAS study on top tagging that is the first original research contribution in this thesis~\cite{ATLAS:2024rua}.
+It closes with a discussion of how jet tagging has progressed since the publication of the ATLAS top tagging paper and prospects for the high-luminosity LHC.
 
 \section{Jet Tagging}
 \label{sec:tagging-intro}
@@ -21,13 +21,13 @@ Jet tagging is the problem of inferring the type of parton that initiated the je
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.85\linewidth]{figures/ch4/jet_types_diagram.pdf}
-    \caption{Schematic illustration of the two broad categories of jets produced in LHC collisions. From the top left working clockwise: light quark and gluon initiated jets are the most abundant jets with no substructure, bottom quark (and to some extent charm quark) initiated jets contain a displaced vertex due to the long-lived B and D hadrons, jets initiated by the hadronic decay of the W and Z bosons contain a two-pronged substructure, jets initiated by the decay of a Higgs boson to two b quarks results in a two-pronged substructure with displaced vertices, and the hadronic decay of a top quark results in a three-pronged substructure with one displaced vertex.}
+    \includegraphics[width=0.85\linewidth, alt={Schematic diagram of five jet types arranged clockwise from top left: light quark and gluon jets with no substructure, bottom and charm quark jets with a displaced secondary vertex, W and Z boson jets with two-pronged substructure, Higgs boson jets decaying to two b quarks with two-pronged substructure and displaced vertices, and top quark jets with three-pronged substructure and one displaced vertex.}]{figures/ch4/jet_types_diagram.pdf}
+    \caption{Schematic illustration of the two broad categories of jets produced in LHC collisions. From the top left working clockwise: light quark and gluon initiated jets are the most abundant jets with no substructure, bottom quark (and to some extent charm quark) initiated jets contain a displaced vertex due to the long-lived B and D hadrons, jets initiated by the hadronic decay of the W and Z bosons contain a two-pronged substructure, jets initiated by the decay of a Higgs boson to two b quarks results in a two-pronged substructure with displaced vertices, and the hadronic decay of a top quark results in a three-pronged substructure with one displaced vertex. Figure adapted from Ref.~\cite{Moreno:2019bmu} by Claude Sonnet 4.6.}
     \label{fig:jet-types}
 \end{figure}
 
 Historically, jet tagging at the LHC has been divided into two distinct problems that utilize different sets of information, though these problems have now largely been unified by the deep learning methods that are the topic of this chapter.
-The first is \textit{boosted jet tagging}, which seeks to identify the hadronic decay modes of massive SM particles such as top quarks, $W$ and $Z$ boson, or Higgs bosons.
+The first is \textit{boosted jet tagging}, which seeks to identify the hadronic decay modes of massive SM particles such as top quarks, $W$ and $Z$ bosons, or Higgs bosons.
 When one of these massive particles is produced with a transverse momentum much larger than its mass ($p_T \gg m$), the jets initiated by each parton produced by the decay become collimated and merge into a single jet with distinct substructure.
 $W/Z/H \to q\bar{q}$ decays produce a two-pronged substructure, and a $t \to Wbq\bar{q}$ decay produces a three-pronged substructure.
 Both types of substructure are different from the single-pronged jets produced by light quarks and gluons.
@@ -44,7 +44,7 @@ Standard flavor tagging methods center on reconstructing displaced vertices expl
 These approaches depended on hand-engineered features, just like with early boosted jet tagging methods.
 
 The types of jets are illustrated in \Cref{fig:jet-types}.
-Boosted jet tagging aims to identify top, W/Z, and Higgs jets against the background of light-quark and gluon jets, and flavor tagging aims to identify $b$ and $c$ jets\footnote{Note that $c$ jets are not shown in the Figure but are a distinct category of jets from $b$ jets though their signatures are very similar.}.
+Boosted jet tagging aims to identify top, W/Z, and Higgs jets against the background of light-quark and gluon jets, and flavor tagging aims to identify $b$ and $c$ jets\footnote{Note that $c$ jets are not shown in the figure but are a distinct category of jets from $b$ jets though their signatures are very similar.}.
 Both are classification tasks, where one must distinguish a signal jet from a background jet using the kinematics of the jet constituents that are measured by the detector.
 The distinction is what subset of the kinematics of the jet constituents are targeted by the hand-engineered features designed to help solve these tasks.
 The features used in boosted tagging depend on the global spatial structure of constituent particles within a jet, while features used for flavor tagging depend on the longitudinal and transverse impact parameter information of the tracks within a jet that are used to reconstruct secondary vertices.
@@ -58,7 +58,7 @@ While this is illustrated in a boosted jet tagging task, the same is true for fl
 The paper featured in this chapter focuses on boosted top tagging (or just \textit{top tagging}), a particular boosted jet tagging task that classifies top quark initiated jets against the light quark and gluon initiated background.
 These background jets are sometimes referred to as \textit{QCD jets}.
 Top tagging is the prototypical boosted jet tagging problem since the three-prong substructure of boosted top jets is very distinct.
-This is why the it was the subject of many early deep learning applications in particle physics.
+This is why it was the subject of many early deep learning applications in particle physics.
 The study presented here was carried out in 2022--2023 and was the first original research contribution of my Ph.D.
 Though the performance presented is somewhat below the current state-of-the-art, the lessons drawn remain relevant to large multi-class taggers of today, to which I will return in \Cref{sec:tagging-future}.
 
@@ -66,30 +66,31 @@ Though the performance presented is somewhat below the current state-of-the-art,
 \label{sec:constituent-top-tagging}
 
 Some context is needed to understand the research contribution of the paper.
-A 2019 community comparison study~\cite{Kasieczka:2019dbj} benchmarked a wide variety of deep learning based top tagging methods on a single dataset to make a direct comparison of their performance. 
+A 2019 community comparison study~\cite{Kasieczka:2019dbj} benchmarked a wide variety of deep-learning-based top tagging methods on a single dataset to make a direct comparison of their performance. 
 The result is summarized by the ROC (receiver operating characteristic) curve shown in \Cref{fig:landscape-roc}, which plots the signal efficiency (true positive rate) on the horizontal axis against background rejection (the inverse of the false positive rate) on the vertical axis.
 As a cut on the tagger output is swept from its minimum to maximum value, the signal efficiency and background rejection will increase.
 A tagger that does not separate signal and background at all will produce a flat line, since all thresholds yield the same signal efficiency and background rejection.
 The curve traces by increasingly powerful taggers will move upward and to the right, as more background is removed at the same signal efficiency.
 The area under the curve\footnote{The curve referred to in this performance metric is a different parametrization of the ROC curve than the one used in this thesis.} (AUC) summarizes overall classification power in a single number, with random guessing producing an AUC of 0.5 and a perfect classifier producing an AUC of 1.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\linewidth]{figures/ch4/landscape_roc.png}
-    \caption{ROC curves for a range of top tagging classifiers evaluated on a common dataset, reproduced from Ref.~\cite{Kasieczka:2019dbj} under the Creative Commons Attribution 4.0 International license.}
+    \includegraphics[width=0.8\linewidth, alt={ROC curve plot comparing background rejection versus signal efficiency for a range of top tagging classifiers evaluated on a common benchmark dataset, showing constituent-based methods achieving higher background rejection than methods using hand-engineered features.}]{figures/ch4/landscape_roc.png}
+    \caption{ROC curves for a range of top tagging classifiers evaluated on a common dataset, reproduced from Ref.~\cite{Kasieczka:2019dbj} under the CC~BY~4.0 license.}
     \label{fig:landscape-roc}
 \end{figure}
 
-There are two important takeways from this Figure.
-First, taggers that process the jet constituent kinematic information directly rather than relying on hand-engineerd expert features produce the best performance.
+There are two important takeways from this figure.
+First, taggers that process the jet constituent kinematic information directly rather than relying on hand-engineered expert features produce the best performance.
 This is the same lesson as the AlexNet moment in a jet tagging context.
 It is more performant to dump all available information into a single neural network than to train a smaller network on a set of well understood features that have been developed by domain experts.
 Second, the dataset was generated with the fast but approximate detector simulation software \textsc{Delphes}~\cite{deFavereau:2013fsa}.
 This tool is commonly used when developing deep learning methods for HEP because it is easy to use and fast, in contrast to the much more realistic \textsc{Geant4}-based full simulation used by ATLAS and CMS.
 However there is no guarantee methods that perform well on datasets generated with \textsc{Delphes} will perform well in full simulation or in experimental data.
 Furthermore, the paper only compared raw classification power as measured by the ROC curve and AUC metric.
-Actual deployment of a top tagging method in a physics analysis requires some consideration of systematic uncertainties, which were not considered given that systematic uncertainties are not defined on Delphes simulations.
-The primary objective of Refs.~\cite{ATLAS:2022qby, ATLAS:2024rua} is to address these gaps by training and evaluating constituent based top taggers on ATLAS full simulation, then assessing the systematic uncertainties on the tagger performance and provide a high-quality public dataset to support future studies.
+Actual deployment of a top tagging method in a physics analysis requires some consideration of systematic uncertainties.
+This could not be done with \textsc{Delphes} simulation which does not maintain a set of systematic variations.
+The primary objective of Refs.~\cite{ATLAS:2022qby, ATLAS:2024rua} is to address these gaps by training and evaluating constituent-based top taggers on ATLAS full simulation, assessing the systematic uncertainties on the tagger performance, and providing a high-quality public dataset to support future studies.
 
 \FloatBarrier
 
@@ -110,7 +111,7 @@ For more details on the ATLAS detector, see Ref.~\cite{ATLAS:2008xda}.
 \subsection{Tagger Architectures}
 
 Six classifiers are considered in the study.
-The neural network architectures were introduced in \Cref{ch:ml}, so only the jet tagging specific details are described here\footnote{An obvious exclusion from this list is a transformer architecture. These models were just starting to be applied in HEP as this research was being done. Based on all evidence the transformer should slightly out-perform ParticleNet.}.
+The neural network architectures were introduced in \Cref{ch:ml}, so only the jet tagging specific details are described here\footnote{An obvious exclusion from this list is a transformer architecture. These models were just starting to be applied in HEP as this research was being done. Based on all evidence the transformer should slightly outperform ParticleNet.}.
 
 \textbf{hlDNN.} A multi-layer perceptron that uses 15 hand-engineered substructure variables as inputs.
 This serves as the baseline for this study, and a very similar neural network is still in use in various ATLAS analyses today.
@@ -141,7 +142,7 @@ Its inputs are \textit{jet images}, which are 2D representations of jets constru
 In this study, a 64x64 bin histogram was used, and the contribution of a single constituent is weighted by the constituent $p_T$.
 A logarithmic rescaling is then applied to the pixel intensities to enhance the contrast of the substructure.
 Example jet images are shown in the top row of \Cref{fig:jet-images}, with the left example being a top jet and the right example being a QCD jet.
-Note that jet images are very sparse since most jets have several tens of constituents that don't fill the plane.
+Note that jet images are very sparse since most jets have several tens of constituents that do not fill the plane.
 The three-prong substructure of the top jet is visible as three over-dense regions in the top left panel.
 The bottom row of \Cref{fig:jet-images} shows the pixel-wise ratio of the average top jet image to the average QCD jet image, with the average taken over the entire test set.
 The additional substructure of the top jets is visible as the excess of normalized \pt surrounding the jet axis\footnote{The jet axis is defined using the ``winner take all'' scheme, where it is set to the $\eta$ and $\phi$ coordinates of the constituent with the highest \pt.}.
@@ -151,31 +152,31 @@ These jet images, a 64x64 grid of pixel intensities with one channel (i.e. the i
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/top_jet.pdf}
+        \includegraphics[width=\linewidth, alt={Grayscale 2D histogram in the eta-phi plane showing the average pixel intensity of top quark jet images, with three distinct over-dense regions visible corresponding to the three-pronged substructure of the top quark decay.}]{figures/ch4/top_jet.pdf}
         \caption{Average top jet image.}
         \label{fig:top-jet-image}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/qcd_jet.pdf}
+        \includegraphics[width=\linewidth, alt={Grayscale 2D histogram in the eta-phi plane showing the average pixel intensity of QCD background jet images, concentrated near the jet axis with no distinct substructure.}]{figures/ch4/qcd_jet.pdf}
         \caption{Average QCD jet image.}
         \label{fig:qcd-jet-image}
     \end{subfigure} \\
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/jet_image_ratio.pdf}
+        \includegraphics[width=\linewidth, alt={Grayscale 2D histogram showing the pixel-wise ratio of the average top jet image to the average QCD jet image, with excess intensity surrounding the jet axis indicating the additional substructure of top jets.}]{figures/ch4/jet_image_ratio.pdf}
         \caption{Ratio: top / QCD.}
         \label{fig:jet-image-ratio}
     \end{subfigure}
-    \caption{Average jet images for top quark jets (top left) and QCD jets (top right), and their pixel-wise ratio (bottom). Pixel intensities are shown on a logarithmic scale. The additional substructure of the top quark decay is visible as the over-dense regions surrounding the jet center in the ratio image.}
+    \caption{Average jet images for top quark jets (top left) and QCD jets (top right), and their pixel-wise ratio (bottom). Pixel intensities are shown on a logarithmic scale. The additional substructure of the top quark decay is visible as the over-dense regions surrounding the jet center in the ratio image. Reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license.}
     \label{fig:jet-images}
 \end{figure}
 
 \textbf{ParticleNet.} A graph neural network~\cite{Qu:2019gqs} that applies the EdgeConv operation discussed in \Cref{sec:gnn}.
 To interpret the jet constituent kinematic information as a graph, each constituent is represented as a node with the seven input features described below as node features.
 In the first EdgeConv layer of the network, edges are assigned such that each node is connected to its $k=18$ nearest neighbors in the $\eta$--$\phi$ plane.
-This means that spatially close constituents are allowed to influence each others features through the message passing operations.
+This means that spatially close constituents are allowed to influence each other's features through the message passing operations.
 In the second and all subsequent EdgeConv layers, the edges are re-assigned to connect the $k=18$ nearest neighbors in the full feature space, rather than only the $\eta$--$\phi$ plane.
 This means the graph edges change with each layer, so ParticleNet is a \textit{dynamic} graph network.
 ParticleNet is an extremely popular deep learning architecture in HEP.
@@ -211,8 +212,8 @@ This will not occur for the top taggers discussed here, but can happen in flavor
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.75\linewidth]{figures/ch4/roc.pdf}
-    \caption{ROC curves for the six top quark taggers evaluated on the full simulation test set. The vertical axis shows the inverse background rejection $\varepsilon^{-1}_\text{bkg}$ and the horizontal axis shows the signal efficiency $\varepsilon_\text{sig}$. The DNN, PFN, and ParticleNet constituent-based taggers outperform the hlDNN expert-feature baseline, with ParticleNet achieving the highest background rejection across all working points. ResNet50 performs significantly worse than the other constituent-based taggers, likely due to the pixelization of the jet image.}
+    \includegraphics[width=0.75\linewidth, alt={ROC curve plot showing inverse background rejection versus signal efficiency for six top quark taggers evaluated on the ATLAS full simulation test set, with ParticleNet achieving the highest background rejection, DNN and PFN also outperforming the hlDNN baseline, and ResNet50 performing worst.}]{figures/ch4/roc.pdf}
+    \caption{ROC curves for the six top quark taggers evaluated on the full simulation test set. The vertical axis shows the inverse background rejection $\varepsilon^{-1}_\text{bkg}$ and the horizontal axis shows the signal efficiency $\varepsilon_\text{sig}$. The DNN, PFN, and ParticleNet constituent-based taggers outperform the hlDNN expert-feature baseline, with ParticleNet achieving the highest background rejection across all working points. ResNet50 performs significantly worse than the other constituent-based taggers, likely due to the pixelization of the jet image. Reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license.}
     \label{fig:roc}
 \end{figure}
 
@@ -240,26 +241,26 @@ This issue is the main topic of the next section.
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/br_50.pdf}
+        \includegraphics[width=\linewidth, alt={Line plot of background rejection versus jet transverse momentum at the 50 percent signal efficiency working point for six top taggers, showing the hlDNN baseline decreasing with jet pT while constituent-based taggers peak at intermediate pT.}]{figures/ch4/br_50.pdf}
         \caption{Background rejection at $\varepsilon_\text{sig} = 50\%$.}
         \label{fig:br-50}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/br_80.pdf}
+        \includegraphics[width=\linewidth, alt={Line plot of background rejection versus jet transverse momentum at the 80 percent signal efficiency working point for six top taggers, showing the hlDNN baseline decreasing with jet pT while constituent-based taggers peak at intermediate pT.}]{figures/ch4/br_80.pdf}
         \caption{Background rejection at $\varepsilon_\text{sig} = 80\%$.}
         \label{fig:br-80}
     \end{subfigure}
-    \caption{Background rejection as a function of jet $p_T$ at the fixed signal efficiency working points of 50\% (left) and 80\% (right). The hlDNN background rejection decreases with increasing jet $p_T$, consistent with the expectation that the expert features loose information as the jet becomes more boosted and the constituents are more tightly collimated. Constituent-based taggers demonstrate a different evolution with jet $p_T$, with peak performance in the intermediate $p_T$ range. This trend is not yet fully understood.}
+    \caption{Background rejection as a function of jet $p_T$ at the fixed signal efficiency working points of 50\% (left) and 80\% (right). The hlDNN background rejection decreases with increasing jet $p_T$, consistent with the expectation that the expert features lose information as the jet becomes more boosted and the constituents are more tightly collimated. Constituent-based taggers demonstrate a different evolution with jet $p_T$, with peak performance in the intermediate $p_T$ range. This trend is not yet fully understood. Reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license.}
     \label{fig:br-pt}
 \end{figure}
 
 Finally, \Cref{fig:br-pt} shows the background rejection at the fixed signal efficiency working points in bins of jet $p_T$.
 The hlDNN background rejection falls monotonically with increasing jet $p_T$.
 This is because the three-prong substructure of the top decay becomes increasingly difficult to resolve as the quarks from the three-body decay become more collimated.
-In the limit of very large $p_T$, all decay products would be contained within a single calorimeter cell top and QCD jets would become indistinguishable\footnote{This is a real concern for tagging extremely boosted top quarks, for example at a future proton-proton collider at $\sqrt{s} = 100$~TeV. Top quarks with $p_T > 5$~TeV would be contained within a single cell of the calorimeters currently in use at the LHC, making them indistinguishable from QCD jets. Developing high granularity calorimeters is necessary for jet tagging at very high $p_T$.}.
-The background rejection of the constituent-based taggers peaks in the intermediate \pt range of 1-2 TeV.
+In the limit of very large $p_T$, all decay products would be contained within a single calorimeter cell, and top and QCD jets would become indistinguishable\footnote{This is a real concern for tagging extremely boosted top quarks, for example at a future proton-proton collider at $\sqrt{s} = 100$~TeV. Top quarks with $p_T > 5$~TeV would be contained within a single cell of the calorimeters currently in use at the LHC, making them indistinguishable from QCD jets. Developing high granularity calorimeters is necessary for jet tagging at very high $p_T$.}.
+The background rejection of the constituent-based taggers peaks in the intermediate \pt range of 1--2 TeV.
 The degradation of the performance at very high \pt is expected, but the better performance at intermediate \pt is not fully understood.
 One plausible contributing factor is that the training dataset contains the most jets in the intermediate \pt range so the networks learn to classify better in this region.
 
@@ -279,7 +280,7 @@ In jet tagging, scale factors are typically calculated for the signal and backgr
 These scale factors can be applied as a multiplicative weight to event yields measured in simulation so that they are in agreement with the same event yields for data.
 
 To measure a scale factor on the signal efficiency, a sample of relatively pure signal jets must be isolated in data by independent means rather than using the tagger itself.
-The same must be done for the background efficiency, but given backround jets are extremely common this is typically straightforward.
+The same must be done for the background efficiency, but given background jets are extremely common this is typically straightforward.
 A pure sample of boosted top (signal) jets can be obtained using semi-leptonic $t\bar{t}$ events, where one top quark decays leptonically and produces an easy-to-identify lepton along with a $b$ jet and a neutrino, while the other top quark decays hadronically and produces a boosted top jet.
 Some straightforward event selections on the lepton can isolate a sample of recoiling jets that can be considered to be due to top quarks to a good approximation.
 The tagger efficiency can then be measured by performing a likelihood fit on the ratio of jet yields in data and simulation.
@@ -307,7 +308,7 @@ See Ref.~\cite{CMS:2025eyd} for an alternative, but similar, approach to uncerta
 
 The downside of the bottom-up approach is that a reliable set of systematic variations must be available on the tagger inputs.
 This is particularly difficult for experimental systematic uncertainties, which often are based on auxiliary measurements of the detector response as opposed to simply varying features of the simulation.
-In particular ATLAS does not maintain a set of validated experimental uncertainties for the UFO jet constituents used in this study.
+In particular ATLAS does not maintain a set of validated experimental uncertainties for the jet constituent objects used in this study.
 One of the novel aspects of this study is to develop such a set of variations.
 However it should be emphasized that these variations are approximate, intended only to estimate the magnitude of experimental effects on tagger performance rather than to serve as the basis for a precision measurement.
 The theoretical uncertainties on tagger performance will be sufficiently dominant that the approximations made are acceptable.
@@ -321,7 +322,7 @@ The distinction between charged and neutral PFOs, in combination with the splitt
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.85\linewidth]{figures/ch4/ufo_diagram.pdf}
+    \includegraphics[width=0.85\linewidth, alt={Flow diagram showing the construction of Unified Flow Objects from inner detector tracks and particle flow objects, illustrating the cluster-splitting step that produces charged, neutral, and merged UFO types.}]{figures/ch4/ufo_diagram.pdf}
     \caption{Flow diagram illustrating the construction of Unified Flow Objects from inner detector tracks and particle flow objects, reproduced from Ref.~\cite{ATLAS:2020gwe} under the CC~BY~4.0 license. The splitting step applied to clusters in dense regions produces three distinct UFO types sensitive to different systematic uncertainties.}
     \label{fig:ufo-diagram}
 \end{figure}
@@ -339,8 +340,7 @@ These uncertainties are less rigorously understood than the ID track uncertainti
 Merged UFOs arise from the charged PFOs in dense regions that are used as inputs to the cluster splitting step.
 The final kinematics of these objects are set by a complicated interplay between inner detector and calorimeter information.
 Here the \pt measurement of merged UFOs is treated as a calorimeter-dominated quantity and assigned the same calorimeter cluster uncertainties as neutral UFOs.
-The angular measurements ($\eta$ and $\phi$) are treated as track-dominated and assigned the same tracking uncertainties as charged UFOs.
-Specifically the angular resolution uncertainties on ID tracks are small enough to be negligible in practice.
+The angular measurements ($\eta$ and $\phi$) are treated as track-dominated, and so have negligible uncertainties.
 
 \subsection{Theoretical Uncertainties}
 
@@ -357,7 +357,7 @@ One uses \textsc{Pythia 8}~\cite{Sjostrand:2014zea} and the other uses \textsc{H
 The full difference in tagger performance between the two samples is taken as the signal modeling uncertainty.
 
 For the background jets, the parton shower and hadronization uncertainties are assessed independently.
-All samples are generated with matrix elements at LO using the \textsc{NNPDF3.0lo}~\cite{Ball:2014uwa} PDF set
+All samples are generated with matrix elements at LO using the \textsc{NNPDF3.0lo}~\cite{Ball:2014uwa} PDF set.
 The parton shower uncertainty is assessed by comparing the tagger performance between two samples generated with \textsc{Herwig}, one which uses the default angular-ordered parton shower model and the other which uses an alternative dipole parton shower model.
 Both \textsc{Herwig} samples use the default cluster-based hadronization model~\cite{Winter:2003tt}.
 The hadronization uncertainty is assessed by comparing the tagger performance between two samples generated with \textsc{Sherpa 2.2}~\cite{Sherpa:2019gpd}, which share the same $p_T$-ordered parton shower.
@@ -374,8 +374,8 @@ The total bottom-up uncertainty on the hlDNN is an upper bound on the possible p
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.75\linewidth]{figures/ch4/sf_comparison.pdf}
-    \caption{Comparison of the hlDNN scale factor measured in data (points with error bars) against the total bottom-up uncertainty (shaded region), as a function of jet $p_T$. Reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license. The bottom-up uncertainty covers the measured scale factor in all $p_T$ bins, validating the method. The scale factor is consistently below 1.0, indicating that tagger efficiency is degraded in data relative to simulation.}
+    \includegraphics[width=0.75\linewidth, alt={Plot comparing the hlDNN scale factor measured in data, shown as points with error bars, against the total bottom-up systematic uncertainty band, shown as a shaded region, as a function of jet transverse momentum, with the scale factor consistently below 1.0 and contained within the uncertainty band.}]{figures/ch4/sf_comparison.pdf}
+    \caption{Comparison of the hlDNN scale factor measured in data (points with error bars) against the total bottom-up uncertainty (shaded region), as a function of jet $p_T$. The bottom-up uncertainty covers the measured scale factor in all $p_T$ bins, validating the method. The scale factor is consistently below 1.0, indicating that tagger efficiency is degraded in data relative to simulation. Reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license.}
     \label{fig:sf-comparison}
 \end{figure}
 
@@ -392,18 +392,18 @@ Following validation the bottom-up uncertainties were used to place bounds on th
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/efn_uncert.pdf}
+        \includegraphics[width=\linewidth, alt={Plot of systematic uncertainty magnitude versus jet transverse momentum for the EFN tagger, showing signal modeling uncertainty as the dominant contribution among several colored uncertainty groups.}]{figures/ch4/efn_uncert.pdf}
         \caption{EFN uncertainty breakdown.}
         \label{fig:efn-uncert}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/particlenet_uncert.pdf}
+        \includegraphics[width=\linewidth, alt={Plot of systematic uncertainty magnitude versus jet transverse momentum for the ParticleNet tagger, showing signal modeling uncertainty as the dominant contribution and larger overall uncertainties than the EFN.}]{figures/ch4/particlenet_uncert.pdf}
         \caption{ParticleNet uncertainty breakdown.}
         \label{fig:particlenet-uncert}
     \end{subfigure}
-    \caption{Systematic uncertainty budgets for the EFN (left) and ParticleNet (right) taggers as a function of jet $p_T$, reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license. The magnitudes of various uncertainty groups are shown as colored points, with the total uncertainty given by their quadrature sum. The signal modeling uncertainty is dominant for both taggers, and all uncertainties are smaller for the EFN than for ParticleNet.}
+    \caption{Systematic uncertainty budgets for the EFN (left) and ParticleNet (right) taggers as a function of jet $p_T$, reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license. The magnitudes of various uncertainty groups are shown as colored points, with the total uncertainty given by their quadrature sum. The signal modeling uncertainty is dominant for both taggers, and all uncertainties are smaller for the EFN than for ParticleNet. Reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license.}
     \label{fig:uncert-budgets}
 \end{figure}
 
@@ -417,18 +417,18 @@ This is more evidence that ParticleNet is sensitive to fine details of the jet s
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.7\linewidth]{figures/ch4/uncert_vs_perf.pdf}
-    \caption{Total systematic uncertainty on the inverse background rejection at the 50\% signal efficiency working point plotted against the background rejection itself, reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license. Each point corresponds to one of the taggers. ParticleNet (upper right) has the highest classification performance but also the largest uncertainty. The EFN (lower left) has the smallest uncertainty but at the cost of lower performance. The ResNet is an outlier with both poor performance and large uncertainty. The other taggers trace a roughly monotonic performance--robustness frontier.}
+    \includegraphics[width=0.7\linewidth, alt={Scatter plot of total systematic uncertainty versus background rejection at the 50 percent signal efficiency working point for six top taggers, with ParticleNet in the upper right showing highest performance and uncertainty, the EFN in the lower left showing lowest performance and uncertainty, and ResNet50 as an outlier with poor performance and large uncertainty.}]{figures/ch4/uncert_vs_perf.pdf}
+    \caption{Total systematic uncertainty on the inverse background rejection at the 50\% signal efficiency working point plotted against the background rejection itself. Each point corresponds to one of the taggers. ParticleNet (upper right) has the highest classification performance but also the largest uncertainty. The EFN (lower left) has the smallest uncertainty but at the cost of lower performance. The ResNet is an outlier with both poor performance and large uncertainty. The other taggers trace a roughly monotonic performance--robustness frontier. Reproduced from Ref.~\cite{ATLAS:2024rua} under the CC~BY~4.0 license.}
     \label{fig:uncert-vs-perf}
 \end{figure}
 
-Calculating to total uncertainty for each tagger over the full range of jet $p_T$ provided a single numerical metric to quantity sensitivity to systematic uncertainties.
+Calculating the total uncertainty for each tagger over the full range of jet $p_T$ provided a single numerical metric to quantify sensitivity to systematic uncertainties.
 \Cref{fig:uncert-vs-perf} plots this quantity against background rejection for each tagger at the 50\% signal efficiency working point.
-In this Figure, a new axis beyond raw classification power is introduced to compare top taggers.
+In this figure, a new axis beyond raw classification power is introduced to compare top taggers.
 The ideal tagger would sit in the lower right hand corner, with high background rejection but low uncertainties.
 ParticleNet occupies the upper right corner with the highest background rejection and greatest performance, but also the highest uncertainty.
 The EFN occupies the lower left with the lowest uncertainty, but also low background rejection.
-The remaining taggers fall roughly on a monotonic performance-robustness frontier between these two endpoints.
+The remaining taggers fall roughly on a monotonic performance--robustness frontier between these two endpoints.
 ResNet50 is the exception, which achieves neither good performance nor low uncertainty.
 Recent results have produced further evidence for this frontier for many different taggers~\cite{Gambhir:2025xim}.
 
@@ -452,11 +452,11 @@ This has made the data additionally useful for the development of foundation mod
 
 The top tagging study described in this chapter was completed in 2022--2023.
 There has been a large amount of progress in the field since then.
-Two broad research directions are worth highlighting heading into the high luminosity (HL) runs of the LHC.
+Two broad research directions are worth highlighting heading into the high-luminosity (HL) runs of the LHC.
 
 \subsection{Symmetry-Constrained Architectures}
 
-The first direction seeks to encode known symmetries of particle physics datasets into neural networks, either through direct constraints or loss-term penalties
+The first direction seeks to encode known symmetries of particle physics datasets into neural networks, either through direct constraints or loss-term penalties.
 The physics of LHC collisions are invariant under Lorentz boosts along the beam axis and rotations around it.
 Symmetry-constrained (sometimes called \textit{equivariant}) architectures respect these symmetries exactly rather than learning to approximate them from data.
 A number of equivariant architectures have been proposed~\cite{Gong:2022lye, Bogatskiy:2022czk, Brehmer:2024yqw}.
@@ -464,7 +464,7 @@ Apart from pure performance, another practical motivation is that enforcing symm
 Equivariant networks are a model-level development produced by the HEP community rather than an import from the broader ML research community.
 Almost no other types of data have such well-known symmetries, making this research something only the HEP community would be motivated to pursue.
 A notable open question is how robustly equivariant taggers behave under the systematic variations discussed in \Cref{sec:systematic-uq}.
-This has not yet been studied in any depth, though there is some evidence that they are very sensitive to \textsc{Delphes} versus \textsc{GEANT}-based detector simulation as will be discussed in \Cref{ch:zjets}.
+This has not yet been studied in any depth, though there is some evidence that they are very sensitive to \textsc{Delphes} versus \textsc{Geant4}-based detector simulation as will be discussed in \Cref{ch:zjets}.
 
 \subsection{Scaling and Foundation Models}
 
@@ -472,22 +472,22 @@ The second direction follows the AI community's focus on scaling, where larger a
 An early effort to scale HEP specific neural networks introduced the Particle Transformer (ParT) architecture, which consisted of a few million parameter model trained on 100 million jets~\cite{Qu:2022mxj}.
 Apart from introducing some architectural tricks that have become very common in HEP applications, this paper was also notable because it demonstrated state-of-the-art performance on the community top tagging dataset from Ref.~\cite{Kasieczka:2019dbj} could be achieved by pretraining ParT on a larger auxiliary dataset and then fine-tuning on the much smaller benchmark dataset.
 At the time of the publication this was referred to as \textit{transfer learning}, but is now generally called building a \textit{foundation model}, which is a large model that is pretrained on large datasets and fine-tuned on more specific tasks.
-Recent many foundation models for jet physics or LHC physics more broadly have been proposed.
+Recently, many foundation models for jet physics or LHC physics more broadly have been proposed.
 A few of these used only supervised learning techniques~\cite{Mikuni:2024qsr,Hsu:2026sww}, but many others used self-supervised objectives like masked particle modeling, next-token predictions, or contrastive learning~\cite{Mikuni:2024qsr, Birk:2024knn, Golling:2024abg, Katel:2024ygn, Li:2024htp, Leigh:2024ked, Birk:2025fbs}.
 These models represent interesting methodological direction, but as of writing none have been deployed by ATLAS or CMS on actual collision data, in part because their performance on jet classification tasks is not dramatically larger than scratch trained models.
 See \Cref{ch:zjets} for an application where pretraining does offer significant performance gains.
 
 \begin{figure}[tb]
     \centering
-    \includegraphics[width=0.78\linewidth]{figures/ch4/br_vs_year.png}
-    \caption{Background rejection on the community top tagging dataset from Ref.~\cite{Kasieczka:2019dbj} versus the year of publication for many different top tagging neural networks, reproduced from Ref.~\cite{Bhimji:2025isp} under the CC~BY~4.0 license. Pretrained models achieve the highest background rejection because they exploit auxiliary training data instead of only the benchmark dataset. The equivariant L-GATr model is among the best performers of the non-pretrained networks.}
+    \includegraphics[width=0.78\linewidth, alt={Scatter plot of background rejection on the community top tagging benchmark dataset versus publication year for many deep learning models, showing pretrained models achieving the highest background rejection and the equivariant L-GATr model leading among non-pretrained models.}]{figures/ch4/br_vs_year.png}
+    \caption{Background rejection on the community top tagging dataset from Ref.~\cite{Kasieczka:2019dbj} versus the year of publication for many different top tagging neural networks. Pretrained models achieve the highest background rejection because they exploit auxiliary training data instead of only the benchmark dataset. The equivariant L-GATr model is among the best performers of the non-pretrained networks. Reproduced from Ref.~\cite{Bhimji:2025isp} under the CC~BY~4.0 license.}
     \label{fig:br-vs-year}
 \end{figure}
 
 \Cref{fig:br-vs-year} shows the background rejection on the community top tagging benchmark for a variety of deep learning based models as function of their publication date\footnote{Note that background rejection performance metric on this dataset has become somewhat unreliable as the models have become powerful enough to nearly saturate performance. The performance differences between the top-performing models likely come down to how they sort a small subset of the most difficult to classify jets.}.
 Pretrained models are consistently the best performers, since they leverage training data beyond what is included in the benchmark.
 Equivariant models such as L-GATr exhibit the best performance among non-pretrained models.
-This plot illustrates the equivarient priors can be useful, but are not as useful as larger scale training data.
+This plot illustrates that equivariant priors can be useful, but are not as useful as larger scale training data.
 This echoes the ``bitter lesson'' of AI: that methods which leverage larger scale always outperform methods which leverage human knowledge in the long run.
 My expectation is that this pattern will continue and the primary direction of improvement in jet tagging will come from larger scale rather than more clever methods for adding domain knowledge to neural networks by hand.
 Whether equivariant inductive biases will be useful for tasks other than classification will be discussed briefly in \Cref{ch:zjets}.
@@ -503,18 +503,18 @@ These models are especially important because the dominant Higgs boson decay mod
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/atlas_ftag.pdf}
+        \includegraphics[width=\linewidth, alt={Bar or line plot showing the improvement in light-jet rejection of successive ATLAS flavor tagging algorithms relative to earlier baselines, including light-jet rejection measured in data, with roughly an order of magnitude improvement from BDT and early deep learning methods to the GN2 transformer.}]{figures/ch4/atlas_ftag.pdf}
         \caption{ATLAS flavor tagger performance evolution.}
         \label{fig:ftag-atlas}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{figures/ch4/cms_ftag.png}
+        \includegraphics[width=\linewidth, alt={Bar or line plot showing the improvement in light-jet rejection of successive CMS flavor tagging algorithms relative to a Run 1 BDT-based baseline, with roughly two orders of magnitude improvement for current transformer-based taggers.}]{figures/ch4/cms_ftag.png}
         \caption{CMS flavor tagger performance evolution.}
         \label{fig:ftag-cms}
     \end{subfigure}
-    \caption{Background rejection of ATLAS (left) and CMS (right) flavor tagging algorithms relative to earlier baselines, reproduced from Refs.~\cite{ATLAS:2025dkv} and~\cite{Sarkar:2024vjz} under the CC~BY~4.0 license. The CMS figure uses an early Run 1 flavor tagging algorithm as its reference and so shows larger multipliers for the current taggers. Both experiments have seen roughly an order of magnitude improvement in light jet rejection by transitioning from BDT-based and early deep learning methods to transformer networks. The ATLAS figure additionally shows the light jet rejection as measured in data, showing that performance gains have also produced larger differences in performance between data and simulation, consistent with the results of \Cref{sec:systematic-uq}.}
+    \caption{Background rejection of ATLAS (left) and CMS (right) flavor tagging algorithms relative to earlier baselines. The CMS figure uses an early Run 1 flavor tagging algorithm as its reference and so shows larger multipliers for the current taggers. Both experiments have seen roughly an order of magnitude improvement in light jet rejection by transitioning from BDT-based and early deep learning methods to transformer networks. The ATLAS figure additionally shows the light jet rejection as measured in data, showing that performance gains have also produced larger differences in performance between data and simulation, consistent with the results of \Cref{sec:systematic-uq}. Reproduced from Refs.~\cite{ATLAS:2025dkv} and~\cite{Sarkar:2024vjz} under the CC~BY~4.0 license.}
     \label{fig:ftag-comparison}
 \end{figure}
 
@@ -525,17 +525,17 @@ The ATLAS figure also shows the light jet rejection as measured in data for each
 The differences in performance between data and simulation and the size of the scale-factor uncertainties are larger for the transformer-based methods being used today than for their predecessors, in agreement with the results of \Cref{sec:systematic-uq}.
 Larger, more expressive networks exploit more of the available information in simulation, including information that is not perfectly modeled, and the performance gap between simulation and data grows accordingly.
 
-At the moment both experiments are focused solely on performance in this performance-bias tradeoff.
-The reason is that the current focus of the LHC physics program is the search for di-Higgs production.
+At the moment both experiments are focused solely on performance in this performance--bias tradeoff.
+The reason is that a current focus of the LHC physics program is the search for di-Higgs production.
 Di-Higgs production has a very small cross section, so searches for it are limited by statistics rather than systematic uncertainties such as scale factor uncertainties.
-Maximizing performance is therefore the correct strategy for ATLAS and CMS at the moment.
-The robustness considerations discussed here are secondary, since they effect only measurements of SM processes which are not as important to LHC physics.
+Maximizing performance is therefore the correct strategy to improve sensitivity to di-Higgs production.
+Robustness considerations can be important to measurements of SM processes, but these use-cases do not set the priorities of the combined performance groups that train and calibrate the flavor taggers in ATLAS and CMS.
 
 \subsection{Prospects for the High-Luminosity LHC}
 
 Further scaling of jet classification neural networks is likely to continue, enabling even greater performance when analyzing the datasets produced by the HL-LHC.
 Very recently, ATLAS released a note detailing GN3, a larger model than GN2 trained on additional information and a larger dataset~\cite{ATLAS:2026vyw}.
-Recently dedicated studies of scaling laws for jet classification tasks have appeared~\cite{ATLAS:2026xxx, Vigl:2026ppx}, including a study of how pretraining data composition effects jet classification scaling laws that I published with collaborators~\cite{Uslu:2026ywh}.
+Recently dedicated studies of scaling laws for jet classification tasks have appeared~\cite{ATLAS:2026xxx, Vigl:2026ppx}, including a study of how pretraining data composition affects jet classification scaling laws that I published with collaborators~\cite{Uslu:2026ywh}.
 The takeaway from these studies is that there are a lot of performance gains available from scaling jet flavor tagging models and training them on billions or even trillions of jets.
 However it is not clear that these performance gains in simulation will translate to performance gains in data.
 The left-hand panel of \Cref{fig:ftag-comparison} suggests that rejection in data does not scale as favorably as rejection in simulation.
@@ -543,10 +543,10 @@ At some point this gap might limit the usefulness of simply scaling supervised t
 
 These improvements are critical for the success of the HL-LHC.
 The projected sensitivity for observing di-Higgs production at the HL-LHC has improved substantially over the past few years.
-In the 2019 CERN Yellow Report~\cite{Cepeda:2019klc} predicted ATLAS and CMS would produce a \textit{combined} significance of roughly $4\sigma$ with the $3$ $\mathrm{ab}^{-1}$ of luminosity expected from runs 4 and 5.
+The 2019 CERN Yellow Report~\cite{Cepeda:2019klc} predicted that ATLAS and CMS would produce a \textit{combined} significance of roughly $4\sigma$ with the $3$ $\mathrm{ab}^{-1}$ of luminosity expected from runs 4 and 5.
 In the most recent ATLAS and CMS projections~\cite{ATLAS:2025eii}, the same figure is greater than $7\sigma$.
 Deep learning based $b$-tagging has been one of the stronger drivers of this improvement.
 This is especially true in channels that depend heavily on b-tagging like $HH \to b\bar{b}b\bar{b}$.
 The ATLAS GN2 tagger alone has improved projected HH sensitivity by up to 30\% in very $b$-tagging-sensitive channels relative to its MLP predecessor~\cite{ATLAS:2025dkv}.
 It now seems likely that the unambiguous observation of di-Higgs production with the HL-LHC datasets will be the first large physics payoff from the adoption of deep learning methods.
-I'll return to these prospects in \Cref{sec:conclusion-dihiggs}.
+I will return to these prospects in \Cref{sec:conclusion-dihiggs}.

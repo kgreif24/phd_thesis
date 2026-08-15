@@ -58,6 +58,15 @@
 % ----------------------------------------------------------
 
 % ----------------------------------------------------------
+% Footnotes -- number continuously through the whole document
+% instead of restarting at 1 in each chapter (the report.cls
+% default, via \@addtoreset{footnote}{chapter}).
+% ----------------------------------------------------------
+\makeatletter
+\@removefromreset{footnote}{chapter}
+\makeatother
+
+% ----------------------------------------------------------
 % Math notation -- add your field-specific macros below
 % ----------------------------------------------------------
 

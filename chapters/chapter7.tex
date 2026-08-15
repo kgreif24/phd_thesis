@@ -7,14 +7,15 @@
 
 Machine learning is nothing new to LHC physics, but the deep learning revolution kicked off by AlexNet has produced a large suite of new tools that have transformed how LHC data is processed into physics results.
 The research covered in this thesis has been a small part of this transformation.
-\Cref{ch:tagging} presented a study of top quark tagging using low-level constituent inputs, which established that neural networks trained directly on low-level jet constituent kinematic information outperform those trained on expert-engineered summary features, mirroring the lessons learned from the AlexNet moment in the computer vision field.
-The study also provided a systematic uncertainty quantification framework which showed that larger, more expressive taggers extract more information from simulation, including information that is imperfectly modeled, so raw performance gains in simulation do not trivially translate into performance gains on data.
+\Cref{ch:tagging} presented a study of top quark tagging using low-level constituent inputs, which established that neural networks trained directly on low-level jet constituent kinematic information outperform those trained on expert-engineered summary features.
+This result mirrors the lessons learned from the AlexNet moment in the computer vision field.
+The study also provided a systematic uncertainty quantification framework, which showed that larger, more expressive taggers extract more information from simulation, including information that is imperfectly modeled, so raw performance gains in simulation do not trivially translate into performance gains on data.
 This effect is visible in the most recent ATLAS and CMS flavor tagging results~\cite{ATLAS:2025dkv,Sarkar:2024vjz}, and managing it will be a challenge for some applications as jet classification models continue to scale.
 
-\Cref{ch:unfolding} surveyed the recent developments in unbinned and high dimensional unfolding methods, including diffusion- and flow-matching-based generative approaches to modeling posteriors.
-It then introduced the \Omnifold algorithm in detail, which is as of this writing the only deep learning based unfolding method to be applied to data.
+\Cref{ch:unfolding} surveyed the recent developments in unbinned and high-dimensional unfolding methods, including diffusion- and flow-matching-based generative approaches to modeling posteriors.
+It then introduced the \Omnifold algorithm in detail, which is as of this writing the only deep-learning-based unfolding method to be applied to data.
 \Cref{ch:zjets} then detailed one such application of \Omnifold to data: a full charged particle phase space measurement of $Z(\to\mu\mu)$+jets production in proton--proton collisions at the LHC.
-This result is the highest dimensional cross section ever measured, with a maximum of 843 simultaneous dimensions.
+This result is the highest-dimensional cross section ever measured, with a maximum of 843 simultaneous dimensions.
 The measurement is represented as a reweighted particle-level dataset that can be projected and used to constrain an enormous variety of derived observables.
 Four particular derived observables were used as examples, three of which would be very difficult or impossible to measure with traditional binned unfolding techniques, proving that deep-learning-based unfolding methods enable entirely new kinds of measurements.
 I believe these new capabilities will produce a shift in how the community understands the purpose of cross section measurements.
@@ -76,14 +77,14 @@ This is especially true for research directions that are only partially complete
 Agentic AI can fill these gaps, without the time and career constraints that limit human scientists.
 
 The current paradigm of fundamental physics research features a division of labor between humans and AI systems, where the AI handles the computational ``backend'' of research while the human handles the ideation, high-level implementation, and communication of results.
-This is often called ``centaur science'', in reference to the mythical creature that is upper half human and lower half horse.
+This is often called ``centaur science'', in reference to the mythical creature that is half human and half horse.
 In my opinion, this is a remarkably exciting moment to be a human researcher.
 Agentic AI has liberated us from the need to spend the majority of our working hours developing and maintaining software, shifting the bottleneck from implementation to creativity.
 I predict that much more elaborate and inventive data analyses will become standard in the near-term future.
 To give a concrete example, given the computational complexity of the intrinsic dimension measurement in \Cref{sec:zjets-results-id}, I could not have produced those results in the timeframe of my Ph.D. without agentic coding tools.
 I was responsible for the ideation and high-level methodology, but the necessary software development and optimization was entirely performed by agentic tools.
 
-My expectation is that the current balance between human researcher and AI will not last long.
+My expectation is that the current balance between human researchers and AI will not last long.
 Particle physics data analysis tasks are, at their core, software engineering and logical inference problems, both areas in which AI agents have shown rapid improvement.
 As of August of 2026, AI systems are still not as good as a competent human researcher at extracting physics from data, but the gap is not very wide and the systems will only get better in the future.
 Over the past decade, betting against all but the most aggressive predictions about AI capability has been a losing proposition.
@@ -95,7 +96,7 @@ A few thoughts on what this may look like, and the conclusion of the thesis, are
 \label{sec:conclusion-discovery}
 
 My prediction is that AI-powered data analysis will allow us to essentially exhaust the physics potential of all available experimental data within the next decade.
-I think we are currently operating far below this level, with the potential to make much more accurate claims about the Standard Model and $\Lambda$~CDM cosmology currently or soon to be sitting on disk.
+I think we are currently operating far below this level, with the potential to make much more accurate claims about the Standard Model and $\Lambda$~CDM cosmology available in our already-collected data.
 In particle physics specifically, the painstaking accumulation of results from the first three runs of the LHC has brought us closer to exhausting the potential of the data than any previous moment, and this thesis has been a small contribution to that effort.
 However, I suspect the remaining gap is wide, and AI will close this gap to near zero in the coming years.
 
